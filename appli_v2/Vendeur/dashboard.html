@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Vendeur — Gold</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/dashboard.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="dashboard-body">
+
+<!-- MOBILE TOGGLE -->
+<button class="dash-mobile-toggle" aria-label="Menu">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside class="sidebar-nav" aria-label="Navigation vendeur">
+
+  <!-- Logo -->
+  <a href="../index.html" class="sn-logo">
+    <span class="sn-logo-text" style="font-family:'Cormorant',serif;font-size:1.3rem;color:#F5E2CE">G<span style="color:#E5A657">old</span></span>
+  </a>
+
+  <!-- User card -->
+  <div class="sn-user">
+    <div class="sn-avatar">JD</div>
+    <div>
+      <div class="sn-user-name">Jacques Dubois</div>
+      <div class="sn-user-badge">
+        <i class="fas fa-star"></i> Vendeur Pro
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="sn-section-label">Principal</div>
+  <a href="dashboard.html" class="sn-link active">
+    <i class="fas fa-chart-line"></i> Tableau de bord
+  </a>
+  <a href="add-product.html" class="sn-link">
+    <i class="fas fa-plus-circle"></i> Ajouter un produit
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-box-open"></i> Mes produits
+    <span class="sn-link-badge">128</span>
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-shopping-bag"></i> Commandes
+    <span class="sn-link-badge">3</span>
+  </a>
+
+  <div class="sn-section-label">Boutique</div>
+  <a href="#" class="sn-link">
+    <i class="fas fa-store"></i> Ma boutique
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-star"></i> Avis clients
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-tag"></i> Promotions
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-photo-video"></i> Médias
+  </a>
+
+  <div class="sn-section-label">Finance</div>
+  <a href="#" class="sn-link">
+    <i class="fas fa-euro-sign"></i> Revenus
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-file-invoice"></i> Factures
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-credit-card"></i> Paiements
+  </a>
+
+  <div class="sn-section-label">Compte</div>
+  <a href="#" class="sn-link">
+    <i class="fas fa-user-cog"></i> Paramètres
+  </a>
+  <a href="#" class="sn-link">
+    <i class="fas fa-headset"></i> Support
+  </a>
+
+  <!-- Bottom promo + logout -->
+  <div class="sn-bottom">
+    <div class="sn-upgrade-card">
+      <div class="sn-upgrade-title">⭐ Passer à Pro+</div>
+      <div class="sn-upgrade-desc">Commission à 5%, analytics avancés, mise en avant catalogue.</div>
+      <button class="sn-upgrade-btn">Voir l'offre</button>
+    </div>
+    <a href="../login.html" class="sn-logout">
+      <i class="fas fa-sign-out-alt"></i> Se déconnecter
+    </a>
+  </div>
+
+</aside>
+
+<!-- ════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════ -->
+<div class="dashboard-main">
+
+  <!-- Topbar -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <div>
+        <div class="dash-page-title">Tableau de bord</div>
+        <div class="dash-date" id="dash-date">Chargement…</div>
+      </div>
+    </div>
+    <div class="dash-topbar-right">
+
+      <!-- Search -->
+      <div style="display:flex;align-items:center;gap:8px;background:var(--linen);border:1px solid var(--wax);border-radius:var(--r-sm);padding:0 12px;height:36px;">
+        <i class="fas fa-search" style="color:var(--muted);font-size:.75rem"></i>
+        <input type="text" class="topbar-search-input" placeholder="Rechercher…" style="border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:.82rem;color:var(--charcoal);outline:none;width:140px"/>
+      </div>
+
+      <a href="#" class="topbar-btn topbar-notif" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span class="topbar-notif-dot"></span>
+      </a>
+      <a href="#" class="topbar-btn" title="Messages">
+        <i class="fas fa-comment-dots"></i>
+      </a>
+      <a href="../index.html" class="topbar-btn" title="Voir la boutique">
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="add-product.html" class="topbar-add-btn">
+        <i class="fas fa-plus"></i> Nouveau produit
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════ DASHBOARD BODY ══════════ -->
+  <div class="dash-body">
+
+    <!-- Welcome banner -->
+    <div style="
+      background: linear-gradient(135deg, var(--tobacco) 0%, var(--espresso) 60%, var(--mahogany) 100%);
+      border: 1px solid rgba(200,118,26,0.18);
+      border-radius: var(--r-xl);
+      padding: 28px 36px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    ">
+      <div style="position:absolute;right:60px;top:50%;transform:translateY(-50%);font-size:6rem;opacity:0.06">🎵</div>
+      <div style="position:relative;z-index:1">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">
+          ✦ Bienvenue, Jacques
+        </div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:var(--cream);margin-bottom:4px">
+          Votre boutique performe <em style="color:var(--gold);font-style:italic">très bien</em> ce mois 🚀
+        </div>
+        <div style="font-size:.85rem;color:var(--muted)">
+          3 nouvelles commandes en attente · Note moyenne : 4.9/5 · 128 produits actifs
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-shrink:0;position:relative;z-index:1">
+        <a href="#" style="padding:10px 20px;background:rgba(200,118,26,0.2);border:1px solid rgba(200,118,26,0.3);color:var(--gold);border-radius:4px;font-size:.78rem;font-weight:700;text-decoration:none;transition:var(--t)" onmouseover="this.style.background='rgba(200,118,26,0.3)'" onmouseout="this.style.background='rgba(200,118,26,0.2)'">
+          <i class="fas fa-box-open"></i> Voir commandes
+        </a>
+        <a href="add-product.html" style="padding:10px 20px;background:linear-gradient(135deg,var(--amber),var(--terracotta));color:#fff;border-radius:4px;font-size:.78rem;font-weight:700;text-decoration:none;box-shadow:0 3px 12px rgba(200,118,26,0.4)">
+          <i class="fas fa-plus"></i> Ajouter produit
+        </a>
+      </div>
+    </div>
+
+    <!-- ── KPI CARDS ── -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon amber"><i class="fas fa-euro-sign"></i></div>
+          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +18%</span>
+        </div>
+        <div class="kpi-value" data-target="2480" data-suffix=" €">0 €</div>
+        <div class="kpi-label">Revenus ce mois</div>
+        <div class="kpi-sub">vs. <strong>2 102 €</strong> mois dernier</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon green"><i class="fas fa-shopping-bag"></i></div>
+          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +6</span>
+        </div>
+        <div class="kpi-value" data-target="34">0</div>
+        <div class="kpi-label">Ventes ce mois</div>
+        <div class="kpi-sub">Total cumulé : <strong>234 ventes</strong></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon blue"><i class="fas fa-star"></i></div>
+          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +0.1</span>
+        </div>
+        <div class="kpi-value" data-target="4.9">0</div>
+        <div class="kpi-label">Note moyenne</div>
+        <div class="kpi-sub">Sur <strong>18 avis</strong> ce mois</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-icon purple"><i class="fas fa-box-open"></i></div>
+          <span class="kpi-trend down"><i class="fas fa-arrow-down"></i> -3</span>
+        </div>
+        <div class="kpi-value" data-target="128">0</div>
+        <div class="kpi-label">Produits actifs</div>
+        <div class="kpi-sub"><strong>5 produits</strong> en attente</div>
+      </div>
+    </div>
+
+    <!-- ── CHARTS ── -->
+    <div class="charts-row">
+
+      <!-- Revenue chart -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-chart-bar"></i> Revenus
+          </div>
+          <div class="dash-card-actions">
+            <button class="period-btn active" data-period="7j">7j</button>
+            <button class="period-btn" data-period="30j">30j</button>
+            <button class="period-btn" data-period="90j">90j</button>
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <div class="chart-canvas-wrap">
+            <div class="chart-bars" id="revenue-bars" style="position:relative;padding-left:44px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--wax)">
+            <div style="text-align:center">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--charcoal)">320 €</div>
+              <div style="font-size:.65rem;color:var(--muted)">Meilleur jour</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--charcoal)">193 €</div>
+              <div style="font-size:.65rem;color:var(--muted)">Moyenne/jour</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--charcoal)">1 355 €</div>
+              <div style="font-size:.65rem;color:var(--muted)">Total 7 jours</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut chart -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-chart-pie"></i> Par catégorie
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <div class="donut-wrap">
+            <div style="position:relative;width:140px;height:140px">
+              <svg id="donut-svg" width="140" height="140" viewBox="0 0 140 140" style="transform:rotate(-90deg)"></svg>
+              <div class="donut-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--charcoal);line-height:1">34</div>
+                <div style="font-size:.6rem;color:var(--muted);margin-top:2px">ventes</div>
+              </div>
+            </div>
+            <div class="donut-legend" id="donut-legend"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── ORDERS + TOP PRODUCTS ── -->
+    <div class="bottom-row">
+
+      <!-- Recent orders -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-shopping-bag"></i> Commandes récentes
+          </div>
+          <a href="#" style="font-size:.75rem;color:var(--amber)">Tout voir →</a>
+        </div>
+        <div class="orders-table">
+          <div class="ot-head">
+            <span>Produit</span>
+            <span>Acheteur</span>
+            <span>Prix</span>
+            <span>Statut</span>
+          </div>
+          <div class="ot-row">
+            <div class="ot-product">
+              <span class="ot-emoji">🎵</span>
+              <div>
+                <div class="ot-product-name">Led Zeppelin IV</div>
+                <div class="ot-product-sub">Vinyle · 1971</div>
+              </div>
+            </div>
+            <div class="ot-buyer">Sophie M.</div>
+            <div class="ot-price">89,99 €</div>
+            <span class="ot-status shipped"><i class="fas fa-truck" style="font-size:.55rem"></i> Expédié</span>
+          </div>
+          <div class="ot-row">
+            <div class="ot-product">
+              <span class="ot-emoji">🌊</span>
+              <div>
+                <div class="ot-product-name">The Wall</div>
+                <div class="ot-product-sub">Vinyle · Pink Floyd</div>
+              </div>
+            </div>
+            <div class="ot-buyer">Marc L.</div>
+            <div class="ot-price">74,00 €</div>
+            <span class="ot-status paid"><i class="fas fa-check" style="font-size:.55rem"></i> Payé</span>
+          </div>
+          <div class="ot-row">
+            <div class="ot-product">
+              <span class="ot-emoji">🌑</span>
+              <div>
+                <div class="ot-product-name">Dark Side of the Moon</div>
+                <div class="ot-product-sub">Vinyle · Pink Floyd</div>
+              </div>
+            </div>
+            <div class="ot-buyer">Claire D.</div>
+            <div class="ot-price">95,00 €</div>
+            <span class="ot-status pending"><i class="fas fa-clock" style="font-size:.55rem"></i> En attente</span>
+          </div>
+          <div class="ot-row">
+            <div class="ot-product">
+              <span class="ot-emoji">🎺</span>
+              <div>
+                <div class="ot-product-name">Kind of Blue</div>
+                <div class="ot-product-sub">Vinyle · Miles Davis</div>
+              </div>
+            </div>
+            <div class="ot-buyer">Pierre R.</div>
+            <div class="ot-price">55,00 €</div>
+            <span class="ot-status done"><i class="fas fa-check-double" style="font-size:.55rem"></i> Livré</span>
+          </div>
+          <div class="ot-row">
+            <div class="ot-product">
+              <span class="ot-emoji">🎼</span>
+              <div>
+                <div class="ot-product-name">Abbey Road</div>
+                <div class="ot-product-sub">Vinyle · Beatles</div>
+              </div>
+            </div>
+            <div class="ot-buyer">Anna K.</div>
+            <div class="ot-price">64,00 €</div>
+            <span class="ot-status done"><i class="fas fa-check-double" style="font-size:.55rem"></i> Livré</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top products -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-trophy"></i> Top produits
+          </div>
+          <a href="#" style="font-size:.75rem;color:var(--amber)">Voir tout →</a>
+        </div>
+        <div class="dash-card-body">
+          <div class="top-product-item">
+            <div class="tp-rank gold">1</div>
+            <div class="tp-thumb">🎵</div>
+            <div>
+              <div class="tp-name">Led Zeppelin IV</div>
+              <div class="tp-sub">Vinyle · 1971</div>
+            </div>
+            <div>
+              <div class="tp-price">89,99 €</div>
+              <div class="tp-sales">12 ventes</div>
+            </div>
+          </div>
+          <div class="top-product-item">
+            <div class="tp-rank silver">2</div>
+            <div class="tp-thumb">🌑</div>
+            <div>
+              <div class="tp-name">Dark Side of the Moon</div>
+              <div class="tp-sub">Vinyle · 1973</div>
+            </div>
+            <div>
+              <div class="tp-price">95,00 €</div>
+              <div class="tp-sales">9 ventes</div>
+            </div>
+          </div>
+          <div class="top-product-item">
+            <div class="tp-rank bronze">3</div>
+            <div class="tp-thumb">🌊</div>
+            <div>
+              <div class="tp-name">The Wall</div>
+              <div class="tp-sub">Vinyle · 1979</div>
+            </div>
+            <div>
+              <div class="tp-price">74,00 €</div>
+              <div class="tp-sales">7 ventes</div>
+            </div>
+          </div>
+          <div class="top-product-item">
+            <div class="tp-rank" style="color:var(--muted)">4</div>
+            <div class="tp-thumb">🎺</div>
+            <div>
+              <div class="tp-name">Kind of Blue</div>
+              <div class="tp-sub">Vinyle · 1959</div>
+            </div>
+            <div>
+              <div class="tp-price">55,00 €</div>
+              <div class="tp-sales">4 ventes</div>
+            </div>
+          </div>
+          <div class="top-product-item">
+            <div class="tp-rank" style="color:var(--muted)">5</div>
+            <div class="tp-thumb">☁️</div>
+            <div>
+              <div class="tp-name">Rumours</div>
+              <div class="tp-sub">Vinyle · 1977</div>
+            </div>
+            <div>
+              <div class="tp-price">42,00 €</div>
+              <div class="tp-sales">2 ventes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── QUICK ACTIONS + REVIEWS ── -->
+    <div class="side-row">
+
+      <!-- Quick actions -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-bolt"></i> Actions rapides
+          </div>
+        </div>
+        <div class="dash-card-body">
+          <div class="quick-actions-grid">
+            <a href="add-product.html" class="qa-btn">
+              <div class="qa-icon">➕</div>
+              <div class="qa-label">Nouveau produit</div>
+              <div class="qa-sub">Publier une annonce</div>
+            </a>
+            <a href="#" class="qa-btn" data-action="export">
+              <div class="qa-icon">📊</div>
+              <div class="qa-label">Exporter CSV</div>
+              <div class="qa-sub">Commandes & revenus</div>
+            </a>
+            <a href="#" class="qa-btn" data-action="promo">
+              <div class="qa-icon">🏷️</div>
+              <div class="qa-label">Créer promo</div>
+              <div class="qa-sub">Code réduction</div>
+            </a>
+            <a href="#" class="qa-btn" data-action="stats">
+              <div class="qa-icon">📈</div>
+              <div class="qa-label">Rapport complet</div>
+              <div class="qa-sub">Analytics détaillés</div>
+            </a>
+            <a href="#" class="qa-btn" data-action="help">
+              <div class="qa-icon">💬</div>
+              <div class="qa-label">Support vendeur</div>
+              <div class="qa-sub">Aide prioritaire</div>
+            </a>
+            <a href="../catalogue.html" class="qa-btn">
+              <div class="qa-icon">🛍️</div>
+              <div class="qa-label">Voir catalogue</div>
+              <div class="qa-sub">Vue acheteur</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent reviews -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <i class="fas fa-star"></i> Avis récents
+          </div>
+          <a href="#" style="font-size:.75rem;color:var(--amber)">Voir tout →</a>
+        </div>
+        <div class="dash-card-body" style="padding-top:8px">
+
+          <div class="review-item">
+            <div class="ri-header">
+              <div class="ri-avatar">SM</div>
+              <div>
+                <div class="ri-name">Sophie M.</div>
+                <div class="ri-stars">★★★★★</div>
+              </div>
+              <div class="ri-date">Il y a 2h</div>
+            </div>
+            <div class="ri-text">« Vinyle en parfait état, expédition ultra-rapide. Vendeur exemplaire ! »</div>
+            <div class="ri-product"><i class="fas fa-record-vinyl" style="font-size:.6rem"></i> Led Zeppelin IV</div>
+          </div>
+
+          <div class="review-item">
+            <div class="ri-header">
+              <div class="ri-avatar" style="background:linear-gradient(135deg,var(--wax-dark),var(--sienna))">ML</div>
+              <div>
+                <div class="ri-name">Marc L.</div>
+                <div class="ri-stars">★★★★★</div>
+              </div>
+              <div class="ri-date">Hier</div>
+            </div>
+            <div class="ri-text">« Exactement comme décrit. Emballage renforcé très professionnel. »</div>
+            <div class="ri-product"><i class="fas fa-record-vinyl" style="font-size:.6rem"></i> The Wall</div>
+          </div>
+
+          <div class="review-item">
+            <div class="ri-header">
+              <div class="ri-avatar" style="background:linear-gradient(135deg,var(--rust),var(--mahogany))">TK</div>
+              <div>
+                <div class="ri-name">Thomas K.</div>
+                <div class="ri-stars">★★★★☆</div>
+              </div>
+              <div class="ri-date">3 jan.</div>
+            </div>
+            <div class="ri-text">« Très beau vinyle. Légère usure de pochette comme mentionné. »</div>
+            <div class="ri-product"><i class="fas fa-record-vinyl" style="font-size:.6rem"></i> Dark Side of the Moon</div>
+          </div>
+
+          <!-- Global score summary -->
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--wax);display:flex;align-items:center;gap:14px">
+            <div style="text-align:center">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--charcoal);line-height:1">4.9</div>
+              <div style="color:var(--gold);font-size:.85rem">★★★★★</div>
+              <div style="font-size:.65rem;color:var(--muted);margin-top:2px">18 avis</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:.7rem">
+                <span style="color:var(--muted);width:12px">5</span>
+                <div style="flex:1;height:5px;background:var(--wax);border-radius:3px;overflow:hidden"><div style="width:88%;height:100%;background:linear-gradient(to right,var(--amber),var(--gold));border-radius:3px"></div></div>
+                <span style="color:var(--muted);width:24px">88%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:.7rem">
+                <span style="color:var(--muted);width:12px">4</span>
+                <div style="flex:1;height:5px;background:var(--wax);border-radius:3px;overflow:hidden"><div style="width:8%;height:100%;background:linear-gradient(to right,var(--amber),var(--gold));border-radius:3px"></div></div>
+                <span style="color:var(--muted);width:24px">8%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:.7rem">
+                <span style="color:var(--muted);width:12px">3</span>
+                <div style="flex:1;height:5px;background:var(--wax);border-radius:3px;overflow:hidden"><div style="width:4%;height:100%;background:linear-gradient(to right,var(--amber),var(--gold));border-radius:3px"></div></div>
+                <span style="color:var(--muted);width:24px">4%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── INVENTORY PREVIEW ── -->
+    <div class="dash-card" style="margin-bottom:0">
+      <div class="dash-card-header">
+        <div class="dash-card-title">
+          <i class="fas fa-box-open"></i> Mes produits récents
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <a href="#" style="font-size:.75rem;color:var(--amber)">Voir les 128 produits →</a>
+          <a href="add-product.html" class="topbar-add-btn" style="padding:7px 14px;font-size:.72rem">
+            <i class="fas fa-plus"></i> Ajouter
+          </a>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:600px">
+          <thead>
+            <tr style="background:var(--parchment);border-bottom:1px solid var(--wax)">
+              <th style="padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Produit</th>
+              <th style="padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Catégorie</th>
+              <th style="padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Prix</th>
+              <th style="padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Statut</th>
+              <th style="padding:10px 16px;text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Vues</th>
+              <th style="padding:10px 16px;text-align:right;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody">
+            <tr style="border-bottom:1px solid var(--wax);transition:background .2s" onmouseover="this.style.background='rgba(200,118,26,.03)'" onmouseout="this.style.background=''">
+              <td style="padding:14px 16px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:38px;height:38px;background:var(--parchment);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid var(--wax)">🎵</div>
+                  <div>
+                    <div style="font-size:.85rem;font-weight:600;color:var(--charcoal)">Led Zeppelin IV</div>
+                    <div style="font-size:.68rem;color:var(--muted)">Vinyle UK · 1971 · EX</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px;font-size:.78rem;color:var(--sienna)">Vinyles</td>
+              <td style="padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;color:var(--charcoal)">89,99 €</td>
+              <td style="padding:14px 16px"><span style="background:rgba(22,163,74,.1);color:#16a34a;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:50px">● Actif</span></td>
+              <td style="padding:14px 16px;font-size:.82rem;color:var(--muted)">342 vues</td>
+              <td style="padding:14px 16px;text-align:right">
+                <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+                  <button class="prod-toggle-btn" data-state="active" style="font-size:.73rem;color:var(--amber);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif">Désactiver</button>
+                  <a href="../product.html" style="font-size:.73rem;color:var(--amber);text-decoration:none">Voir</a>
+                  <a href="add-product.html" style="font-size:.73rem;color:var(--sienna);text-decoration:none">Modifier</a>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--wax);transition:background .2s" onmouseover="this.style.background='rgba(200,118,26,.03)'" onmouseout="this.style.background=''">
+              <td style="padding:14px 16px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:38px;height:38px;background:var(--parchment);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid var(--wax)">🌑</div>
+                  <div>
+                    <div style="font-size:.85rem;font-weight:600;color:var(--charcoal)">Dark Side of the Moon</div>
+                    <div style="font-size:.68rem;color:var(--muted)">Vinyle MFSL · 1973 · EX</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px;font-size:.78rem;color:var(--sienna)">Vinyles</td>
+              <td style="padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;color:var(--charcoal)">95,00 €</td>
+              <td style="padding:14px 16px"><span style="background:rgba(22,163,74,.1);color:#16a34a;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:50px">● Actif</span></td>
+              <td style="padding:14px 16px;font-size:.82rem;color:var(--muted)">218 vues</td>
+              <td style="padding:14px 16px;text-align:right">
+                <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+                  <button class="prod-toggle-btn" data-state="active" style="font-size:.73rem;color:var(--amber);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif">Désactiver</button>
+                  <a href="../product.html" style="font-size:.73rem;color:var(--amber);text-decoration:none">Voir</a>
+                  <a href="add-product.html" style="font-size:.73rem;color:var(--sienna);text-decoration:none">Modifier</a>
+                </div>
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--wax);transition:background .2s" onmouseover="this.style.background='rgba(200,118,26,.03)'" onmouseout="this.style.background=''">
+              <td style="padding:14px 16px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:38px;height:38px;background:var(--parchment);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid var(--wax)">🎸</div>
+                  <div>
+                    <div style="font-size:.85rem;font-weight:600;color:var(--charcoal)">Fender Stratocaster '65</div>
+                    <div style="font-size:.68rem;color:var(--muted)">Instrument · 1965 · EX</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:14px 16px;font-size:.78rem;color:var(--sienna)">Instruments</td>
+              <td style="padding:14px 16px;font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:700;color:var(--charcoal)">1 240,00 €</td>
+              <td style="padding:14px 16px"><span style="background:rgba(200,118,26,.12);color:var(--amber);font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:50px">◐ En attente</span></td>
+              <td style="padding:14px 16px;font-size:.82rem;color:var(--muted)">89 vues</td>
+              <td style="padding:14px 16px;text-align:right">
+                <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+                  <button class="prod-toggle-btn" data-state="inactive" style="font-size:.73rem;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif">Activer</button>
+                  <a href="../product.html" style="font-size:.73rem;color:var(--amber);text-decoration:none">Voir</a>
+                  <a href="add-product.html" style="font-size:.73rem;color:var(--sienna);text-decoration:none">Modifier</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <!-- end dash-body -->
+
+</div>
+<!-- end dashboard-main -->
+
+<div class="toast" role="alert" aria-live="polite"></div>
+<script src="../js/auth-system.js"></script>
+<script src="../js/dashboard.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const user = GoldAuth.getUser();
+  if (!user || user.role !== 'seller') {
+    requireLogin('accéder au dashboard vendeur');
+    setTimeout(()=> window.location.href='../register.html?role=seller', 3000);
+    return;
+  }
+  const ini = (user.firstName||'V')[0].toUpperCase() + ((user.lastName||'S')[0]||'S').toUpperCase();
+  const shopName = user.shopName || (user.firstName + ' Shop');
+  document.querySelectorAll('.sn-avatar').forEach(el => el.textContent = ini);
+  document.querySelectorAll('.sn-user-name').forEach(el => el.textContent = shopName);
+  // Logout button
+  document.querySelector('.sn-logout, [data-action="logout"]')?.addEventListener('click', ()=>GoldAuth.logout());
+});
+</script>
+</body>
+</html>

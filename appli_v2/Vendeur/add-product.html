@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ajouter un produit — Gold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/dashboard.css"/>
+  <link rel="stylesheet" href="../css/add-product.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="dashboard-body">
+
+<button class="dash-mobile-toggle"><i class="fas fa-bars"></i></button>
+
+<!-- SIDEBAR (same as dashboard) -->
+<aside class="sidebar-nav">
+  <a href="../index.html" class="sn-logo">
+    <div class="logo-vinyl" style="width:28px;height:28px;border-width:1.5px"></div>
+    <span class="sn-logo-text">Retro<span>Wave</span></span>
+  </a>
+  <div class="sn-user">
+    <div class="sn-avatar">JD</div>
+    <div>
+      <div class="sn-user-name">Jacques Dubois</div>
+      <div class="sn-user-badge"><i class="fas fa-star"></i> Vendeur Pro</div>
+    </div>
+  </div>
+  <div class="sn-section-label">Principal</div>
+  <a href="dashboard.html" class="sn-link"><i class="fas fa-chart-line"></i> Tableau de bord</a>
+  <a href="add-product.html" class="sn-link active"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
+  <a href="#" class="sn-link"><i class="fas fa-box-open"></i> Mes produits <span class="sn-link-badge">128</span></a>
+  <a href="#" class="sn-link"><i class="fas fa-shopping-bag"></i> Commandes <span class="sn-link-badge">3</span></a>
+  <div class="sn-section-label">Boutique</div>
+  <a href="#" class="sn-link"><i class="fas fa-store"></i> Ma boutique</a>
+  <a href="#" class="sn-link"><i class="fas fa-star"></i> Avis clients</a>
+  <a href="#" class="sn-link"><i class="fas fa-tag"></i> Promotions</a>
+  <div class="sn-section-label">Finance</div>
+  <a href="#" class="sn-link"><i class="fas fa-euro-sign"></i> Revenus</a>
+  <a href="#" class="sn-link"><i class="fas fa-file-invoice"></i> Factures</a>
+  <div class="sn-section-label">Compte</div>
+  <a href="#" class="sn-link"><i class="fas fa-user-cog"></i> Paramètres</a>
+  <a href="#" class="sn-link"><i class="fas fa-headset"></i> Support</a>
+  <div class="sn-bottom">
+    <div class="sn-upgrade-card">
+      <div class="sn-upgrade-title">⭐ Passer à Pro+</div>
+      <div class="sn-upgrade-desc">Commission à 5%, analytics avancés, mise en avant.</div>
+      <button class="sn-upgrade-btn">Voir l'offre</button>
+    </div>
+    <a href="../login.html" class="sn-logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="dashboard-main">
+
+  <!-- Topbar -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <div>
+        <div class="dash-page-title">Ajouter un produit</div>
+        <div class="dash-date" id="dash-date">Chargement…</div>
+      </div>
+    </div>
+    <div class="dash-topbar-right">
+      <a href="dashboard.html" class="topbar-btn" title="Retour au dashboard">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <a href="#" class="topbar-btn" title="Aide">
+        <i class="fas fa-question-circle"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Form layout -->
+  <form id="add-product-form" novalidate>
+  <div class="add-prod-layout">
+
+    <!-- ════ LEFT: FORM SECTIONS ════ -->
+    <div>
+
+      <!-- 1. Informations principales -->
+      <div class="form-section">
+        <div class="fs-header">
+          <div class="fs-step-badge">1</div>
+          <div>
+            <div class="fs-title">Informations principales</div>
+            <div class="fs-subtitle">Titre, artiste, catégorie et année</div>
+          </div>
+        </div>
+        <div class="fs-body">
+
+          <div class="ap-row">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-name">Titre du produit <span class="req">*</span></label>
+              <input type="text" id="prod-name" class="ap-input" placeholder="Ex: Led Zeppelin IV, Fender Stratocaster '65…" maxlength="100"/>
+              <span class="ap-error">Ce champ est requis</span>
+            </div>
+          </div>
+
+          <div class="ap-row cols-2">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-artist">Artiste / Marque <span class="req">*</span></label>
+              <input type="text" id="prod-artist" class="ap-input" placeholder="Led Zeppelin, Fender, Miles Davis…"/>
+              <span class="ap-error">Ce champ est requis</span>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="prod-category">Catégorie <span class="req">*</span></label>
+              <select id="prod-category" class="ap-input">
+                <option value="">Sélectionner une catégorie</option>
+                <option value="vinyles">🎵 Vinyles</option>
+                <option value="cassettes">📼 Cassettes</option>
+                <option value="instruments">🎸 Instruments</option>
+                <option value="posters">🖼️ Posters & Art</option>
+                <option value="livres">📚 Livres & Magazines</option>
+                <option value="autres">📦 Autres</option>
+              </select>
+              <span class="ap-error">Ce champ est requis</span>
+            </div>
+          </div>
+
+          <div class="ap-row cols-3">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-year">Année <span class="hint">(optionnel)</span></label>
+              <input type="number" id="prod-year" class="ap-input" placeholder="1971" min="1900" max="2024"/>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="prod-label">Label / Éditeur <span class="hint">(optionnel)</span></label>
+              <input type="text" id="prod-label" class="ap-input" placeholder="Atlantic Records, Fender…"/>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="prod-origin">Pays d'origine <span class="hint">(optionnel)</span></label>
+              <select id="prod-origin" class="ap-input">
+                <option value="">Sélectionner</option>
+                <option value="fr">🇫🇷 France</option>
+                <option value="uk">🇬🇧 Royaume-Uni</option>
+                <option value="us">🇺🇸 États-Unis</option>
+                <option value="de">🇩🇪 Allemagne</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Vinyl-specific (hidden by default) -->
+          <div id="vinyl-specific-fields" style="display:none">
+            <div style="height:1px;background:var(--wax);margin:8px 0 18px"></div>
+            <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:14px;display:flex;align-items:center;gap:6px">
+              <i class="fas fa-record-vinyl"></i> Détails vinyle
+            </div>
+            <div class="ap-row cols-3">
+              <div class="ap-field">
+                <label class="ap-label" for="vinyl-format">Format</label>
+                <select id="vinyl-format" class="ap-input">
+                  <option value="33">33 tours (LP)</option>
+                  <option value="45">45 tours (Single)</option>
+                  <option value="78">78 tours</option>
+                </select>
+              </div>
+              <div class="ap-field">
+                <label class="ap-label" for="vinyl-pressing">Pressage</label>
+                <select id="vinyl-pressing" class="ap-input">
+                  <option value="">Sélectionner</option>
+                  <option value="original">Original 1er pressage</option>
+                  <option value="repress">Réédition</option>
+                  <option value="audiophile">Audiophile (MFSL, etc.)</option>
+                  <option value="picture">Picture Disc</option>
+                  <option value="colored">Vinyle couleur</option>
+                </select>
+              </div>
+              <div class="ap-field">
+                <label class="ap-label" for="vinyl-matrix">Matriçage <span class="hint">(ex: A1/B1)</span></label>
+                <input type="text" id="vinyl-matrix" class="ap-input" placeholder="A1 / B1"/>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 2. Description -->
+      <div class="form-section">
+        <div class="fs-header">
+          <div class="fs-step-badge">2</div>
+          <div>
+            <div class="fs-title">Description & Tags</div>
+            <div class="fs-subtitle">Décrivez votre produit honnêtement et précisément</div>
+          </div>
+        </div>
+        <div class="fs-body">
+
+          <div class="ap-row">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-desc">Description <span class="req">*</span></label>
+              <textarea id="prod-desc" class="ap-input" placeholder="Décrivez l'état, l'historique, les particularités du produit. Soyez précis pour rassurer l'acheteur…" rows="5"></textarea>
+              <span class="ap-hint-text">Conseil : mentionnez l'état du vinyle, de la pochette, si nettoyé, son historique…</span>
+            </div>
+          </div>
+
+          <div class="ap-field">
+            <label class="ap-label" for="tags-input">
+              Tags <span class="hint">(Entrée ou virgule pour valider · max 8)</span>
+            </label>
+            <div class="tags-input-wrap" id="tags-wrap">
+              <input type="text" class="tags-text-input" id="tags-input" placeholder="rock, vintage, blues, 70s…"/>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3. État du produit -->
+      <div class="form-section">
+        <div class="fs-header">
+          <div class="fs-step-badge">3</div>
+          <div>
+            <div class="fs-title">État du produit</div>
+            <div class="fs-subtitle">Évaluez honnêtement l'état pour éviter les litiges</div>
+          </div>
+        </div>
+        <div class="fs-body">
+          <div class="condition-grid">
+            <label class="cond-opt selected">
+              <input type="radio" name="condition" value="parfait" checked/>
+              <div class="cond-dot-wrap"><div class="cond-dot" style="background:#16a34a"></div></div>
+              <div class="cond-label">Parfait</div>
+              <div class="cond-desc">Neuf ou état neuf, aucune trace</div>
+            </label>
+            <label class="cond-opt">
+              <input type="radio" name="condition" value="excellent"/>
+              <div class="cond-dot-wrap"><div class="cond-dot" style="background:#84cc16"></div></div>
+              <div class="cond-label">Excellent</div>
+              <div class="cond-desc">Légères traces usage imperceptibles</div>
+            </label>
+            <label class="cond-opt">
+              <input type="radio" name="condition" value="bon"/>
+              <div class="cond-dot-wrap"><div class="cond-dot" style="background:var(--amber)"></div></div>
+              <div class="cond-label">Bon</div>
+              <div class="cond-desc">Traces visibles, mais fonctionnel</div>
+            </label>
+            <label class="cond-opt">
+              <input type="radio" name="condition" value="correct"/>
+              <div class="cond-dot-wrap"><div class="cond-dot" style="background:var(--rust)"></div></div>
+              <div class="cond-label">Correct</div>
+              <div class="cond-desc">Usure notable, prix ajusté</div>
+            </label>
+          </div>
+
+          <div style="margin-top:18px">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-cond-detail">Précisions sur l'état <span class="hint">(optionnel)</span></label>
+              <textarea id="prod-cond-detail" class="ap-input" rows="2" placeholder="Ex: Légère rayure sur la face B imperceptible à l'écoute, pochette avec légères traces d'usure aux coins…"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Photos -->
+      <div class="form-section">
+        <div class="fs-header">
+          <div class="fs-step-badge">4</div>
+          <div>
+            <div class="fs-title">Photos du produit</div>
+            <div class="fs-subtitle">Les annonces avec 4+ photos se vendent 3× plus vite</div>
+          </div>
+        </div>
+        <div class="fs-body">
+
+          <div class="image-upload-zone" id="upload-zone">
+            <div class="iuz-icon">📸</div>
+            <div class="iuz-title">Glissez vos photos ici</div>
+            <div class="iuz-sub">ou cliquez pour sélectionner depuis votre appareil</div>
+            <button type="button" class="iuz-btn">
+              <i class="fas fa-upload"></i> Choisir des photos
+            </button>
+            <div class="iuz-formats">JPG, PNG, WebP — max 10 Mo par photo · max 8 photos</div>
+            <input type="file" id="image-file-input" accept="image/*" multiple/>
+          </div>
+
+          <div class="image-preview-grid" id="image-preview-grid"></div>
+
+          <div style="font-size:.72rem;color:var(--muted);margin-top:10px">
+            <i class="fas fa-info-circle" style="color:var(--amber)"></i>
+            La première photo sera utilisée comme image principale de l'annonce.
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Prix & Stock -->
+      <div class="form-section">
+        <div class="fs-header">
+          <div class="fs-step-badge">5</div>
+          <div>
+            <div class="fs-title">Prix & Disponibilité</div>
+            <div class="fs-subtitle">Commission Gold : 8% · Paiement sous 48h</div>
+          </div>
+        </div>
+        <div class="fs-body">
+
+          <div class="ap-row cols-2">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-price">Prix de vente <span class="req">*</span></label>
+              <div class="ap-input-prefix-wrap">
+                <span class="ap-input-prefix">€</span>
+                <input type="number" id="prod-price" class="ap-input" placeholder="89.99" min="1" step="0.01"/>
+              </div>
+              <span class="ap-error">Ce champ est requis</span>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="prod-old-price">
+                Prix barré <span class="hint">(optionnel, pour afficher une promo)</span>
+              </label>
+              <div class="ap-input-prefix-wrap">
+                <span class="ap-input-prefix">€</span>
+                <input type="number" id="prod-old-price" class="ap-input" placeholder="110.00" min="0" step="0.01"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="ap-row cols-2">
+            <div class="ap-field">
+              <label class="ap-label" for="prod-stock">Quantité disponible</label>
+              <input type="number" id="prod-stock" class="ap-input" value="1" min="1" max="99"/>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="prod-shipping">Mode d'expédition</label>
+              <select id="prod-shipping" class="ap-input">
+                <option value="colissimo">Colissimo Suivi (offert)</option>
+                <option value="chrono">Chronopost (+9,90€)</option>
+                <option value="relay">Point Relais (+3,50€)</option>
+                <option value="local">Remise en main propre</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Pricing preview -->
+          <div class="pricing-preview">
+            <div class="pricing-preview-title">
+              <i class="fas fa-calculator"></i> Simulation de revenus
+            </div>
+            <div class="pp-row"><span class="pp-key">Prix de vente</span><span class="pp-val" id="pp-price">–</span></div>
+            <div class="pp-row" id="pp-discount-row" style="display:none"><span class="pp-key" style="color:var(--rust)">Réduction affichée</span><span class="pp-val" style="color:var(--rust)" id="pp-discount">–</span></div>
+            <div class="pp-row"><span class="pp-key">Commission Gold (8%)</span><span class="pp-val" style="color:var(--rust)" id="pp-commission">–</span></div>
+            <div class="pp-divider"></div>
+            <div class="pp-total-row">
+              <span class="pp-total-key">Vous recevrez</span>
+              <span class="pp-total-val" id="pp-net">–</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <!-- end left -->
+
+    <!-- ════ RIGHT: SIDEBAR ════ -->
+    <div class="ap-sidebar">
+
+      <!-- Live preview card -->
+      <div class="ap-preview-card">
+        <div class="apc-thumb" id="preview-emoji">📀</div>
+        <div class="apc-body">
+          <div class="apc-meta" id="preview-meta">Catégorie · Année</div>
+          <div class="apc-name" id="preview-name">Nom du produit</div>
+          <div class="apc-artist" id="preview-artist">Artiste</div>
+          <div class="apc-price" id="preview-price">–</div>
+          <div class="apc-cond" id="preview-cond">● Parfait</div>
+        </div>
+      </div>
+
+      <!-- Publish card -->
+      <div class="ap-publish-card">
+        <div class="ap-publish-title">Prêt à publier ?</div>
+
+        <!-- Progress bar -->
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-bottom:6px">
+            <span>Complétude de l'annonce</span>
+            <span id="publish-pct">20%</span>
+          </div>
+          <div style="height:6px;background:var(--wax);border-radius:3px;overflow:hidden">
+            <div id="publish-progress" style="height:100%;background:linear-gradient(to right,var(--amber),var(--gold));border-radius:3px;transition:width .4s ease;width:20%"></div>
+          </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="ap-checklist">
+          <div class="ap-check-item">
+            <div class="ap-check-icon pending" id="check-title-icon"><i class="fas fa-circle"></i></div>
+            <span class="ap-check-text pending" id="check-title-text">Titre renseigné</span>
+          </div>
+          <div class="ap-check-item">
+            <div class="ap-check-icon pending" id="check-cat-icon"><i class="fas fa-circle"></i></div>
+            <span class="ap-check-text pending" id="check-cat-text">Catégorie sélectionnée</span>
+          </div>
+          <div class="ap-check-item">
+            <div class="ap-check-icon done" id="check-cond-icon"><i class="fas fa-check"></i></div>
+            <span class="ap-check-text done" id="check-cond-text">État du produit</span>
+          </div>
+          <div class="ap-check-item">
+            <div class="ap-check-icon pending" id="check-photo-icon"><i class="fas fa-circle"></i></div>
+            <span class="ap-check-text pending" id="check-photo-text">Au moins 1 photo</span>
+          </div>
+          <div class="ap-check-item">
+            <div class="ap-check-icon pending" id="check-price-icon"><i class="fas fa-circle"></i></div>
+            <span class="ap-check-text pending" id="check-price-text">Prix défini</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-publish">
+          <i class="fas fa-rocket"></i> Publier l'annonce
+        </button>
+        <button type="button" class="btn-save-draft">
+          <i class="fas fa-save"></i> Sauvegarder le brouillon
+        </button>
+      </div>
+
+      <!-- Tips card -->
+      <div class="ap-tips-card">
+        <div class="ap-tips-title"><i class="fas fa-lightbulb"></i> Conseils de vente</div>
+        <div class="ap-tip"><i class="fas fa-check-circle"></i> Utilisez des photos claires sur fond blanc ou neutre</div>
+        <div class="ap-tip"><i class="fas fa-check-circle"></i> Mentionnez le matriçage pour les vinyles (gage d'authenticité)</div>
+        <div class="ap-tip"><i class="fas fa-check-circle"></i> Soyez précis sur les défauts : les acheteurs apprécient l'honnêteté</div>
+        <div class="ap-tip"><i class="fas fa-check-circle"></i> Un titre incluant l'artiste + album + année attire plus de vues</div>
+        <div class="ap-tip"><i class="fas fa-check-circle"></i> Prix compétitif = vente rapide. Comparez sur le catalogue !</div>
+      </div>
+
+    </div>
+
+  </div>
+  </form>
+
+</div>
+
+<div class="toast" role="alert" aria-live="polite"></div>
+<script src="../js/add-product.js"></script>
+</body>
+</html> BVC
+<script src="../js/auth-system.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const user = GoldAuth.getUser();
+  if (!user || user.role !== 'seller') {
+    requireLoginNotification('ajouter des produits');
+    setTimeout(() => { window.location.href = '../register.html?role=seller'; }, 2000);
+    return;
+  }
+  // Update sidebar user info
+  const snAvatar = document.querySelector('.sn-avatar');
+  const snName = document.querySelector('.sn-user-name');
+  if (snAvatar) snAvatar.textContent = (user.firstName||'V')[0] + ((user.lastName||'')[0]||'');
+  if (snName) snName.textContent = user.shopName || `${user.firstName} ${user.lastName||''}`;
+});
+</script>

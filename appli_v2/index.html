@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gold — Musique Vintage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Promo Banner ── */
+    .promo-banner { background:#1c0f07; overflow:hidden; border-bottom:1px solid rgba(229,166,87,0.2); }
+    .promo-track { display:flex; width:max-content; animation:promoScroll 36s linear infinite; }
+    .promo-track:hover { animation-play-state:paused; }
+    @keyframes promoScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .promo-item {
+      display:inline-flex;align-items:center;gap:10px;
+      padding:12px 28px;white-space:nowrap;flex-shrink:0;
+      cursor:pointer;transition:background .2s;text-decoration:none;
+    }
+    .promo-item:hover { background:rgba(255,255,255,.04); }
+    .promo-emoji {
+      width:38px;height:38px;border-radius:6px;
+      background:linear-gradient(135deg,#B53324,#E5A657);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.2rem;flex-shrink:0;
+    }
+    .promo-info { display:flex;flex-direction:column;gap:1px; }
+    .promo-name { font-size:.79rem;color:rgba(245,226,206,.85); }
+    .promo-price { font-size:.73rem;color:#E5A657;font-weight:500; }
+    .promo-badge { background:#B53324;color:white;font-size:.58rem;padding:2px 7px;border-radius:100px;font-weight:700;letter-spacing:.05em;text-transform:uppercase; }
+    .promo-sep { color:rgba(229,166,87,.25);padding:0 6px;font-size:1.1rem; }
+
+    /* ── Mon Compte Dropdown ── */
+    .account-menu-wrap { position:relative; }
+    .account-btn {
+      display:flex;align-items:center;gap:8px;
+      padding:8px 16px;border-radius:6px;
+      background:rgba(229,166,87,0.12);border:1px solid rgba(229,166,87,0.3);
+      color:#E5A657;font-size:.82rem;font-family:'Jost',sans-serif;font-weight:500;
+      cursor:pointer;transition:all .2s;white-space:nowrap;
+    }
+    .account-btn:hover { background:rgba(229,166,87,0.22); }
+    .account-btn i.fa-chevron-down { font-size:.65rem;transition:transform .2s; }
+    .account-menu-wrap.open .account-btn i.fa-chevron-down { transform:rotate(180deg); }
+    .account-dropdown {
+      position:absolute;top:calc(100% + 10px);right:0;
+      min-width:200px;background:#1c0f07;
+      border:1px solid rgba(229,166,87,0.2);border-radius:10px;
+      box-shadow:0 12px 40px rgba(0,0,0,.5);
+      overflow:hidden;opacity:0;pointer-events:none;
+      transform:translateY(-8px);transition:all .2s;z-index:999;
+    }
+    .account-menu-wrap.open .account-dropdown { opacity:1;pointer-events:all;transform:translateY(0); }
+    .account-dropdown a {
+      display:flex;align-items:center;gap:10px;
+      padding:12px 18px;color:rgba(245,226,206,.85);
+      font-size:.82rem;font-family:'Jost',sans-serif;
+      text-decoration:none;transition:background .15s;
+    }
+    .account-dropdown a:hover { background:rgba(229,166,87,0.1);color:#E5A657; }
+    .account-dropdown a i { width:16px;text-align:center;color:#E5A657;opacity:.8; }
+    .account-dropdown-sep { height:1px;background:rgba(229,166,87,0.15);margin:4px 0; }
+    .account-dropdown-logout { color:rgba(181,51,36,.9) !important; }
+    .account-dropdown-logout i { color:rgba(181,51,36,.9) !important; }
+  </style>
+</head>
+<body>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" placeholder="Rechercher vinyles, artistes, instruments…" />
+  </div>
+  <div class="search-hints">
+    <span>Pink Floyd</span><span>Fender 1965</span><span>Jazz Vinyl</span><span>Beatles</span><span>Cassettes 80s</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">G<span>old</span></a>
+    <!-- nav-mid and nav-r inserted here by initGoldNavbar() -->
+
+    <!-- Mon Compte dropdown (vendeur) — injecté si connecté comme vendeur -->
+    <div class="account-menu-wrap" id="accountMenuWrap" style="display:none">
+      <button class="account-btn" id="accountBtn">
+        <i class="fas fa-user-circle"></i>
+        Mon compte
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="account-dropdown" id="accountDropdown">
+        <a href="Vendeur/orders.html"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
+        <a href="Vendeur/dashboard.html"><i class="fas fa-store"></i> Ma boutique</a>
+        <a href="Vendeur/add-product.html"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
+        <a href="Vendeur/reviews.html"><i class="fas fa-star"></i> Avis clients</a>
+        <div class="account-dropdown-sep"></div>
+        <a href="login.html" class="account-dropdown-logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mob-nav" id="mobNav"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-slides" id="heroSlides">
+    <div class="hslide active" style="background:url('assets/images/hover/first.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hover/second.jpg') center/cover no-repeat;background-color:#2d1508"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hover/third.jpg') center/cover no-repeat;background-color:#3d1f0a"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hover/forth.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
+    <div class="slide-progress"><div class="slide-prog-bar" id="progBar"></div></div>
+    <div class="slide-dots" id="slideDots">
+      <span class="sdot active"></span><span class="sdot"></span><span class="sdot"></span><span class="sdot"></span>
+    </div>
+    <div class="slide-counter" id="slideCounter">01 / 04</div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="heline"></span><span>Marketplace · Son Vintage</span></div>
+    <h1 class="hero-title">Le Son<br/>du Passé,<br/><em>Revit.</em></h1>
+    <p class="hero-sub">Des milliers de vinyles, cassettes &amp; instruments<br/>sélectionnés par des passionnés.</p>
+    <div class="hero-btns">
+      <a href="#categories" class="hb-primary js-scroll-cats">Explorer <span class="hb-arr">→</span></a>
+      <a href="register.html?role=buyer" class="hb-sec">Acheter</a>
+      <a href="register.html?role=seller" class="hb-ter">Vendre</a>
+    </div>
+    <div class="hero-trust">
+      <i class="fas fa-shield-alt"></i> Paiement sécurisé
+      <span class="htdot"></span>
+      <i class="fas fa-certificate"></i> Certifié authentique
+      <span class="htdot"></span>
+      <i class="fas fa-undo"></i> Retours 30j
+    </div>
+  </div>
+  <div class="hero-scroll-hint"><div class="hsh-line"></div><span>Scroll</span></div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="tickerInner">
+    <span>Livraison offerte dès 60€</span><span class="ts">·</span>
+    <span>Vendez en 2 min</span><span class="ts">·</span>
+    <span>+1 247 vendeurs actifs</span><span class="ts">·</span>
+    <span>Paiement 100% sécurisé</span><span class="ts">·</span>
+    <span>Retours gratuits 30 jours</span><span class="ts">·</span>
+    <span>Commission 8% seulement</span><span class="ts">·</span>
+    <span>Authenticité certifiée</span><span class="ts">·</span>
+  </div>
+</div>
+
+<!-- PROMO BANNER AUTO-SCROLL -->
+<div class="promo-banner"><div class="promo-track" id="promoTrack"></div></div>
+
+<!-- CATEGORIES -->
+<section class="sec" id="categories">
+  <div class="wrap">
+    <div class="sec-hd">
+      <div><div class="sec-lbl">Collections</div><h2 class="sec-ttl">Explorer par <em>catégorie</em></h2></div>
+      <a href="catalogue.html" class="sec-more">Tout voir →</a>
+    </div>
+    <div class="cat-grid">
+      <a href="catalogue.html?cat=vinyles" class="ccard big">
+        <div class="ccard-bg"><img src="assets/images/categories/vinyle.jpg" alt="Vinyles" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill">Le plus populaire</span><div class="cname">Vinyles</div><div class="ccount">218 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="catalogue.html?cat=cassettes" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/cassetes.jpg" alt="Cassettes" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill">Rétro</span><div class="cname">Cassettes</div><div class="ccount">94 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="catalogue.html?cat=instruments" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/instruments.jpg" alt="Instruments" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><div class="cname">Instruments</div><div class="ccount">132 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="catalogue.html?cat=posters" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/posters.jpg" alt="Posters" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill">Art</span><div class="cname">Posters</div><div class="ccount">76 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="catalogue.html?cat=electronique" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/electro.jpg" alt="Électronique" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><div class="cname">Électronique</div><div class="ccount">58 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="catalogue.html?cat=cd" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/cd.jpg" alt="CDs" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill">Numérique</span><div class="cname">CDs</div><div class="ccount">47 références</div><div class="cgo">Explorer →</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS POPULAIRES -->
+<section class="sec sec-light">
+  <div class="wrap">
+    <div class="frow-decade">
+      <span class="fdec-lbl"><i class="fas fa-clock-rotate-left"></i> Décennie</span>
+      <button class="fdec active" data-decade="all">Toutes</button>
+      <button class="fdec" data-decade="60">Années 60</button>
+      <button class="fdec" data-decade="70">Années 70</button>
+      <button class="fdec" data-decade="80">Années 80</button>
+      <button class="fdec" data-decade="90">Années 90</button>
+      <button class="fdec" data-decade="2000">Années 2000</button>
+    </div>
+    <div class="sec-hd">
+      <div><div class="sec-lbl">Tendances</div><h2 class="sec-ttl">Produits <em>populaires</em></h2></div>
+      <a href="catalogue.html" class="sec-more">Voir tout →</a>
+    </div>
+    <div class="pgrid">
+      <article class="pcard">
+        <a href="product.html?id=led-zeppelin-iv" class="pcard-link" aria-label="Voir Led Zeppelin IV"></a>
+        <div class="pthumb" style="height:320px">
+          <img src="assets/images/products/led.jpg" alt="Led Zeppelin IV" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pemoji" style="display:none"></div>
+          <span class="pbadge rare">Rare</span>
+          <button class="pfav" data-pid="led-zeppelin-iv">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1971</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Led Zeppelin IV</div>
+          <div class="pfoot"><span class="pprice">89,99 €</span><span class="pold">110 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=the-wall" class="pcard-link" aria-label="Voir The Wall"></a>
+        <div class="pthumb" style="height:320px">
+          <img src="assets/images/products/the wall.jpg" alt="The Wall" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pemoji" style="display:none"></div>
+          <span class="pbadge new">Nouveau</span>
+          <button class="pfav" data-pid="the-wall">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1979</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">The Wall</div>
+          <div class="pfoot"><span class="pprice">74,00 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=thriller" class="pcard-link" aria-label="Voir Thriller"></a>
+        <div class="pthumb" style="height:320px">
+          <img src="assets/images/products/michael jackson.jpg" alt="Thriller" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pemoji" style="display:none"></div>
+          <span class="pbadge sale">-30%</span>
+          <button class="pfav" data-pid="thriller">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Cassette · 1982</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Thriller</div>
+          <div class="pfoot"><span class="pprice">21,00 €</span><span class="pold">30 €</span><span class="pstars">★★★★☆</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=fender-65" class="pcard-link" aria-label="Voir Fender Stratocaster"></a>
+        <div class="pthumb" style="height:320px">
+          <img src="assets/images/products/Guitare.jpg" alt="Fender Stratocaster '65" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pemoji" style="display:none"></div>
+          <span class="pbadge rare">Rare</span>
+          <button class="pfav" data-pid="fender-65">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Guitare · Années 60</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Fender Stratocaster '65</div>
+          <div class="pfoot"><span class="pprice">1 240 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- NOUVEAUTÉS -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-hd">
+      <div><div class="sec-lbl">Nouveautés</div><h2 class="sec-ttl">Derniers <em>arrivages</em></h2></div>
+      <a href="catalogue.html?new=1" class="sec-more">Voir tout →</a>
+    </div>
+    <div class="pgrid">
+      <article class="pcard">
+        <a href="product.html?id=kind-of-blue" class="pcard-link"></a>
+        <div class="pthumb">
+          <div class="pemoji"></div>
+          <span class="pbadge new">Nouveau</span>
+          <button class="pfav" data-pid="kind-of-blue">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1959</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Kind of Blue</div>
+          <div class="pfoot"><span class="pprice">55,00 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=abbey-road" class="pcard-link"></a>
+        <div class="pthumb">
+          <div class="pemoji"></div>
+          <span class="pbadge new">Nouveau</span>
+          <button class="pfav" data-pid="abbey-road">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1969</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Abbey Road</div>
+          <div class="pfoot"><span class="pprice">64,00 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=dark-side" class="pcard-link"></a>
+        <div class="pthumb">
+          <div class="pemoji"></div>
+          <span class="pbadge sale">-15%</span>
+          <button class="pfav" data-pid="dark-side">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1973</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Dark Side of the Moon</div>
+          <div class="pfoot"><span class="pprice">95,00 €</span><span class="pold">112 €</span><span class="pstars">★★★★★</span></div>
+        </div>
+      </article>
+      <article class="pcard">
+        <a href="product.html?id=rumours" class="pcard-link"></a>
+        <div class="pthumb">
+          <div class="pemoji"></div>
+          <span class="pbadge" style="background:rgba(181,51,36,.9)">Top vente</span>
+          <button class="pfav" data-pid="rumours">♡</button>
+        </div>
+        <div class="pbody" style="padding:10px 14px">
+          <div class="pmeta" style="font-size:0.6rem;margin-bottom:2px">Vinyle · 1977</div>
+          <div class="pname" style="font-size:0.95rem;margin-bottom:5px">Rumours</div>
+          <div class="pfoot"><span class="pprice">48,00 €</span><span class="pstars">★★★★☆</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- VENDEURS -->
+<section class="sec sec-light">
+  <div class="wrap">
+    <div class="sec-hd">
+      <div><div class="sec-lbl">Communauté</div><h2 class="sec-ttl">Vendeurs <em>populaires</em></h2></div>
+      <a href="#" class="sec-more">Tous les vendeurs →</a>
+    </div>
+    <div class="sgrid">
+      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#B53324,#7a2015)">JP</div><div class="sname">Jean-Pierre V.</div><div class="sspec">Vinyles Rock classique</div><div class="srow"><div class="ss"><b>4.9</b><small>Note</small></div><div class="ss"><b>248</b><small>Ventes</small></div><div class="ss"><b>134</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=jean-pierre" class="sbtn">Voir boutique</a></div>
+      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#E5A657,#c07d30)">ML</div><div class="sname">Marie-Louise R.</div><div class="sspec">Cassettes & Soul</div><div class="srow"><div class="ss"><b>5.0</b><small>Note</small></div><div class="ss"><b>192</b><small>Ventes</small></div><div class="ss"><b>87</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=marie-louise" class="sbtn">Voir boutique</a></div>
+      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#DFBC94,#a07040)">RA</div><div class="sname">RétroArt Studio</div><div class="sspec">Instruments & Posters</div><div class="srow"><div class="ss"><b>4.8</b><small>Note</small></div><div class="ss"><b>315</b><small>Ventes</small></div><div class="ss"><b>210</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=retroart" class="sbtn">Voir boutique</a></div>
+      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#B53324,#E5A657)">TK</div><div class="sname">TomKaz Records</div><div class="sspec">Jazz & Éditions rares</div><div class="srow"><div class="ss"><b>4.7</b><small>Note</small></div><div class="ss"><b>156</b><small>Ventes</small></div><div class="ss"><b>98</b><small>Produits</small></div></div><div class="sstars">★★★★☆</div><a href="seller-profile.html?id=tomkaz" class="sbtn">Voir boutique</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec sec-dark" id="how">
+  <div class="wrap">
+    <div class="sec-hd centered"><div><div class="sec-lbl light">Simple & rapide</div><h2 class="sec-ttl light">Comment <em>ça marche ?</em></h2></div></div>
+    <div class="hiw-tabs"><button class="ht active" data-m="buy">J'achète</button><button class="ht" data-m="sell">Je vends</button></div>
+    <div class="hiw-steps" id="hiwSteps"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-band">
+  <div class="wrap">
+    <div class="stats-row" id="statsRow">
+      <div class="st-cell"><div class="st-num" data-to="520" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Produits</div></div>
+      <div class="st-sep"></div>
+      <div class="st-cell"><div class="st-num" data-to="1247" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Vendeurs actifs</div></div>
+      <div class="st-sep"></div>
+      <div class="st-cell"><div class="st-num" data-to="8500" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Clients satisfaits</div></div>
+      <div class="st-sep"></div>
+      <div class="st-cell"><div class="st-num" data-to="98" data-sfx="%"><span class="cv">0</span>%</div><div class="st-lbl">Satisfaction</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="sec sec-light">
+  <div class="wrap">
+    <div class="sec-hd centered"><div><div class="sec-lbl">Avis clients</div><h2 class="sec-ttl">Ce qu'ils <em>disent</em></h2></div></div>
+    <div class="tgrid">
+      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« J'ai trouvé un vinyle de Miles Davis que je cherchais depuis 3 ans, en parfait état. Incroyable. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Sophie M.</div><div class="trole">Collectionneuse, Paris</div></div><span class="tbadge">Acheteur</span></div></div>
+      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« En 6 mois, j'ai vendu 200 vinyles pour plus de 8 000€. La meilleure plateforme pour vendeurs sérieux. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Jacques D.</div><div class="trole">Vendeur Pro — 200+ ventes</div></div><span class="tbadge" style="color:#B53324;border-color:rgba(181,51,36,.25)">Vendeur</span></div></div>
+      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« Interface superbe et intuitive. J'adore pouvoir gérer ma boutique et mes achats depuis le même profil. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Marc L.</div><div class="trole">Acheteur & Vendeur, Lyon</div></div><span class="tbadge">Les deux</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand">
+        <div class="flogo">G<span>old</span></div>
+        <p>La marketplace de référence pour la musique vintage. Achetez et vendez avec confiance.</p>
+        <div class="fsocials">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-x-twitter"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="fcol"><div class="fctitle">Marketplace</div><a href="catalogue.html">Catalogue</a><a href="catalogue.html?new=1">Nouveautés</a><a href="catalogue.html?rare=1">Éditions rares</a><a href="catalogue.html?sale=1">Ventes flash</a></div>
+      <div class="fcol"><div class="fctitle">Vendeurs</div><a href="register.html?role=seller">Créer ma boutique</a><a href="Vendeur/dashboard.html">Dashboard</a><a href="Vendeur/add-product.html">Ajouter un produit</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a><a href="tel:+33123456789">+33 1 23 45 67 89</a><a href="#">Lun–Ven 9h–18h</a></div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 Gold Marketplace · <a href="#">CGV</a> · <a href="#">Confidentialité</a></span>
+      <div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span><span>APPLE PAY</span></div>
+    </div>
+  </div>
+</footer>
+
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="js/auth-system.js"></script>
+<script src="js/main.js"></script>
+<script>
+/* ── Mon Compte dropdown : visible uniquement si vendeur connecté ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap = document.getElementById('accountMenuWrap');
+  const btn  = document.getElementById('accountBtn');
+  const drop = document.getElementById('accountDropdown');
+
+  // Afficher le menu seulement si vendeur connecté via GoldAuth
+  if (typeof GoldAuth !== 'undefined') {
+    const user = GoldAuth.getUser();
+    if (user && user.role === 'seller') {
+      wrap.style.display = 'block';
+    }
+  }
+
+  // Toggle dropdown
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('open');
+  });
+
+  // Fermer si clic ailleurs
+  document.addEventListener('click', () => {
+    wrap.classList.remove('open');
+  });
+});
+
+/* ── Promo banner ── */
+document.addEventListener('DOMContentLoaded', () => {
+  const promos = [
+    {e:'', n:'Led Zeppelin IV',      p:'89,99 €', b:'Rare',     h:'product.html?id=led-zeppelin-iv'},
+    {e:'', n:'The Wall',             p:'74,00 €', b:'Populaire',h:'product.html?id=the-wall'},
+    {e:'', n:'Thriller',             p:'21,00 €', b:'-30%',     h:'product.html?id=thriller'},
+    {e:'', n:"Fender '65",           p:'1 240 €', b:'Rare',     h:'product.html?id=fender-65'},
+    {e:'', n:'Kind of Blue',         p:'55,00 €', b:'Jazz',     h:'product.html?id=kind-of-blue'},
+    {e:'', n:'Dark Side',            p:'95,00 €', b:'-15%',     h:'product.html?id=dark-side'},
+    {e:'', n:'Abbey Road',           p:'64,00 €', b:'Nouveau',  h:'product.html?id=abbey-road'},
+    {e:'', n:'Rumours',              p:'48,00 €', b:'Top vente',h:'product.html?id=rumours'},
+  ];
+  const track = document.getElementById('promoTrack');
+  if (!track) return;
+  let html = '';
+  for (let r = 0; r < 2; r++) {
+    promos.forEach(p => {
+      html += `<a href="${p.h}" class="promo-item">
+        <div class="promo-emoji"></div>
+        <div class="promo-info">
+          <span class="promo-name">${p.n}</span>
+          <span class="promo-price">${p.p}</span>
+        </div>
+        <span class="promo-badge">${p.b}</span>
+      </a><span class="promo-sep">·</span>`;
+    });
+  }
+  track.innerHTML = html;
+});
+</script>
+</body>
+</html>
