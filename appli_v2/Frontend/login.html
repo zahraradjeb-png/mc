@@ -733,7 +733,7 @@
   }
 
   /* ── Submit ── */
-  document.getElementById('loginBtn').addEventListener('click', () => {
+  document.getElementById('loginBtn').addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
     const pass  = document.getElementById('password').value;
     const btn   = document.getElementById('loginBtn');
@@ -745,21 +745,45 @@
     btn.disabled  = true;
     vinylDisc.style.animationDuration = '3s';
 
-    setTimeout(() => {
-      const isSeller = document.querySelector('.rp-tab[data-mode="seller"].active');
-      const parts    = email.split('@')[0].split('.');
-      const user = {
-        role:      isSeller ? 'seller' : 'buyer',
-        firstName: parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1) : 'Utilisateur',
-        lastName:  parts[1] ? parts[1].charAt(0).toUpperCase() + parts[1].slice(1) : '',
-        email,
-        shopName:  isSeller ? email.split('@')[0] + ' Shop' : null,
-        joinDate:  new Date().toISOString()
-      };
-      localStorage.setItem('gold_user', JSON.stringify(user));
-      showToast('Bienvenue ! ✦', 'success');
-      setTimeout(() => window.location.href = 'index.html', 900);
-    }, 1800);
+    try {
+        const response = await fetch('http://localhost:8000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email: email, mdp: pass })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const user = {
+                id: data.user.id,
+                role: data.user.role === 'VENDEUR' ? 'seller' : 'buyer',
+                firstName: data.user.prenom,
+                lastName: data.user.nom,
+                email: data.user.email,
+                joinDate: new Date().toISOString()
+            };
+            localStorage.setItem('gold_user', JSON.stringify(user));
+            showToast('Bienvenue ! ✦', 'success');
+            setTimeout(() => window.location.href = 'index.html', 900);
+        } else {
+            let errorMsg = 'Erreur lors de la connexion';
+            if (data.message) errorMsg = data.message;
+            showToast(errorMsg, 'warn');
+            btn.innerHTML = '<i class="fas fa-arrow-right"></i> Se connecter';
+            btn.disabled = false;
+            vinylDisc.style.animationDuration = '';
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion au serveur', 'warn');
+        btn.innerHTML = '<i class="fas fa-arrow-right"></i> Se connecter';
+        btn.disabled = false;
+        vinylDisc.style.animationDuration = '';
+    }
   });
 
   // Already logged in
