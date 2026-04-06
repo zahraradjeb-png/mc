@@ -532,12 +532,12 @@ function _attachNavEvents() {
     document.addEventListener('click', ()=>{ drop.style.opacity='0'; drop.style.visibility='hidden'; });
   });
 
-  /* ── SELLER : clic sur profil → ouvre le drawer ── */
+  /* ── SELLER : clic sur profil → redirige vers dashboard ── */
   document.getElementById('sellerProfileTrigger')?.addEventListener('click', e => {
     e.stopPropagation();
     const user = GoldAuth.getUser();
     if (user && user.role === 'seller') {
-      buildSellerDrawer(user, _root());
+      window.location.href = _root() + 'Vendeur/dashboard.html';
     }
   });
 }

@@ -420,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
     activeFilters.search = q;
     const el = document.getElementById('filter-search');
     if (el) el.value = overlayInput.value.trim();
-    if (q.length >= 1) searchOverlay?.classList.remove('open');
     applyFilters();
   });
   searchOverlay?.querySelectorAll('.search-hints span').forEach(span => {
