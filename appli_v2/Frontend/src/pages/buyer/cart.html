@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Panier — Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .cart-wrap { max-width: 1100px; margin: 60px auto; padding: 0 24px; display: grid; grid-template-columns: 1fr 340px; gap: 40px; }
+        .cart-title { font-family: 'Cormorant', serif; font-size: 2.8rem; margin-bottom: 40px; }
+        .cart-card { background: #fff; border: 1px solid #e1e3d9; border-radius: 20px; overflow: hidden; }
+        .cart-item { display: flex; align-items: center; gap: 20px; padding: 24px; border-bottom: 1px solid #f0f0f0; }
+        .cart-item:last-child { border-bottom: none; }
+        .item-img { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; }
+        .item-info { flex: 1; }
+        .item-name { font-weight: 600; font-size: 1.1rem; margin-bottom: 4px; color: #1c0f07; }
+        .item-meta { font-size: 0.85rem; color: #8a6a50; }
+        .item-actions { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .remove-btn { border: none; background: none; color: #B53324; font-size: 0.82rem; cursor: pointer; text-decoration: underline; margin-left: 10px; }
+        
+        .summary-card { background: #1c0f07; border-radius: 20px; padding: 32px; color: #F5E2CE; position: sticky; top: 120px; }
+        .sum-row { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 0.95rem; }
+        .sum-total { border-top: 1px solid rgba(245,226,206,0.1); padding-top: 20px; margin-top: 20px; font-size: 1.3rem; font-weight: 700; color: #E5A657; font-family: 'Special Elite', cursive; }
+        .checkout-btn { width: 100%; padding: 16px; background: #B53324; color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; margin-top: 30px; cursor: pointer; transition: background 0.2s; }
+        .checkout-btn:hover { background: #8a2419; }
+    </style>
+</head>
+<body class="site-layout">
+    
+    <!-- NAVBAR (via initGoldNavbar) -->
+    <header class="navbar scrolled" style="position:static; background:#1c0f07;">
+        <div class="nav-wrap">
+            <a href="../visitor/index.html" class="logo">G<span>old</span></a>
+        </div>
+    </header>
+
+    <main class="cart-wrap">
+        <div class="cart-main">
+            <h1 class="cart-title">Votre <em>panier</em></h1>
+            
+            <div class="cart-card" id="cart-container">
+                <!-- Cart items injected by JS -->
+                <div style="padding:80px; text-align:center; opacity:0.5">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px"></i>
+                </div>
+            </div>
+            
+            <a href="../visitor/catalogue.html" style="display:inline-block; margin-top:32px; color:#1c0f07; font-weight:600; text-decoration:none">
+                ← Continuer mes achats
+            </a>
+        </div>
+
+        <aside class="cart-summary">
+            <div class="summary-card">
+                <h3 style="font-family:'Cormorant',serif; font-size:1.6rem; margin-bottom:24px">Résumé</h3>
+                <div class="sum-row"><span>Sous-total</span> <span id="subtotal">0.00 €</span></div>
+                <div class="sum-row"><span>Livraison</span> <span style="color:#16a34a">Gratuite</span></div>
+                <div class="sum-total"><span>Total</span> <span id="total">0.00 €</span></div>
+                <button class="checkout-btn" onclick="goToCheckout()">Passer commande</button>
+                <div style="margin-top:20px; font-size:0.75rem; opacity:0.6; text-align:center">
+                    🔒 Paiement 100% sécurisé
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <script src="../../js/core/auth-system.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+        });
+
+        function renderCart() {
+            const cart = GoldAuth.getCart();
+            const container = document.getElementById('cart-container');
+            const subtotalEl = document.getElementById('subtotal');
+            const totalEl = document.getElementById('total');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<div style="padding:100px 30px; text-align:center"><i class="fas fa-shopping-bag" style="font-size:3rem; margin-bottom:20px; opacity:0.2"></i><p style="font-family:\'Cormorant\',serif; font-size:1.4rem">Votre panier est vide.</p></div>';
+                subtotalEl.textContent = '0.00 €';
+                totalEl.textContent = '0.00 €';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const sub = (item.price * (item.qty || 1));
+                total += sub;
+                return `
+                    <div class="cart-item">
+                        <img src="../../../${item.photo || 'assets/images/placeholder.jpg'}" class="item-img" onerror="this.src='../../../assets/images/placeholder-product.jpg'">
+                        <div class="item-info">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-meta">Prix unitaire: ${item.price} €</div>
+                            <div class="item-actions">
+                                <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                                <span style="font-weight:700; width:20px; text-align:center">${item.qty || 1}</span>
+                                <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                                <button class="remove-btn" onclick="removeItem('${item.id}')">Supprimer</button>
+                            </div>
+                        </div>
+                        <div style="font-weight:700; font-family:'Special Elite',cursive">${sub.toFixed(2)} €</div>
+                    </div>
+                `;
+            }).join('');
+
+            subtotalEl.textContent = `${total.toFixed(2)} €`;
+            totalEl.textContent = `${total.toFixed(2)} €`;
+        }
+
+        function updateQty(id, delta) {
+            const cart = GoldAuth.getCart();
+            const item = cart.find(i => i.id == id);
+            if (item) {
+                item.qty = Math.max(1, (item.qty || 1) + delta);
+                GoldAuth.saveCart(cart);
+                renderCart();
+            }
+        }
+
+        function removeItem(id) {
+            GoldAuth.removeFromCart(id);
+            renderCart();
+        }
+
+        function goToCheckout() {
+            const user = GoldAuth.getUser();
+            if (!user) {
+                requireLogin('passer commande');
+                return;
+            }
+            showToast("Redirection vers le paiement en cours...", "info");
+            // window.location.href = 'checkout.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avis Clients — Gold Seller Studio</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles/seller-base.css">
+  <link rel="stylesheet" href="styles/seller-layout.css">
+  <link rel="stylesheet" href="styles/seller-reviews.css">
+</head>
+
+<body class="seller-studio">
+
+  <div class="studio-layout">
+    <div id="sidebar-container"></div>
+
+    <main class="studio-main animate-slide">
+      <header class="studio-header">
+        <div class="welcome-msg">
+          <p>Réputation de la boutique</p>
+          <h1>Avis Clients</h1>
+        </div>
+        <div class="header-actions">
+            <div class="studio-card" style="padding:10px 20px; display:flex; align-items:center; gap:8px;">
+             <span class="header-rating-val" style="font-size:1.1rem; font-weight:700; color:var(--studio-honey);">...</span>
+             <div class="r-stars header-stars"><i class="fas fa-star"></i></div>
+           </div>
+        </div>
+      </header>
+
+      <div id="reviews-list">
+        <!-- Rendered by JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Common Libraries -->
+  <script src="../../js/auth-system.js"></script>
+  
+  <!-- Modular Services -->
+  <script src="services/seller-auth.js"></script>
+  
+  <!-- Shared Components -->
+  <script src="components/sidebar.js"></script>
+  <script src="components/header.js"></script>
+  <script src="components/seller-layout.js"></script>
+  
+  <script src="services/products.service.js"></script>
+  <script src="scripts/reviews.js"></script>
+</body>
+</html>

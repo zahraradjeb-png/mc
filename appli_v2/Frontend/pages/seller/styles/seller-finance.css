@@ -1,0 +1,42 @@
+/* ══ Gold Studio Finance CSS ══ */
+.finance-summary {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.balance-card {
+  background: linear-gradient(135deg, rgba(229,166,87,0.1), rgba(181,51,36,0.1));
+  border: 1px solid var(--studio-border);
+  border-radius: var(--radius-card);
+  padding: 40px; color: var(--studio-honey);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+}
+.balance-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem; font-weight: 700; color: #fff;
+  line-height: 1; margin-top: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.stat-card {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+}
+.t-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.2s;
+}
+.t-row:hover { background: rgba(229,166,87,0.04); }
+.t-info {
+  display: flex; align-items: center; gap: 16px;
+}
+.t-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--studio-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; color: var(--studio-muted);
+}
+.t-amt {
+  font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1.1rem; color: #fff;
+}
+.t-amt.plus { color: #22C55E; }
+@media(max-width: 900px){ .finance-summary { grid-template-columns: 1fr; } }

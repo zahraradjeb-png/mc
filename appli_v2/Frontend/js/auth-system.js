@@ -9,8 +9,8 @@ const GoldAuth = {
   setUser(u) { localStorage.setItem('gold_user', JSON.stringify(u)); },
   logout()   { localStorage.removeItem('gold_user'); window.location.href = _root() + 'index.html'; },
   isLoggedIn(){ return !!this.getUser(); },
-  isBuyer()  { const u=this.getUser(); return u?.role==='buyer'; },
-  isSeller() { const u=this.getUser(); return u?.role==='seller'; },
+  isBuyer()  { const u=this.getUser(); return u?.role==='ACHETEUR' || u?.role==='buyer'; },
+  isSeller() { const u=this.getUser(); return u?.role==='VENDEUR' || u?.role==='seller'; },
 
   /* Cart */
   getCart()  { try { return JSON.parse(localStorage.getItem('gold_cart'))||[]; } catch { return []; } },
@@ -39,10 +39,14 @@ const GoldAuth = {
   }
 };
 
-/* ── root path helper (works from subfolders like /Vendeur/) ── */
+/* ── root path helper (works from nested src/pages/) ── */
 function _root() {
   const p = window.location.pathname;
-  if (p.includes('/Vendeur/') || p.includes('/admin/')) return '../';
+  // Legacy pages/seller/ or pages/buyer/ (2 levels deep)
+  if (p.includes('/pages/seller/') || p.includes('/pages/buyer/')) return '../../';
+  // Visiteur: src/pages/visiteur/ (3 levels deep)
+  if (p.includes('/src/pages/visiteur/')) return '../../../';
+  // Root level: index.html
   return '';
 }
 
@@ -241,16 +245,16 @@ function buildSellerDrawer(user, root) {
     </div>
 
     <div class="gsd-body">
-      <div class="gsd-section-label">Gestion</div>
-      <a href="${root}Vendeur/orders.html"       class="gsd-link"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
-      <a href="${root}Vendeur/dashboard.html"    class="gsd-link"><i class="fas fa-store"></i> Ma boutique</a>
-      <a href="${root}Vendeur/add-product.html"  class="gsd-link"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
-      <a href="${root}Vendeur/reviews.html"      class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
+      <div class="gsd-section-label">Gestion Studio</div>
+      <a href="${root}pages/seller/dashboard.html"   class="gsd-link"><i class="fas fa-th-large"></i> Tableau de bord</a>
+      <a href="${root}pages/seller/products.html"    class="gsd-link"><i class="fas fa-boxes"></i> Mes produits</a>
+      <a href="${root}pages/seller/orders.html"      class="gsd-link"><i class="fas fa-shopping-cart"></i> Commandes</a>
+      <a href="${root}pages/seller/reviews.html"     class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
 
       <div class="gsd-sep"></div>
-      <div class="gsd-section-label">Compte</div>
-      <a href="${root}Vendeur/dashboard.html"   class="gsd-link"><i class="fas fa-chart-line"></i> Tableau de bord</a>
-      <a href="${root}Vendeur/settings.html"    class="gsd-link"><i class="fas fa-user-cog"></i> Paramètres</a>
+      <div class="gsd-section-label">Boutique</div>
+      <a href="${root}pages/seller/finance.html"     class="gsd-link"><i class="fas fa-wallet"></i> Finances</a>
+      <a href="${root}pages/seller/settings.html"    class="gsd-link"><i class="fas fa-cog"></i> Paramètres</a>
     </div>
 
     <button class="gsd-logout" id="gsdLogout">
@@ -296,25 +300,25 @@ function buildNavbar(active='home') {
   /* ─ Catalogue dropdown ─ */
   const catDrop = `
     <div class="nd">
-      <a href="${root}catalogue.html" class="nl ${active==='catalogue'?'active':''}">Catalogue <i class="fas fa-chevron-down" style="font-size:.45rem;opacity:.5;margin-left:3px"></i></a>
+      <a href="${root}src/pages/visiteur/catalogue.html" class="nl ${active==='catalogue'?'active':''}">Catalogue <i class="fas fa-chevron-down" style="font-size:.45rem;opacity:.5;margin-left:3px"></i></a>
       <div class="drop">
-        <a href="${root}catalogue.html?cat=vinyles"><i class="fas fa-record-vinyl"></i> Vinyles</a>
-        <a href="${root}catalogue.html?cat=cassettes"><i class="fas fa-tape"></i> Cassettes</a>
-        <a href="${root}catalogue.html?cat=instruments"><i class="fas fa-guitar"></i> Instruments</a>
-        <a href="${root}catalogue.html?cat=posters"><i class="fas fa-image"></i> Posters & Art</a>
-        <a href="${root}catalogue.html?cat=electronique"><i class="fas fa-plug"></i> Électronique</a>
-        <a href="${root}catalogue.html?cat=cd"><i class="fas fa-compact-disc"></i> CDs</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=vinyles"><i class="fas fa-record-vinyl"></i> Vinyles</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=cassettes"><i class="fas fa-tape"></i> Cassettes</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=instruments"><i class="fas fa-guitar"></i> Instruments</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=posters"><i class="fas fa-image"></i> Posters & Art</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=electronique"><i class="fas fa-plug"></i> Électronique</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?cat=cd"><i class="fas fa-compact-disc"></i> CDs</a>
         <div class="dd"></div>
-        <a href="${root}catalogue.html?rare=1"><i class="fas fa-gem"></i> Éditions rares</a>
+        <a href="${root}src/pages/visiteur/catalogue.html?rare=1"><i class="fas fa-gem"></i> Éditions rares</a>
       </div>
     </div>`;
 
   /* ─ Nav middle ─ */
   const navMid = `
     <nav class="nav-mid">
-      <a href="${root}index.html" class="nl ${active==='home'?'active':''}">Accueil</a>
+      <a href="${root}src/pages/visiteur/index.html" class="nl ${active==='home'?'active':''}">Accueil</a>
       ${catDrop}
-      <a href="${root}index.html#how" class="nl">Comment ça marche</a>
+      <a href="${root}src/pages/visiteur/index.html#how" class="nl">Comment ça marche</a>
     </nav>`;
 
   /* ─ Right side by role ─ */
@@ -325,9 +329,9 @@ function buildNavbar(active='home') {
       <div class="nav-r">
         <button class="ni search-trigger" aria-label="Recherche"><i class="fas fa-search"></i></button>
         <div class="nsep"></div>
-        <a href="${root}login.html" class="ntxt">Connexion</a>
-        <a href="${root}register.html" class="nbtn">S'inscrire</a>
-        <a href="${root}register.html?role=seller" class="nsell">Vendre <i class="fas fa-store"></i></a>
+        <a href="${root}auth/sign-in.html" class="ntxt">Connexion</a>
+        <a href="${root}src/pages/visiteur/auth-entry.html" class="nbtn">S'inscrire</a>
+        <a href="${root}src/pages/visiteur/auth-entry.html?role=seller" class="nsell">Vendre <i class="fas fa-store"></i></a>
         <button class="hamburger" id="hbg"><span></span><span></span><span></span></button>
       </div>`;
 
@@ -335,9 +339,13 @@ function buildNavbar(active='home') {
     navR = `
       <div class="nav-r">
         <button class="ni search-trigger"><i class="fas fa-search"></i></button>
-        <a href="${root}cart.html" class="ni cart-icon" style="position:relative">
+        <a href="${root}src/pages/acheteur/cart.html" class="ni cart-icon" style="position:relative">
           <i class="fas fa-shopping-bag"></i>${badge}
         </a>
+        <button class="ni notif-trigger" style="position:relative">
+          <i class="fas fa-bell"></i>
+          <span class="cbadge notif-badge" style="display:none">0</span>
+        </button>
         <div class="nsep"></div>
         <div class="nd gold-profile-dd">
           <button class="gold-profile-btn">
@@ -346,12 +354,13 @@ function buildNavbar(active='home') {
             <i class="fas fa-chevron-down" style="font-size:.42rem;opacity:.5;margin-left:4px"></i>
           </button>
           <div class="drop gold-drop-profile">
-            <a href="${root}profile.html"><i class="fas fa-user"></i> Mon profil</a>
-            <a href="${root}cart.html"><i class="fas fa-shopping-bag"></i> Panier (${count})</a>
-            <a href="${root}profile.html#orders"><i class="fas fa-box"></i> Commandes</a>
-            <a href="${root}profile.html#favorites"><i class="fas fa-heart"></i> Favoris</a>
+            <a href="${root}src/pages/acheteur/profile.html"><i class="fas fa-user"></i> Mon profil</a>
+            <a href="${root}src/pages/acheteur/cart.html"><i class="fas fa-shopping-bag"></i> Panier (${count})</a>
+            <a href="${root}src/pages/acheteur/orders.html"><i class="fas fa-box"></i> Commandes</a>
+            <a href="${root}src/pages/acheteur/favorites.html"><i class="fas fa-heart"></i> Favoris</a>
+            <a href="${root}src/pages/acheteur/settings.html"><i class="fas fa-cog"></i> Paramètres</a>
             <div class="dd"></div>
-            <a href="${root}register.html?role=seller" style="color:#E5A657"><i class="fas fa-store"></i> Devenir vendeur</a>
+            <a href="${root}src/pages/visiteur/auth-entry.html?role=seller" style="color:#E5A657"><i class="fas fa-store"></i> Devenir vendeur</a>
             <div class="dd"></div>
             <a href="#" class="gold-logout" style="color:#B53324"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
           </div>
@@ -403,18 +412,18 @@ function buildMobileNav() {
   const dispName = user.role==='seller' ? (user.shopName||user.firstName) : user.firstName;
   const avStyle = user.role==='seller' ? 'background:linear-gradient(135deg,#E5A657,#c07d30);color:#1c0f07' : 'background:linear-gradient(135deg,#B53324,#E5A657)';
 
-  let links = user.role==='seller' ? `
+  let links = (user.role==='seller' || user.role==='VENDEUR') ? `
+    <a href="${root}index.html">Accueil</a>
+    <a href="${root}src/pages/visiteur/catalogue.html">Catalogue</a>
+    <a href="${root}pages/seller/dashboard.html">Seller Studio</a>
+    <a href="${root}pages/seller/products.html">Mes produits</a>
+    <a href="${root}pages/seller/orders.html">Commandes</a>
+    <a href="${root}pages/seller/reviews.html">Avis clients</a>` : `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}Vendeur/orders.html">Mes commandes</a>
-    <a href="${root}Vendeur/dashboard.html">Ma boutique</a>
-    <a href="${root}Vendeur/add-product.html">+ Ajouter un produit</a>
-    <a href="${root}Vendeur/reviews.html">Avis clients</a>` : `
-    <a href="${root}index.html">Accueil</a>
-    <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}cart.html">Mon panier</a>
-    <a href="${root}profile.html">Mon profil</a>
-    <a href="${root}profile.html#orders">Mes commandes</a>`;
+    <a href="${root}pages/buyer/cart.html">Mon panier</a>
+    <a href="${root}pages/buyer/profile.html">Mon profil</a>
+    <a href="${root}pages/buyer/orders.html">Mes commandes</a>`;
 
   return `
     <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(229,166,87,0.15)">
@@ -537,9 +546,116 @@ function _attachNavEvents() {
     e.stopPropagation();
     const user = GoldAuth.getUser();
     if (user && user.role === 'seller') {
-      window.location.href = _root() + 'Vendeur/dashboard.html';
+      window.location.href = _root() + 'src/pages/vendeur/dashboard.html';
     }
   });
+
+  /* ── NOTIFICATIONS DRAPER ── */
+  document.querySelector('.notif-trigger')?.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleNotifDrawer();
+  });
+}
+
+function toggleNotifDrawer() {
+  let drawer = document.getElementById('notifDrawer');
+  if (!drawer) {
+    drawer = document.createElement('div');
+    drawer.id = 'notifDrawer';
+    drawer.className = 'gold-drawer';
+    document.body.appendChild(drawer);
+    
+    // Style for drawer
+    if (!document.getElementById('gold-drawer-styles')) {
+      const s = document.createElement('style');
+      s.id = 'gold-drawer-styles';
+      s.textContent = `
+        .gold-drawer {
+            position:fixed; top:0; right:-380px; width:380px; height:100%;
+            background:#fff; border-left:1px solid #e1e3d9; z-index:10000;
+            box-shadow:-10px 0 40px rgba(0,0,0,0.05); transition:transform 0.5s cubic-bezier(0.16,1,0.3,1);
+            display:flex; flex-direction:column;
+        }
+        .gold-drawer.open { transform:translateX(-380px); }
+        .gd-header { padding:30px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+        .gd-title { font-family:'Cormorant',serif; font-size:1.8rem; margin:0; }
+        .gd-close { background:none; border:none; font-size:1.5rem; cursor:pointer; opacity:0.5; }
+        .gd-body { flex:1; overflow-y:auto; padding:20px; }
+        .notif-item { padding:15px; border-radius:12px; margin-bottom:12px; background:#f9f9f9; border:1px solid transparent; transition:all 0.2s; cursor:pointer; }
+        .notif-item:hover { background:#fff; border-color:#e5a657; transform:translateX(-5px); }
+        .notif-item.unread { background:#fff; border-color:rgba(229,166,87,0.3); box-shadow:0 5px 15px rgba(229,166,87,0.08); }
+        .ni-top { display:flex; justify-content:space-between; margin-bottom:5px; }
+        .ni-tag { font-size:0.6rem; text-transform:uppercase; font-weight:700; color:#e5a657; }
+        .ni-date { font-size:0.65rem; color:#aaa; }
+        .ni-ttl { font-size:0.9rem; font-weight:600; margin-bottom:4px; display:block; }
+        .ni-txt { font-size:0.8rem; color:#666; line-height:1.4; }
+      `;
+      document.head.appendChild(s);
+    }
+  }
+
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    drawer.classList.remove('open');
+  } else {
+    drawer.classList.add('open');
+    refreshNotifications();
+  }
+}
+
+async function refreshNotifications() {
+  const user = GoldAuth.getUser();
+  if (!user) return;
+  const drawer = document.getElementById('notifDrawer');
+  const body = drawer.querySelector('.gd-body') || document.createElement('div');
+  if (!drawer.querySelector('.gd-body')) {
+    drawer.innerHTML = `
+      <div class="gd-header">
+        <h3 class="gd-title">Notifications</h3>
+        <button class="gd-close" onclick="toggleNotifDrawer()">&times;</button>
+      </div>
+      <div class="gd-body">
+        <div class="notif-loading" style="text-align:center;padding:40px">
+          <i class="fas fa-spinner fa-spin" style="color:#e5a657"></i>
+        </div>
+      </div>
+    `;
+  }
+  
+  const bodyEl = drawer.querySelector('.gd-body');
+  try {
+    const res = await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/notifications`);
+    if (res.ok) {
+      const notifs = await res.json();
+      if (notifs.length === 0) {
+        bodyEl.innerHTML = '<div style="text-align:center;padding:60px 20px;opacity:0.4"><i class="fas fa-bell-slash" style="font-size:2rem;margin-bottom:10px;display:block"></i>Aucune notification</div>';
+      } else {
+        bodyEl.innerHTML = notifs.map(n => `
+          <div class="notif-item ${n.est_lue ? '' : 'unread'}" onclick="markNotifRead(${n.id})">
+            <div class="ni-top">
+              <span class="ni-tag">${n.type}</span>
+              <span class="ni-date">${new Date(n.created_at).toLocaleDateString()}</span>
+            </div>
+            <span class="ni-ttl">${n.titre}</span>
+            <p class="ni-txt">${n.contenu}</p>
+          </div>
+        `).join('');
+      }
+      
+      const unreadCount = notifs.filter(n => !n.est_lue).length;
+      const badge = document.querySelector('.notif-badge');
+      if (badge) {
+        badge.textContent = unreadCount;
+        badge.style.display = unreadCount > 0 ? 'block' : 'none';
+      }
+    }
+  } catch (e) { bodyEl.innerHTML = 'Erreur de chargement'; }
+}
+
+async function markNotifRead(id) {
+    const user = GoldAuth.getUser();
+    await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/notifications/${id}/lue`, { method: 'PUT' });
+    refreshNotifications();
 }
 
 /* ══════════════════════════════════════════════════════
@@ -573,7 +689,7 @@ function initCartAndFavButtons() {
     e.preventDefault();
     if (!GoldAuth.isLoggedIn()) { requireLogin('acheter ce produit'); return; }
     const root = _root();
-    window.location.href = root + 'cart.html';
+    window.location.href = root + 'src/pages/acheteur/cart.html';
   });
 
   /* Fav buttons */
@@ -583,10 +699,22 @@ function initCartAndFavButtons() {
     const fresh = btn.cloneNode(true);
     btn.parentNode?.replaceChild(fresh, btn);
     if (pid && GoldAuth.isFav(pid)) { fresh.innerHTML='♥'; fresh.classList.add('liked'); }
-    fresh.addEventListener('click', e=>{
+    fresh.addEventListener('click', async e=>{
       e.preventDefault(); e.stopPropagation();
       if (!GoldAuth.isLoggedIn()) { requireLogin('ajouter aux favoris'); return; }
+      
+      const user = GoldAuth.getUser();
       const added = GoldAuth.toggleFav(pid);
+      
+      // Sync with API
+      try {
+        await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/favoris`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_produit: pid })
+        });
+      } catch (err) { console.error("API Fav sync failed", err); }
+
       fresh.innerHTML = added ? '♥' : '♡';
       fresh.classList.toggle('liked', added);
       showToast(added ? '♥ Ajouté aux favoris' : 'Retiré des favoris');

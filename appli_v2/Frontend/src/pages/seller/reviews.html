@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avis Clients — Seller Studio | Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/seller-studio.css">
+    <style>
+        .review-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 24px; margin-bottom: 24px; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .review-stars { color: var(--accent); font-size: 0.9rem; }
+        .review-date { font-size: 0.75rem; color: var(--text-secondary); }
+        .review-author { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+        .author-av { width: 32px; height: 32px; border-radius: 50%; background: #B53324; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .review-content { font-size: 0.9rem; line-height: 1.6; color: var(--text-primary); font-style: italic; margin-bottom: 16px; }
+        .review-product { font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; }
+        .reply-box { margin-top: 16px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.1); border-left: 3px solid var(--accent); }
+    </style>
+</head>
+<body class="seller-layout">
+    
+    <div id="seller-sidebar-container"></div>
+
+    <main class="seller-main">
+        <div id="seller-topbar-container"></div>
+
+        <div class="seller-content">
+            <div style="margin-bottom: 32px">
+                <h2 class="page-title" style="font-size: 2rem;">Avis <em>Clients</em></h2>
+                <p style="color:var(--text-secondary); font-size:0.88rem; margin-top:4px">Suivez votre réputation et répondez à vos acheteurs.</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 32px;">
+                <!-- SUMMARY -->
+                <div>
+                    <div class="review-card" style="text-align:center">
+                        <div style="font-size:3.5rem; font-family:'Special Elite', cursive; color:var(--accent); margin-bottom:10px" id="avg-rating">5.0</div>
+                        <div class="review-stars" style="font-size:1.4rem" id="avg-stars">★★★★★</div>
+                        <div style="font-size:0.82rem; color:var(--text-secondary); margin-top:8px" id="total-reviews">Basé sur 0 avis</div>
+                        
+                        <div style="margin-top:32px; text-align:left">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+                                <span style="font-size:0.75rem; width:20px">5★</span>
+                                <div style="flex:1; height:6px; background:rgba(255,255,255,0.05); border-radius:10px"><div style="width:100%; height:100%; background:var(--accent); border-radius:10px"></div></div>
+                            </div>
+                            <!-- Repete for 4,3,2,1 star -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIST -->
+                <div id="reviews-list">
+                    <div style="text-align:center; padding:80px; color:var(--text-secondary); opacity:0.5">
+                        <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; display:block"></i>
+                        Chargement des avis...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/auth-system.js"></script>
+    <script src="../../js/core/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = GoldAuth.getUser();
+            if (!user) return;
+
+            GoldComponents.injectSellerSidebar('reviews');
+            GoldComponents.injectSellerTopbar('Avis Clients');
+
+            await loadReviews();
+        });
+
+        async function loadReviews() {
+            const user = GoldAuth.getUser();
+            try {
+                const res = await fetch(`http://localhost:8000/api/vendeurs/${user.id_vendeur || user.id}/avis`);
+                if (res.ok) {
+                    const avis = await res.json();
+                    renderReviews(avis);
+                }
+            } catch (e) {
+                console.error("Load reviews error:", e);
+            }
+        }
+
+        function renderReviews(avis) {
+            const list = document.getElementById('reviews-list');
+            const avgRatingEl = document.getElementById('avg-rating');
+            const avgStarsEl = document.getElementById('avg-stars');
+            const totalReviewsEl = document.getElementById('total-reviews');
+
+            if (avis.length === 0) {
+                list.innerHTML = '<div style="padding:80px; text-align:center; opacity:0.4"><i class="fas fa-comment-slash" style="font-size:3rem; margin-bottom:15px; display:block"></i>Vous n\'avez pas encore d\'avis.</div>';
+                return;
+            }
+
+            const avg = (avis.reduce((s, a) => s + a.note, 0) / avis.length).toFixed(1);
+            avgRatingEl.textContent = avg;
+            avgStarsEl.textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+            totalReviewsEl.textContent = `Basé sur ${avis.length} avis`;
+
+            list.innerHTML = avis.map(a => `
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-stars">${'★'.repeat(a.note)}${'☆'.repeat(5-a.note)}</div>
+                        <div class="review-date">${new Date(a.date_avis).toLocaleDateString()}</div>
+                    </div>
+                    <div class="review-author">
+                        <div class="author-av">${(a.prenom_acheteur||'A')[0].toUpperCase()}</div>
+                        <div style="font-size:0.85rem; font-weight:600">${a.prenom_acheteur} ${a.nom_acheteur}</div>
+                    </div>
+                    <div class="review-content">« ${a.commentaire} »</div>
+                    <div class="review-product">
+                        <i class="fas fa-shopping-bag" style="color:var(--accent)"></i>
+                        Achat: <strong>${a.titre_produit}</strong>
+                    </div>
+                    ${a.reponse ? `
+                        <div class="reply-box">
+                            <div style="font-size:0.75rem; font-weight:700; color:var(--accent); margin-bottom:4px">Votre réponse:</div>
+                            <div style="font-size:0.85rem; color:var(--text-primary)">cat ${a.reponse}</div>
+                        </div>
+                    ` : `
+                        <div style="margin-top:16px; text-align:right">
+                            <button onclick="showReplyForm(${a.id_avis})" style="background:transparent; border:1px solid var(--accent); color:var(--accent); padding:6px 16px; border-radius:8px; font-size:0.75rem; font-weight:600; cursor:pointer">Répondre</button>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function showReplyForm(avisId) {
+            showToast("Fonctionnalité de réponse bientôt disponible !", "info");
+        }
+    </script>
+</body>
+</html>

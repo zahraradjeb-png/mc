@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Commandes — Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .buyer-wrap { max-width: 900px; margin: 60px auto; padding: 0 24px; }
+        .buyer-title { font-family: 'Cormorant', serif; font-size: 2.8rem; margin-bottom: 40px; }
+        .order-card { background: #fff; border: 1px solid #e1e3d9; border-radius: 20px; overflow: hidden; margin-bottom: 24px; padding: 24px; }
+        .order-head { display: flex; justify-content: space-between; border-bottom: 1px solid #f0f0f0; padding-bottom: 16px; margin-bottom: 16px; }
+        .order-status { font-size: 0.75rem; padding: 4px 12px; border-radius: 100px; background: #f0f0f0; font-weight: 700; color: #8a6a50; }
+        .st-delivered { background: #16a34a; color: white; }
+        .order-item { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+        .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    </style>
+</head>
+<body class="site-layout">
+    
+    <header class="navbar scrolled" style="position:static; background:#1c0f07;">
+        <div class="nav-wrap">
+            <a href="../visitor/index.html" class="logo">G<span>old</span></a>
+        </div>
+    </header>
+
+    <main class="buyer-wrap">
+        <h1 class="buyer-title">Mes <em>commandes</em></h1>
+        
+        <div id="buyer-orders-list">
+            <div style="text-align:center; padding:80px; color:#8a6a50; opacity:0.5">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; display:block"></i>
+                Chargement de vos commandes...
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/auth-system.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = GoldAuth.getUser();
+            if (!user) { window.location.href = '../visitor/index.html'; return; }
+            
+            try {
+                const res = await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/commandes`);
+                if (res.ok) {
+                    const orders = await res.json();
+                    renderOrders(orders);
+                }
+            } catch (e) {
+                document.getElementById('buyer-orders-list').innerHTML = '<p style="text-align:center; padding:40px; color:#B53324">Erreur de chargement.</p>';
+            }
+        });
+
+        function renderOrders(orders) {
+            const list = document.getElementById('buyer-orders-list');
+            if (orders.length === 0) {
+                list.innerHTML = '<div style="padding:100px; text-align:center; opacity:0.3"><i class="fas fa-box-open" style="font-size:3rem; margin-bottom:20px; display:block"></i>Vous n\'avez pas encore passé de commande.</div>';
+                return;
+            }
+
+            list.innerHTML = orders.map(o => `
+                <div class="order-card">
+                    <div class="order-head">
+                        <div>
+                            <div style="font-weight:700; color:#1c0f07">Commande #${o.id_commande}</div>
+                            <div style="font-size:0.8rem; color:#8a6a50">${new Date(o.date_commande).toLocaleDateString()}</div>
+                        </div>
+                        <div class="order-status ${o.statut === 'LIVRE' ? 'st-delivered' : ''}">${o.statut}</div>
+                    </div>
+                    <div class="order-items">
+                        ${o.liste_produits.map(p => `
+                            <div class="order-item">
+                                <img src="../../../${p.photo_principale || 'assets/images/placeholder.jpg'}" class="item-img" onerror="this.src='../../../assets/images/placeholder-product.jpg'">
+                                <div style="flex:1">
+                                    <div style="font-weight:600; font-size:0.9rem">${p.titre}</div>
+                                    <div style="font-size:0.75rem; color:#8a6a50">Vendeur: ${p.nom_boutique || 'Particulier'}</div>
+                                </div>
+                                <div style="font-weight:600">${p.prix} €</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top:20px; text-align:right; border-top:1px solid #f0f0f0; padding-top:16px">
+                        <span style="font-size:0.85rem; color:#8a6a50">Total payé:</span>
+                        <span style="font-size:1.2rem; font-weight:700; color:#B53324; margin-left:10px">${o.total} €</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

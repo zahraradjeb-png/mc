@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Favoris — Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        .buyer-wrap { max-width: 1000px; margin: 60px auto; padding: 0 24px; }
+        .buyer-title { font-family: 'Cormorant', serif; font-size: 2.8rem; margin-bottom: 40px; }
+        .fav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+        .fav-card { background: #fff; border: 1px solid #e1e3d9; border-radius: 18px; overflow: hidden; position: relative; transition: all 0.3s; }
+        .fav-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .fav-img { width: 100%; height: 220px; object-fit: cover; }
+        .fav-body { padding: 16px; }
+        .fav-name { font-weight: 600; font-size: 1rem; color: #1c0f07; margin-bottom: 4px; }
+        .fav-price { font-weight: 700; color: #B53324; font-family: 'Special Elite', cursive; }
+        .remove-fav { position: absolute; top: 12px; right: 12px; background: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #B53324; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="site-layout">
+    <header class="navbar scrolled" style="position:static; background:#1c0f07;">
+        <div class="nav-wrap"><a href="../visitor/index.html" class="logo">G<span>old</span></a></div>
+    </header>
+
+    <main class="buyer-wrap">
+        <h1 class="buyer-title">Mes <em>coups de cœur</em></h1>
+        <div id="fav-list" class="fav-grid">
+            <div style="text-align:center; grid-column: 1 / -1; padding:100px; opacity:0.3">
+                <i class="fas fa-spinner fa-spin" style="font-size:2.5rem; margin-bottom:20px; display:block"></i>
+                Chargement de vos favoris...
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/auth-system.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = GoldAuth.getUser();
+            if (!user) return;
+            
+            try {
+                const res = await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/favoris`);
+                if (res.ok) {
+                    const favs = await res.json();
+                    renderFavs(favs);
+                }
+            } catch (e) { document.getElementById('fav-list').innerHTML = 'Erreur chargement.'; }
+        });
+
+        function renderFavs(favs) {
+            const list = document.getElementById('fav-list');
+            if (favs.length === 0) {
+                list.innerHTML = '<div style="grid-column: 1 / -1; padding:100px; text-align:center; opacity:0.4"><i class="fas fa-heart" style="font-size:3rem; margin-bottom:20px; display:block"></i>Votre liste est vide.</div>';
+                return;
+            }
+
+            list.innerHTML = favs.map(f => `
+                <div class="fav-card">
+                    <button class="remove-fav" onclick="unfav(${f.id_produit})"><i class="fas fa-heart"></i></button>
+                    <a href="../visitor/product.html?id=${f.id_produit}">
+                        <img src="../../../${f.photo_principale || 'assets/images/placeholder.jpg'}" class="fav-img" onerror="this.src='../../../assets/images/placeholder-product.jpg'">
+                    </a>
+                    <div class="fav-body">
+                        <div class="fav-name">${f.titre}</div>
+                        <div style="font-size:0.8rem; color:#8a6a50; margin-bottom:8px">${f.artiste || 'Collectif'}</div>
+                        <div class="fav-price">${f.prix} €</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function unfav(pid) {
+            const user = GoldAuth.getUser();
+            try {
+                await fetch(`http://localhost:8000/api/acheteurs/${user.id_user || user.id}/favoris`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_produit: pid }) // Note: toggle API
+                });
+                location.reload();
+            } catch (e) {}
+        }
+    </script>
+</body>
+</html>

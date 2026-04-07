@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Boutique — Seller Studio | Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/seller-studio.css">
+    <style>
+        .profile-header { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; overflow: hidden; margin-bottom: 24px; position: relative; }
+        .profile-banner { height: 260px; background: url('../../assets/images/hero/first.jpg') center/cover; position: relative; }
+        .profile-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg-card) 0%, transparent 100%); }
+        .profile-info-wrap { padding: 0 40px 30px; position: relative; margin-top: -60px; z-index: 2; display: flex; align-items: flex-end; gap: 30px; }
+        .profile-av-lg { width: 150px; height: 150px; border-radius: 20px; border: 6px solid var(--bg-card); background: linear-gradient(135deg, var(--accent), #B27F44); color: var(--bg-dark); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 700; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .profile-details { flex: 1; padding-bottom: 10px; }
+        .profile-name { font-family: 'Cormorant', serif; font-size: 2.5rem; font-weight: 600; color: white; margin-bottom: 5px; }
+        .profile-meta { display: flex; gap: 20px; color: var(--text-secondary); font-size: 0.85rem; }
+        .profile-meta span { display: flex; align-items: center; gap: 6px; }
+        .profile-bio { margin-top: 24px; padding: 0 40px 40px; color: var(--text-secondary); line-height: 1.6; max-width: 800px; }
+        .profile-stats-bar { display: flex; gap: 40px; padding: 24px 40px; border-top: 1px solid var(--border-light); background: rgba(255,255,255,0.02); }
+        .p-stat { text-align: center; }
+        .p-stat-val { display: block; font-size: 1.5rem; font-weight: 700; font-family: 'Special Elite', cursive; color: var(--accent); }
+        .p-stat-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-top: 4px; }
+    </style>
+</head>
+<body class="seller-layout">
+    
+    <div id="seller-sidebar-container"></div>
+
+    <main class="seller-main">
+        <div id="seller-topbar-container"></div>
+
+        <div class="seller-content">
+            <div class="profile-header" id="profile-container">
+                <!-- SKELETON -->
+                <div style="height: 400px; display:flex; align-items:center; justify-content:center">
+                    <i class="fas fa-spinner fa-spin" style="font-size:2rem"></i>
+                </div>
+            </div>
+
+            <!-- PREVIEW SHOP AS CUSTOMER -->
+            <div style="margin-top:40px; border-top: 1px solid var(--border-light); padding-top:40px">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px">
+                    <h3 class="page-title" style="font-size:1.5rem">Aperçu de vos <em>produits</em></h3>
+                    <a href="../visitor/catalogue.html?vendeur=me" class="nav-link" style="color:var(--accent); font-size:0.85rem; text-decoration:none">Voir tout mon catalogue public →</a>
+                </div>
+                <div id="my-products-preview" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:20px">
+                    <!-- Products will be injected here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/auth-system.js"></script>
+    <script src="../../js/core/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = GoldAuth.getUser();
+            if (!user) return;
+
+            GoldComponents.injectSellerSidebar('profile');
+            GoldComponents.injectSellerTopbar('Profil Boutique');
+
+            await loadProfile();
+        });
+
+        async function loadProfile() {
+            const user = GoldAuth.getUser();
+            try {
+                const res = await fetch(`http://localhost:8000/api/vendeurs/${user.id_vendeur || user.id}/stats`);
+                if (res.ok) {
+                    const stats = await res.json();
+                    renderProfile(stats);
+                    loadMyProductsPreview();
+                }
+            } catch (e) { console.error("Load profile error:", e); }
+        }
+
+        function renderProfile(stats) {
+            const user = GoldAuth.getUser();
+            const container = document.getElementById('profile-container');
+            const initials = (user.nom || 'V')[0].toUpperCase() + (user.prenom || '')[0].toUpperCase();
+
+            container.innerHTML = `
+                <div class="profile-banner">
+                    <button style="position:absolute; top:20px; right:20px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:8px; padding:8px 16px; font-size:0.75rem; cursor:pointer">
+                        <i class="fas fa-camera" style="margin-right:8px"></i> Modifier la bannière
+                    </button>
+                </div>
+                <div class="profile-info-wrap">
+                    <div class="profile-av-lg">${initials}</div>
+                    <div class="profile-details">
+                        <h1 class="profile-name">${user.nom_boutique || user.nom || 'Ma Boutique'}</h1>
+                        <div class="profile-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> ${user.adresse || 'France'}</span>
+                            <span><i class="fas fa-calendar-alt"></i> Membre depuis ${new Date(user.created_at || Date.now()).getFullYear()}</span>
+                            <span><i class="fas fa-certificate" style="color:var(--accent)"></i> Vendeur Premium</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-bio">
+                    ${user.description_boutique || "Passionné de musique vintage, je propose une sélection rigoureuse d'objets rares, de vinyles d'époque et d'instruments certifiés. Chaque pièce est vérifiée avant mise en vente."}
+                </div>
+                <div class="profile-stats-bar">
+                    <div class="p-stat"><span class="p-stat-val">${stats.total_produits}</span><span class="p-stat-lbl">Produits</span></div>
+                    <div class="p-stat"><span class="p-stat-val">${stats.total_ventes || 0}</span><span class="p-stat-lbl">Ventes</span></div>
+                    <div class="p-stat"><span class="p-stat-val">${stats.vendeur_note || '5.0'}</span><span class="p-stat-lbl">Note</span></div>
+                    <div class="p-stat"><span class="p-stat-val">${stats.abonne_count || 42}</span><span class="p-stat-lbl">Abonnés</span></div>
+                </div>
+            `;
+        }
+
+        async function loadMyProductsPreview() {
+            const user = GoldAuth.getUser();
+            const container = document.getElementById('my-products-preview');
+            try {
+                const res = await fetch(`http://localhost:8000/api/produits?id_vendeur=${user.id_vendeur || user.id}&limit=4`);
+                if (res.ok) {
+                    const products = await res.json();
+                    if (products.length === 0) {
+                        container.innerHTML = '<p style="opacity:0.4">Aucun produit en ligne.</p>';
+                        return;
+                    }
+                    container.innerHTML = products.slice(0, 4).map(p => `
+                        <div class="stat-card" style="padding:10px">
+                            <div style="height:120px; border-radius:10px; overflow:hidden; background:#000; margin-bottom:12px; border:1px solid var(--border-light)">
+                                <img src="../../../${p.photo_principale || 'assets/images/placeholder.jpg'}" style="width:100%; height:100%; object-fit:cover">
+                            </div>
+                            <div style="font-size:0.85rem; font-weight:600; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${p.titre}</div>
+                            <div style="font-size:0.85rem; color:var(--accent); font-weight:700; margin-top:4px">${p.prix} €</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { container.innerHTML = 'Erreur chargement preview'; }
+        }
+    </script>
+</body>
+</html>

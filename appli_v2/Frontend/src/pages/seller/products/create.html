@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajouter un Produit — Seller Studio | Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/seller-studio.css">
+    <style>
+        .form-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 18px; padding: 32px; margin-bottom: 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .form-group.full { grid-column: span 2; }
+        .form-label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
+            border-radius: 8px; color: white; font-family: 'Jost', sans-serif; font-size: 0.9rem; transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
+        .upload-zone {
+            width: 100%; height: 200px; border: 2px dashed var(--border-light); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .upload-zone:hover { border-color: var(--accent); background: rgba(229,166,87,0.05); }
+        .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+        .preview-item { height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light); position: relative; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .remove-img { position: absolute; top: 4px; right: 4px; background: rgba(181, 51, 36, 0.8); border: none; color: white; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem; }
+    </style>
+</head>
+<body class="seller-layout">
+    
+    <div id="seller-sidebar-container"></div>
+
+    <main class="seller-main">
+        <div id="seller-topbar-container"></div>
+
+        <div class="seller-content" style="max-width: 900px; margin: 0 auto;">
+            <div style="margin-bottom: 32px">
+                <a href="../products.html" style="color:var(--accent); text-decoration:none; font-size:0.85rem; display:flex; align-items:center; gap:8px">
+                    <i class="fas fa-arrow-left"></i> Retour à l'inventaire
+                </a>
+                <h2 class="page-title" style="font-size: 2rem; margin-top:12px">Mettre en vente un <em>nouvel objet</em></h2>
+            </div>
+
+            <form id="product-form">
+                <!-- 1. INFOS GÉNÉRALES -->
+                <div class="form-card">
+                    <h3 style="font-family:'Cormorant',serif; font-size:1.4rem; margin-bottom:24px; color:var(--accent)">Informations Générales</h3>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Titre de l'annonce *</label>
+                            <input type="text" name="titre" class="form-input" placeholder="Ex: Pink Floyd - The Dark Side of the Moon (Original 1973)" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Catégorie *</label>
+                            <select name="id_categorie" id="cat-select" class="form-select" required>
+                                <option value="">Choisir une catégorie</option>
+                                <option value="3">Vinyle</option>
+                                <option value="1">CD</option>
+                                <option value="2">Cassette</option>
+                                <option value="5">Instrument</option>
+                                <option value="4">Poster</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">État de l'objet *</label>
+                            <select name="etat" class="form-select" required>
+                                <option value="NEUF">Neuf (Scellé)</option>
+                                <option value="BON">Bon état</option>
+                                <option value="ACCEPTABLE">Acceptable</option>
+                                <option value="ABIME">Abîmé / Pour pièces</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Prix (€) *</label>
+                            <input type="number" step="0.01" name="prix" class="form-input" placeholder="0.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quantité</label>
+                            <input type="number" name="quantite" class="form-input" value="1">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Description détaillée</label>
+                            <textarea name="description" class="form-textarea" rows="5" placeholder="Décrivez l'état précis, l'histoire de l'objet, les défauts éventuels..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PHOTOS -->
+                <div class="form-card">
+                    <h3 style="font-family:'Cormorant',serif; font-size:1.4rem; margin-bottom:12px; color:var(--accent)">Photos (Max 4)</h3>
+                    <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:20px">Une belle photo augmente vos chances de vente de 80% !</p>
+                    
+                    <div class="upload-zone" id="drop-zone">
+                        <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem; opacity:0.3"></i>
+                        <span style="font-size:0.9rem">Glissez vos photos ici ou <strong>cliquez pour choisir</strong></span>
+                        <input type="file" id="file-input" name="photos[]" multiple accept="image/*" style="position:absolute; inset:0; opacity:0; cursor:pointer">
+                    </div>
+                    <div class="preview-grid" id="preview-grid"></div>
+                </div>
+
+                <!-- 3. DÉTAILS SPÉCIFIQUES (Injectés via JS) -->
+                <div class="form-card" id="spec-fields-card" style="display:none">
+                    <h3 style="font-family:'Cormorant',serif; font-size:1.4rem; margin-bottom:24px; color:var(--accent)">Détails Techniques</h3>
+                    <div class="form-grid" id="spec-fields-container">
+                        <!-- Points for specialized tables (Vinyle, Cassette, CD) -->
+                    </div>
+                </div>
+
+                <!-- 4. RARETÉ & ANNÉE -->
+                <div class="form-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Artiste / Marque</label>
+                            <input type="text" name="artiste" class="form-input" placeholder="Ex: Nirvana, Gibson, Sony...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Année de sortie</label>
+                            <input type="number" name="annee" class="form-input" placeholder="Ex: 1991">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rareté</label>
+                            <select name="rarete" class="form-select">
+                                <option value="COMMUN">Commun</option>
+                                <option value="RARE">Rare</option>
+                                <option value="TRES_RARE">Très Rare</option>
+                                <option value="COLLECTOR">Édition Collector</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Décennie</label>
+                            <select name="decennie" class="form-select">
+                                <option value="">Inconnu</option>
+                                <option value="50">Années 50</option>
+                                <option value="60">Années 60</option>
+                                <option value="70">Années 70</option>
+                                <option value="80">Années 80</option>
+                                <option value="90">Années 90</option>
+                                <option value="2000">Années 2000</option>
+                                <option value="2010">Années 2010</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:16px; margin-bottom:80px">
+                    <button type="button" onclick="history.back()" style="padding:14px 32px; background:transparent; color:white; border:1px solid var(--border-light); border-radius:10px; font-weight:600; cursor:pointer">Annuler</button>
+                    <button type="submit" style="padding:14px 48px; background:var(--accent); color:var(--bg-dark); border:none; border-radius:10px; font-weight:700; cursor:pointer; font-size:1rem; box-shadow:0 8px 32px rgba(229,166,87,0.2)">Publier l'annonce</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="../../../js/core/auth-system.js"></script>
+    <script src="../../../js/core/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = GoldAuth.getUser();
+            if (!user) return;
+
+            // Manual adjustment for root levels because we are in src/pages/seller/products/
+            // auth-system _root() returns ../../
+            // but we are 3 levels deep from src/js/
+            // Let's force it if necessary
+            window._root = () => '../../../../'; // Relative to src/pages/seller/products/
+
+            GoldComponents.injectSellerSidebar('products');
+            GoldComponents.injectSellerTopbar('Ajouter un Produit');
+
+            // Category specialized fields
+            const catSelect = document.getElementById('cat-select');
+            const specCard = document.getElementById('spec-fields-card');
+            const specContainer = document.getElementById('spec-fields-container');
+
+            catSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                specCard.style.display = 'block';
+                
+                if (val == '3' || val == '1' || val == '2') { // Musique (Vinyle, CD, Cassette)
+                    let extra = '';
+                    if (val == '1') extra = `<div class="form-group"><label class="form-label">Nombre de pistes</label><input type="number" name="nb_pistes" class="form-input"></div>`;
+                    if (val == '2') extra = `<div class="form-group"><label class="form-label">Durée (min)</label><input type="number" name="duree_min" class="form-input"></div>`;
+
+                    specContainer.innerHTML = `
+                        <div class="form-group"><label class="form-label">Label / Maison d'édition</label><input type="text" name="label" class="form-input" placeholder="Ex: EMI, Blue Note..."></div>
+                        <div class="form-group"><label class="form-label">Genre Musical</label><input type="text" name="genre" class="form-input" placeholder="Ex: Jazz, Progressive Rock..."></div>
+                        ${extra}
+                    `;
+                } else {
+                    specCard.style.display = 'none';
+                }
+            });
+
+            // Image Preview logic
+            const fileInput = document.getElementById('file-input');
+            const previewGrid = document.getElementById('preview-grid');
+            let selectedFiles = [];
+
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (selectedFiles.length + files.length > 4) {
+                    showToast("Max 4 photos autorisées", "warn");
+                    return;
+                }
+                
+                files.forEach(file => {
+                    selectedFiles.push(file);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        div.innerHTML = `
+                            <img src="${e.target.result}">
+                            <button type="button" class="remove-img">&times;</button>
+                        `;
+                        div.querySelector('.remove-img').onclick = () => {
+                            div.remove();
+                            selectedFiles = selectedFiles.filter(f => f !== file);
+                        };
+                        previewGrid.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            // Form Submit using Fetch
+            const form = document.getElementById('product-form');
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                
+                // Add the user ID
+                formData.append('id_vendeur', user.id_vendeur || user.id);
+                
+                // Clear the default photos entry and add our selectedFiles
+                formData.delete('photos[]');
+                selectedFiles.forEach(file => formData.append('photos[]', file));
+
+                try {
+                    showToast("Publication en cours...", "info");
+                    const res = await fetch('http://localhost:8000/api/produits', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        showToast("Produit publié avec succès !", "ok");
+                        setTimeout(() => window.location.href = '../products.html', 1500);
+                    } else {
+                        const err = await res.json();
+                        showToast("Erreur: " + (err.message || "Vérifiez les champs"), "error");
+                    }
+                } catch (err) {
+                    showToast("Erreur serveur", "error");
+                }
+            };
+        });
+    </script>
+</body>
+</html>

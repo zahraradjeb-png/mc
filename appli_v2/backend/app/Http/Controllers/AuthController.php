@@ -31,9 +31,11 @@ class AuthController extends Controller
         // Si vendeur → créer entrée dans table vendeur
         if ($request->role === 'VENDEUR') {
             DB::table('vendeur')->insert([
-                'id_user'      => $id,
-                'nom_boutique' => $request->nom_boutique ?? 'Ma Boutique',
-                'description'  => $request->description ?? ''
+                'id_user'              => $id,
+                'nom_boutique'         => $request->nom_boutique ?? 'Ma Boutique',
+                'description'          => $request->description ?? '',
+                'categorie_principale' => $request->categorie_principale ?? '',
+                'localisation'         => $request->localisation ?? ''
             ]);
         }
 
@@ -70,15 +72,49 @@ public function login(Request $request)
         ], 401);
     }
 
+    $userData = [
+        'id'     => $user->id_user,
+        'nom'    => $user->nom,
+        'prenom' => $user->prenom,
+        'email'  => $user->email,
+        'role'   => $user->role
+    ];
+
+    // Si vendeur, récupérer ses infos spécifiques
+    if ($user->role === 'VENDEUR') {
+        $vendeur = DB::table('vendeur')->where('id_user', $user->id_user)->first();
+        if ($vendeur) {
+            $userData['nom_boutique'] = $vendeur->nom_boutique;
+            $userData['description']  = $vendeur->description;
+            $userData['categorie_principale'] = $vendeur->categorie_principale;
+            $userData['localisation'] = $vendeur->localisation;
+            $userData['photo_profil'] = $vendeur->photo_profil;
+        }
+    }
+
     return response()->json([
         'message' => 'Connexion réussie !',
-        'user'    => [
-            'id'     => $user->id_user,
-            'nom'    => $user->nom,
-            'prenom' => $user->prenom,
-            'email'  => $user->email,
-            'role'   => $user->role
-        ]
+        'user'    => $userData
     ], 200);
 }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'nouveau_mdp' => 'required|min:6'
+        ]);
+
+        $user = DB::table('users')->where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+        }
+
+        DB::table('users')->where('email', $request->email)->update([
+            'mdp' => Hash::make($request->nouveau_mdp)
+        ]);
+
+        return response()->json(['message' => 'Mot de passe modifié avec succès.'], 200);
+    }
 }

@@ -86,7 +86,7 @@
     <a href="index.html" class="logo">G<span>old</span></a>
     <!-- nav-mid and nav-r inserted here by initGoldNavbar() -->
 
-    <!-- Mon Compte dropdown (vendeur) — injecté si connecté comme vendeur -->
+    <!-- Mon Compte dropdown (vendeur) — injecté si connecté comme vendeur by auth-system or here -->
     <div class="account-menu-wrap" id="accountMenuWrap" style="display:none">
       <button class="account-btn" id="accountBtn">
         <i class="fas fa-user-circle"></i>
@@ -94,12 +94,12 @@
         <i class="fas fa-chevron-down"></i>
       </button>
       <div class="account-dropdown" id="accountDropdown">
-        <a href="Vendeur/orders.html"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
-        <a href="Vendeur/dashboard.html"><i class="fas fa-store"></i> Ma boutique</a>
-        <a href="Vendeur/add-product.html"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
-        <a href="Vendeur/reviews.html"><i class="fas fa-star"></i> Avis clients</a>
+        <a href="pages/seller/orders.html"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
+        <a href="pages/seller/dashboard.html"><i class="fas fa-store"></i> Ma boutique</a>
+        <a href="pages/seller/create-product.html"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
+        <a href="pages/seller/reviews.html"><i class="fas fa-star"></i> Avis clients</a>
         <div class="account-dropdown-sep"></div>
-        <a href="login.html" class="account-dropdown-logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+        <a href="#" onclick="GoldAuth.logout(); window.location.reload(); return false;" class="account-dropdown-logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
       </div>
     </div>
 
@@ -112,10 +112,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-slides" id="heroSlides">
-    <div class="hslide active" style="background:url('assets/images/hover/first.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hover/second.jpg') center/cover no-repeat;background-color:#2d1508"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hover/third.jpg') center/cover no-repeat;background-color:#3d1f0a"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hover/forth.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
+    <div class="hslide active" style="background:url('assets/images/hero/first.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/second.jpg') center/cover no-repeat;background-color:#2d1508"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/third.jpg') center/cover no-repeat;background-color:#3d1f0a"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/forth.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
     <div class="slide-progress"><div class="slide-prog-bar" id="progBar"></div></div>
     <div class="slide-dots" id="slideDots">
       <span class="sdot active"></span><span class="sdot"></span><span class="sdot"></span><span class="sdot"></span>
@@ -128,8 +128,8 @@
     <p class="hero-sub">Des milliers de vinyles, cassettes &amp; instruments<br/>sélectionnés par des passionnés.</p>
     <div class="hero-btns">
       <a href="#categories" class="hb-primary js-scroll-cats">Explorer <span class="hb-arr">→</span></a>
-      <a href="register.html?role=buyer" class="hb-sec">Acheter</a>
-      <a href="register.html?role=seller" class="hb-ter">Vendre</a>
+      <a href="auth-entry.html?role=buyer" class="hb-sec">Acheter</a>
+      <a href="auth-entry.html?role=seller" class="hb-ter">Vendre</a>
     </div>
     <div class="hero-trust">
       <i class="fas fa-shield-alt"></i> Paiement sécurisé
@@ -402,11 +402,11 @@
         </div>
       </div>
       <div class="fcol"><div class="fctitle">Marketplace</div><a href="catalogue.html">Catalogue</a><a href="catalogue.html?new=1">Nouveautés</a><a href="catalogue.html?rare=1">Éditions rares</a><a href="catalogue.html?sale=1">Ventes flash</a></div>
-      <div class="fcol"><div class="fctitle">Vendeurs</div><a href="register.html?role=seller">Créer ma boutique</a><a href="Vendeur/dashboard.html">Dashboard</a><a href="Vendeur/add-product.html">Ajouter un produit</a></div>
+      <div class="fcol"><div class="fctitle">Vendeurs</div><a href="auth-entry.html?role=seller">Créer ma boutique</a><a href="../vendeur/dashboard.html">Dashboard</a><a href="../vendeur/products/create.html">Ajouter un produit</a></div>
       <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a><a href="tel:+33123456789">+33 1 23 45 67 89</a><a href="#">Lun–Ven 9h–18h</a></div>
     </div>
     <div class="fbot">
-      <span>© 2026 Gold Marketplace · <a href="#">CGV</a> · <a href="#">Confidentialité</a></span>
+      <span>© 2026 Gold Marketplace · <a href="cgv.html">CGV</a> · <a href="confidentialite.html">Confidentialité</a></span>
       <div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span><span>APPLE PAY</span></div>
     </div>
   </div>
@@ -476,3 +476,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
+

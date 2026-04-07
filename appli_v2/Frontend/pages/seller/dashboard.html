@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord — Gold Seller Studio</title>
+  <meta name="description" content="Gérez votre boutique Gold : produits, ventes, commandes et avis clients.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles/seller-base.css">
+  <link rel="stylesheet" href="styles/seller-layout.css">
+  <link rel="stylesheet" href="styles/seller-dashboard.css">
+</head>
+<body class="seller-studio">
+
+<!-- Mobile sidebar toggle -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Menu">
+  <i class="fas fa-bars"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div id="studio-toast"></div>
+
+<div class="studio-layout">
+  <div id="sidebar-container"></div>
+
+  <main class="studio-main animate-slide">
+    <div id="header-container"></div>
+
+    <!-- ── KPI Row ── -->
+    <div class="dashboard-kpi-row" id="kpi-row">
+      <!-- KPIs injected by JS -->
+      <div class="kpi-card"><div class="loading-pulse" style="height:90px;border-radius:14px;"></div></div>
+      <div class="kpi-card"><div class="loading-pulse" style="height:90px;border-radius:14px;"></div></div>
+      <div class="kpi-card"><div class="loading-pulse" style="height:90px;border-radius:14px;"></div></div>
+      <div class="kpi-card"><div class="loading-pulse" style="height:90px;border-radius:14px;"></div></div>
+    </div>
+
+    <!-- ── Main Cards Row ── -->
+    <div class="dashboard-cards-row">
+
+      <!-- Activité Récente -->
+      <div class="studio-card">
+        <h3 class="section-title"><i class="fas fa-bolt"></i> Activité Récente</h3>
+        <div id="activity-list" class="activity-list">
+          <div class="loading-pulse" style="height:50px;margin-bottom:8px;border-radius:12px;"></div>
+          <div class="loading-pulse" style="height:50px;border-radius:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Actions rapides -->
+      <div class="studio-card">
+        <h3 class="section-title"><i class="fas fa-rocket"></i> Actions Rapides</h3>
+        <div class="quick-actions">
+          <a href="create-product.html" class="quick-action-btn">
+            <div class="qa-icon" style="background:rgba(229,166,87,0.1);color:var(--studio-honey);">
+              <i class="fas fa-plus"></i>
+            </div>
+            <div>
+              <div style="font-weight:600">Ajouter un produit</div>
+              <div style="font-size:0.75rem;color:var(--studio-muted);margin-top:1px">Publier un nouvel article</div>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto;opacity:0.35;font-size:0.8rem;"></i>
+          </a>
+          <a href="orders.html" class="quick-action-btn">
+            <div class="qa-icon" style="background:rgba(34,197,94,0.1);color:#22C55E;">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div>
+              <div style="font-weight:600">Gérer les commandes</div>
+              <div style="font-size:0.75rem;color:var(--studio-muted);margin-top:1px">Voir &amp; traiter les commandes</div>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto;opacity:0.35;font-size:0.8rem;"></i>
+          </a>
+          <a href="products.html" class="quick-action-btn">
+            <div class="qa-icon" style="background:rgba(59,130,246,0.1);color:#3B82F6;">
+              <i class="fas fa-boxes"></i>
+            </div>
+            <div>
+              <div style="font-weight:600">Gérer l'inventaire</div>
+              <div style="font-size:0.75rem;color:var(--studio-muted);margin-top:1px">Modifier ou supprimer des articles</div>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto;opacity:0.35;font-size:0.8rem;"></i>
+          </a>
+          <a href="profile.html" class="quick-action-btn">
+            <div class="qa-icon" style="background:rgba(168,85,247,0.1);color:#A855F7;">
+              <i class="fas fa-store"></i>
+            </div>
+            <div>
+              <div style="font-weight:600">Aperçu boutique</div>
+              <div style="font-size:0.75rem;color:var(--studio-muted);margin-top:1px">Voir comme un acheteur</div>
+            </div>
+            <i class="fas fa-chevron-right" style="margin-left:auto;opacity:0.35;font-size:0.8rem;"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Second row ── -->
+    <div class="dashboard-cards-row">
+
+      <!-- Derniers Avis -->
+      <div class="studio-card">
+        <h3 class="section-title"><i class="fas fa-star"></i> Derniers Avis Clients</h3>
+        <div id="reviews-mini">
+          <div class="loading-pulse" style="height:70px;border-radius:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Produits récents -->
+      <div class="studio-card">
+        <h3 class="section-title" style="margin-bottom:14px;">
+          <i class="fas fa-clock"></i> Produits Récents
+          <a href="products.html" style="margin-left:auto;font-size:0.75rem;font-family:'Outfit',sans-serif;color:var(--studio-honey);font-weight:500;opacity:0.8;">
+            Voir tout →
+          </a>
+        </h3>
+        <div id="recent-products-list">
+          <div class="loading-pulse" style="height:55px;margin-bottom:8px;border-radius:10px;"></div>
+          <div class="loading-pulse" style="height:55px;border-radius:10px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="../../js/auth-system.js"></script>
+<script src="services/seller-auth.js"></script>
+<script src="services/products.service.js"></script>
+<script src="components/sidebar.js"></script>
+<script src="components/header.js"></script>
+<script src="components/seller-layout.js"></script>
+<script src="scripts/dashboard.js"></script>
+</body>
+</html>

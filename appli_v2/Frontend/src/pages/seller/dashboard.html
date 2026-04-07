@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Studio — Dashboard | Gold</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/seller-studio.css">
+</head>
+<body class="seller-layout">
+    
+    <!-- SIDEBAR -->
+    <div id="seller-sidebar-container"></div>
+
+    <!-- MAIN -->
+    <main class="seller-main">
+        <!-- TOPBAR -->
+        <div id="seller-topbar-container"></div>
+
+        <div class="seller-content">
+            <!-- DASHBOARD WIDGETS -->
+            <div class="dashboard-grid" id="stats-grid">
+                <!-- SKELETONS -->
+                <div class="stat-card skeleton" style="height: 160px;"></div>
+                <div class="stat-card skeleton" style="height: 160px;"></div>
+                <div class="stat-card skeleton" style="height: 160px;"></div>
+                <div class="stat-card skeleton" style="height: 160px;"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                <!-- RECENT ORDERS -->
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+                        <h3 class="page-title" style="font-size: 1.3rem;">Commandes récentes</h3>
+                        <a href="orders.html" style="color:var(--accent); font-size:0.82rem; text-decoration:none">Voir tout →</a>
+                    </div>
+                    <div id="recent-orders-list">
+                        <div style="text-align:center; padding:40px; color:var(--text-secondary); opacity:0.5">
+                            <i class="fas fa-spinner fa-spin" style="margin-bottom:10px; font-size:1.5rem"></i>
+                            <p>Chargement des commandes...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QUICK ACTIONS & ALERTS -->
+                <div class="stat-card">
+                    <h3 class="page-title" style="font-size: 1.3rem; margin-bottom:20px">Actions rapides</h3>
+                    <div style="display:flex; flex-direction:column; gap:12px">
+                        <a href="products/create.html" class="nav-link" style="background:rgba(229,166,87,0.1); border-radius:10px; border:1px solid var(--border-light)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Ajouter un produit</span>
+                        </a>
+                        <a href="finance.html" class="nav-link" style="background:rgba(229,166,87,0.1); border-radius:10px; border:1px solid var(--border-light)">
+                            <i class="fas fa-wallet"></i>
+                            <span>Demander un virement</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPTS -->
+    <script src="../../js/core/auth-system.js"></script>
+    <script src="../../js/core/components.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Protection
+            const user = GoldAuth.getUser();
+            if (!user || user.role !== 'seller') {
+                window.location.href = '../visitor/index.html';
+                return;
+            }
+
+            // 2. Initialiser UI
+            GoldComponents.injectSellerSidebar('dashboard');
+            GoldComponents.injectSellerTopbar('Tableau de bord');
+
+            // 3. Charger Stats via API
+            try {
+                const response = await fetch(`http://localhost:8000/api/vendeurs/${user.id_vendeur || user.id}/stats`);
+                if (response.ok) {
+                    const stats = await response.json();
+                    renderStats(stats);
+                } else {
+                    renderStats(null); // Fallback data
+                }
+            } catch (error) {
+                console.error("Fetch stats error:", error);
+                renderStats(null);
+            }
+
+            // 4. Charger Commandes Récentes
+            try {
+                const response = await fetch(`http://localhost:8000/api/vendeurs/${user.id_vendeur || user.id}/commandes?limit=5`);
+                if (response.ok) {
+                    const orders = await response.json();
+                    renderRecentOrders(orders);
+                }
+            } catch (error) {
+                console.error("Fetch orders error:", error);
+            }
+        });
+
+        function renderStats(stats) {
+            const grid = document.getElementById('stats-grid');
+            const data = stats || {
+                revenu_mensuel: 0,
+                commandes_en_attente: 0,
+                total_produits: 0,
+                vendeur_note: 5.0
+            };
+
+            grid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-row">
+                        <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
+                        <span class="stat-trend trend-up">+12%</span>
+                    </div>
+                    <div class="stat-value">${data.revenu_mensuel} €</div>
+                    <div class="stat-label">Revenus ce mois</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-row">
+                        <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+                        <span class="stat-trend trend-up">${data.commandes_en_attente} nveaux</span>
+                    </div>
+                    <div class="stat-value">${data.commandes_en_attente}</div>
+                    <div class="stat-label">Commandes en cours</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-row">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <span class="stat-trend">Actifs</span>
+                    </div>
+                    <div class="stat-value">${data.total_produits}</div>
+                    <div class="stat-label">Produits en ligne</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-row">
+                        <div class="stat-icon"><i class="fas fa-star"></i></div>
+                        <span class="stat-trend">Top Seller</span>
+                    </div>
+                    <div class="stat-value">${data.vendeur_note || 5.0}</div>
+                    <div class="stat-label">Note vendeur</div>
+                </div>
+            `;
+        }
+
+        function renderRecentOrders(orders) {
+            const list = document.getElementById('recent-orders-list');
+            if (!orders || orders.length === 0) {
+                list.innerHTML = '<p style="text-align:center; padding:40px; opacity:0.5">Aucune commande récente.</p>';
+                return;
+            }
+
+            list.innerHTML = `
+                <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+                    <thead>
+                        <tr style="text-align:left; color:var(--text-secondary); border-bottom:1px solid var(--border-light)">
+                            <th style="padding:12px 10px">ID</th>
+                            <th style="padding:12px 10px">Produit</th>
+                            <th style="padding:12px 10px">Total</th>
+                            <th style="padding:12px 10px">Statut</th>
+                            <th style="padding:12px 10px">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orders.map(o => `
+                            <tr style="border-bottom:1px solid rgba(229,166,87,0.05)">
+                                <td style="padding:16px 10px; font-family:monospace">#${o.id_commande}</td>
+                                <td style="padding:16px 10px">
+                                    <div style="font-weight:500">${o.liste_produits[0]?.titre || 'Produit'}</div>
+                                    <div style="font-size:0.75rem; color:var(--text-secondary)">Acheteur: ${o.prenom_acheteur} ${o.nom_acheteur}</div>
+                                </td>
+                                <td style="padding:16px 10px; font-weight:700">${o.total_vendeur} €</td>
+                                <td style="padding:16px 10px">
+                                    <span style="padding:4px 10px; border-radius:100px; font-size:0.75rem; background:rgba(229,166,87,0.1); color:var(--accent)">
+                                        ${o.statut}
+                                    </span>
+                                </td>
+                                <td style="padding:16px 10px">
+                                    <a href="orders.html?id=${o.id_commande}" style="color:var(--accent)"><i class="fas fa-eye"></i></a>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+    </script>
+</body>
+</html>

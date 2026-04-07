@@ -1,0 +1,113 @@
+/* ══════════════════════════════════════
+   GOLD — Pages informatives
+   About, CGV, Confidentialité
+══════════════════════════════════════ */
+
+body.info-page { padding-top: 80px; }
+
+.info-hero {
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink2) 100%);
+  padding: 80px 0 60px;
+  text-align: center;
+}
+.info-hero-label {
+  font-size: .65rem; font-weight: 400;
+  letter-spacing: .25em; text-transform: uppercase;
+  color: var(--honey); margin-bottom: 14px;
+}
+.info-hero-title {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--crumpet); font-weight: 400;
+  line-height: 1.15; margin-bottom: 14px;
+}
+.info-hero-title em { font-style: italic; color: var(--honey); }
+.info-hero-sub {
+  font-size: .92rem; color: var(--muted);
+  max-width: 560px; margin: 0 auto; line-height: 1.65;
+}
+
+/* Content layout */
+.info-layout {
+  max-width: 900px; margin: 0 auto;
+  padding: 60px 32px 80px;
+}
+.info-card {
+  background: white;
+  border: 1px solid rgba(103,51,47,.08);
+  border-radius: 16px;
+  padding: 40px 48px;
+  box-shadow: 0 4px 24px rgba(28,15,7,.04);
+}
+
+/* Typography */
+.info-card h2 {
+  font-family: 'Cormorant', serif;
+  font-size: 1.6rem; color: var(--ink);
+  margin: 36px 0 16px; padding-bottom: 10px;
+  border-bottom: 1px solid rgba(103,51,47,.08);
+}
+.info-card h2:first-child { margin-top: 0; }
+.info-card h3 {
+  font-family: 'Cormorant', serif;
+  font-size: 1.2rem; color: var(--paprika);
+  margin: 24px 0 10px;
+}
+.info-card p {
+  font-size: .9rem; color: var(--muted);
+  line-height: 1.75; margin-bottom: 14px;
+}
+.info-card ul {
+  list-style: none; margin: 0 0 16px; padding: 0;
+}
+.info-card ul li {
+  position: relative; padding-left: 20px;
+  font-size: .88rem; color: var(--muted);
+  line-height: 1.7; margin-bottom: 6px;
+}
+.info-card ul li::before {
+  content: '→'; position: absolute; left: 0;
+  color: var(--honey); font-weight: 500;
+}
+
+/* FAQ Accordion */
+.faq-item {
+  border: 1px solid rgba(103,51,47,.1);
+  border-radius: 10px; margin-bottom: 10px;
+  overflow: hidden; transition: all .2s;
+}
+.faq-item:hover { border-color: rgba(103,51,47,.2); }
+.faq-question {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer;
+  font-size: .92rem; font-weight: 500; color: var(--ink);
+  background: none; border: none; width: 100%;
+  font-family: 'Jost', sans-serif; text-align: left;
+  transition: background .2s;
+}
+.faq-question:hover { background: rgba(103,51,47,.03); }
+.faq-question i { color: var(--honey); transition: transform .3s; font-size: .7rem; }
+.faq-item.open .faq-question i { transform: rotate(180deg); }
+.faq-answer {
+  max-height: 0; overflow: hidden;
+  transition: max-height .35s ease, padding .35s ease;
+  padding: 0 20px;
+  font-size: .87rem; color: var(--muted); line-height: 1.7;
+}
+.faq-item.open .faq-answer {
+  max-height: 300px; padding: 0 20px 18px;
+}
+
+/* Last updated badge */
+.info-updated {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; color: var(--muted);
+  margin-top: 28px; padding-top: 16px;
+  border-top: 1px solid rgba(103,51,47,.08);
+}
+.info-updated i { color: var(--honey); }
+
+@media(max-width: 600px) {
+  .info-card { padding: 24px 20px; }
+  .info-layout { padding: 32px 16px 60px; }
+}

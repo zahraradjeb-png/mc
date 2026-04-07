@@ -1,0 +1,31 @@
+.product-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.p-gallery-card { padding: 0; overflow: hidden; background: #000; position: relative; }
+.p-gallery-main { width: 100%; aspect-ratio: 1; object-fit: cover; }
+
+.p-info-card { padding: 40px; }
+
+.p-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.p-title { font-size: 2.2rem; color: #fff; margin:0; line-height: 1.2; }
+
+.p-stat-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+  padding: 24px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 20px;
+  border: 1px solid var(--studio-border);
+}
+
+.p-mini-stat { text-align: center; }
+.p-ms-lbl { font-size: 0.65rem; color: var(--studio-honey); opacity: 0.6; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px; }
+.p-ms-val { font-size: 1.5rem; font-weight: 700; color: #fff; }
+
+.performance-section { margin-top: 48px; }
