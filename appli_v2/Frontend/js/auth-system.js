@@ -44,6 +44,8 @@ function _root() {
   const p = window.location.pathname;
   // Legacy pages/seller/ or pages/buyer/ (2 levels deep)
   if (p.includes('/pages/seller/') || p.includes('/pages/buyer/')) return '../../';
+  // src/pages/acheteur/ fallback (legacy)
+  if (p.includes('/src/pages/acheteur/')) return '../../../';
   // Visiteur: src/pages/visiteur/ (3 levels deep)
   if (p.includes('/src/pages/visiteur/')) return '../../../';
   // Root level: index.html
@@ -294,8 +296,8 @@ function buildNavbar(active='home') {
   const root = _root();
   const count = GoldAuth.getCartCount();
   const badge = `<span class="cbadge" id="cBadge" ${count===0?'style="display:none"':''}>${count}</span>`;
-  const initials = user ? (user.firstName||'U')[0].toUpperCase() + ((user.lastName||'')[0]||'').toUpperCase() : '';
-  const displayName = user?.role==='seller' ? (user.shopName || user.firstName) : user?.firstName;
+  const initials = user ? (user.firstName||user.prenom||'U')[0].toUpperCase() + ((user.lastName||user.nom||'')[0]||'').toUpperCase() : '';
+  const displayName = GoldAuth.isSeller() ? (user.shopName || user.nom_boutique || user.firstName || user.prenom) : (user.firstName || user.prenom);
 
   /* ─ Catalogue dropdown ─ */
   const catDrop = `
@@ -335,17 +337,22 @@ function buildNavbar(active='home') {
         <button class="hamburger" id="hbg"><span></span><span></span><span></span></button>
       </div>`;
 
-  } else if (user.role === 'buyer') {
+  } else if (GoldAuth.isBuyer()) {
+    const favCount = GoldAuth.getFavs().length;
+    const favBadge = `<span class="cbadge fav-badge" ${favCount===0?'style="display:none"':''}>${favCount}</span>`;
     navR = `
       <div class="nav-r">
         <button class="ni search-trigger"><i class="fas fa-search"></i></button>
-        <a href="${root}src/pages/acheteur/cart.html" class="ni cart-icon" style="position:relative">
+        <a href="${root}pages/buyer/favorites.html" class="ni" style="position:relative" title="Favoris">
+          <i class="fas fa-heart"></i>${favBadge}
+        </a>
+        <a href="${root}pages/buyer/cart.html" class="ni cart-icon" style="position:relative" title="Panier">
           <i class="fas fa-shopping-bag"></i>${badge}
         </a>
-        <button class="ni notif-trigger" style="position:relative">
+        <a href="${root}pages/buyer/notifications.html" class="ni notif-trigger" style="position:relative" title="Notifications">
           <i class="fas fa-bell"></i>
           <span class="cbadge notif-badge" style="display:none">0</span>
-        </button>
+        </a>
         <div class="nsep"></div>
         <div class="nd gold-profile-dd">
           <button class="gold-profile-btn">
@@ -354,13 +361,15 @@ function buildNavbar(active='home') {
             <i class="fas fa-chevron-down" style="font-size:.42rem;opacity:.5;margin-left:4px"></i>
           </button>
           <div class="drop gold-drop-profile">
-            <a href="${root}src/pages/acheteur/profile.html"><i class="fas fa-user"></i> Mon profil</a>
-            <a href="${root}src/pages/acheteur/cart.html"><i class="fas fa-shopping-bag"></i> Panier (${count})</a>
-            <a href="${root}src/pages/acheteur/orders.html"><i class="fas fa-box"></i> Commandes</a>
-            <a href="${root}src/pages/acheteur/favorites.html"><i class="fas fa-heart"></i> Favoris</a>
-            <a href="${root}src/pages/acheteur/settings.html"><i class="fas fa-cog"></i> Paramètres</a>
+            <a href="${root}pages/buyer/profile.html"><i class="fas fa-user"></i> Mon profil</a>
+            <a href="${root}pages/buyer/orders.html"><i class="fas fa-box"></i> Mes commandes</a>
+            <a href="${root}pages/buyer/cart.html"><i class="fas fa-shopping-bag"></i> Mon panier <span style="opacity:.5">(${count})</span></a>
+            <a href="${root}pages/buyer/favorites.html"><i class="fas fa-heart"></i> Mes favoris</a>
+            <a href="${root}pages/buyer/reviews.html"><i class="fas fa-star"></i> Mes avis</a>
+            <a href="${root}pages/buyer/notifications.html"><i class="fas fa-bell"></i> Notifications</a>
             <div class="dd"></div>
-            <a href="${root}src/pages/visiteur/auth-entry.html?role=seller" style="color:#E5A657"><i class="fas fa-store"></i> Devenir vendeur</a>
+            <a href="${root}pages/buyer/settings.html"><i class="fas fa-cog"></i> Paramètres</a>
+            <a href="${root}auth-entry.html?role=seller" style="color:var(--honey,#A1BEC7)"><i class="fas fa-store"></i> Devenir vendeur</a>
             <div class="dd"></div>
             <a href="#" class="gold-logout" style="color:#B53324"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
           </div>
@@ -368,7 +377,7 @@ function buildNavbar(active='home') {
         <button class="hamburger" id="hbg"><span></span><span></span><span></span></button>
       </div>`;
 
-  } else if (user.role === 'seller') {
+  } else if (GoldAuth.isSeller()) {
     /* ── VENDEUR : pas de bouton Ajouter, juste Mon profil → drawer ── */
     navR = `
       <div class="nav-r">
@@ -421,9 +430,13 @@ function buildMobileNav() {
     <a href="${root}pages/seller/reviews.html">Avis clients</a>` : `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}pages/buyer/cart.html">Mon panier</a>
     <a href="${root}pages/buyer/profile.html">Mon profil</a>
-    <a href="${root}pages/buyer/orders.html">Mes commandes</a>`;
+    <a href="${root}pages/buyer/orders.html">Mes commandes</a>
+    <a href="${root}pages/buyer/cart.html">Mon panier</a>
+    <a href="${root}pages/buyer/favorites.html">Mes favoris</a>
+    <a href="${root}pages/buyer/reviews.html">Mes avis</a>
+    <a href="${root}pages/buyer/notifications.html">Notifications</a>
+    <a href="${root}pages/buyer/settings.html">Paramètres</a>`;
 
   return `
     <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(229,166,87,0.15)">
@@ -689,7 +702,7 @@ function initCartAndFavButtons() {
     e.preventDefault();
     if (!GoldAuth.isLoggedIn()) { requireLogin('acheter ce produit'); return; }
     const root = _root();
-    window.location.href = root + 'src/pages/acheteur/cart.html';
+    window.location.href = root + 'pages/buyer/cart.html';
   });
 
   /* Fav buttons */

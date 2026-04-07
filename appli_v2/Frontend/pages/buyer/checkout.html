@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement — Gold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/buyer.css">
+</head>
+<body>
+<div class="search-overlay" id="searchOverlay"><button class="search-close">&times;</button><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher…"></div></div>
+<header class="navbar scrolled" id="navbar"><div class="nav-wrap"><a href="../../index.html" class="logo">G<span>old</span></a></div></header>
+<div class="mob-nav" id="mobNav"></div>
+
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb"><a href="../../index.html">Accueil</a><span class="bph-sep">›</span><a href="cart.html">Panier</a><span class="bph-sep">›</span><span>Paiement</span></div>
+        <h1 class="bph-title">Finaliser la <em>commande</em></h1>
+      </div>
+      <!-- Stepper -->
+      <div class="checkout-stepper" style="margin-bottom:0">
+        <div class="cs-step"><div class="cs-num done"><i class="fas fa-check" style="font-size:0.6rem"></i></div><span class="cs-label">Panier</span></div>
+        <div class="cs-connector"></div>
+        <div class="cs-step"><div class="cs-num active">2</div><span class="cs-label active">Livraison & Paiement</span></div>
+        <div class="cs-connector"></div>
+        <div class="cs-step"><div class="cs-num">3</div><span class="cs-label">Confirmation</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="buyer-content" id="checkoutForm">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start">
+
+      <!-- Left: Forms -->
+      <div>
+        <!-- Address -->
+        <div class="settings-section" style="margin-bottom:24px">
+          <div class="ss-header">
+            <div class="ss-icon" style="background:rgba(59,130,246,0.08);color:#3b82f6"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="ss-title">Adresse de livraison</div>
+          </div>
+          <div class="ss-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="buyer-form-group">
+                <label class="buyer-label">Prénom *</label>
+                <input type="text" class="buyer-input" id="coFirstName" required>
+              </div>
+              <div class="buyer-form-group">
+                <label class="buyer-label">Nom *</label>
+                <input type="text" class="buyer-input" id="coLastName" required>
+              </div>
+            </div>
+            <div class="buyer-form-group">
+              <label class="buyer-label">Adresse *</label>
+              <input type="text" class="buyer-input" id="coAddress" placeholder="12 Rue de la Musique" required>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px">
+              <div class="buyer-form-group">
+                <label class="buyer-label">Code postal *</label>
+                <input type="text" class="buyer-input" id="coZip" placeholder="75011" required>
+              </div>
+              <div class="buyer-form-group">
+                <label class="buyer-label">Ville *</label>
+                <input type="text" class="buyer-input" id="coCity" placeholder="Paris" required>
+              </div>
+            </div>
+            <div class="buyer-form-group">
+              <label class="buyer-label">Téléphone</label>
+              <input type="tel" class="buyer-input" id="coPhone" placeholder="+33 6 12 34 56 78">
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Method -->
+        <div class="settings-section" style="margin-bottom:24px">
+          <div class="ss-header">
+            <div class="ss-icon" style="background:rgba(168,85,247,0.08);color:#7c3aed"><i class="fas fa-truck"></i></div>
+            <div class="ss-title">Méthode de livraison</div>
+          </div>
+          <div class="ss-body">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="address-card selected" onclick="selectDelivery(this, 'standard')" data-price="0" style="display:flex;align-items:center;gap:16px">
+                <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--paprika);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--paprika)" class="delivery-dot"></div>
+                </div>
+                <div style="flex:1">
+                  <div class="ac-name">Livraison standard</div>
+                  <div class="ac-text" style="font-size:0.78rem">4-6 jours ouvrés · Colissimo</div>
+                </div>
+                <div style="font-family:'Cormorant',serif;font-size:1.1rem;font-weight:600;color:#16a34a">Gratuite</div>
+              </div>
+              <div class="address-card" onclick="selectDelivery(this, 'express')" data-price="9.90" style="display:flex;align-items:center;gap:16px">
+                <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--biscuit);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <div style="width:8px;height:8px;border-radius:50%;background:transparent" class="delivery-dot"></div>
+                </div>
+                <div style="flex:1">
+                  <div class="ac-name">Livraison express</div>
+                  <div class="ac-text" style="font-size:0.78rem">1-2 jours ouvrés · Chronopost</div>
+                </div>
+                <div style="font-family:'Cormorant',serif;font-size:1.1rem;font-weight:600;color:var(--ink)">9,90 €</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="settings-section">
+          <div class="ss-header">
+            <div class="ss-icon" style="background:rgba(34,197,94,0.08);color:#16a34a"><i class="fas fa-credit-card"></i></div>
+            <div class="ss-title">Paiement</div>
+          </div>
+          <div class="ss-body">
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+              <div class="address-card selected" onclick="selectPayment(this, 'card')" style="display:flex;align-items:center;gap:14px">
+                <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--paprika);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--paprika)" class="pay-dot"></div>
+                </div>
+                <div style="width:40px;height:28px;background:rgba(184,168,158,0.15);border:1px solid rgba(184,168,158,0.3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--muted)">VISA</div>
+                <span style="flex:1;font-weight:500;color:var(--ink);font-size:0.88rem">Carte bancaire</span>
+                <span style="font-size:0.65rem;color:#16a34a;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);padding:2px 8px;border-radius:100px;font-weight:600">Sécurisé</span>
+              </div>
+              <div class="address-card" onclick="selectPayment(this, 'paypal')" style="display:flex;align-items:center;gap:14px">
+                <div style="width:18px;height:18px;border-radius:50%;border:2px solid var(--biscuit);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <div style="width:8px;height:8px;border-radius:50%;background:transparent" class="pay-dot"></div>
+                </div>
+                <div style="width:40px;height:28px;background:rgba(184,168,158,0.15);border:1px solid rgba(184,168,158,0.3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:#003087">PP</div>
+                <span style="flex:1;font-weight:500;color:var(--ink);font-size:0.88rem">PayPal</span>
+              </div>
+            </div>
+
+            <!-- Card fields -->
+            <div id="cardFields">
+              <div class="buyer-form-group">
+                <label class="buyer-label">Numéro de carte *</label>
+                <input type="text" class="buyer-input" id="coCard" placeholder="1234 5678 9012 3456" maxlength="19" style="letter-spacing:0.12em;font-family:'Special Elite',cursive" required>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div class="buyer-form-group">
+                  <label class="buyer-label">Date d'expiration *</label>
+                  <input type="text" class="buyer-input" id="coExpiry" placeholder="MM/AA" maxlength="5" required>
+                </div>
+                <div class="buyer-form-group">
+                  <label class="buyer-label">CVV *</label>
+                  <input type="text" class="buyer-input" id="coCvv" placeholder="123" maxlength="3" required>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Summary -->
+      <div>
+        <div class="cart-summary-card">
+          <div class="csc-header"><div class="csc-title">Résumé</div></div>
+          <div class="csc-body">
+            <div id="coItems" style="margin-bottom:16px"></div>
+            <div class="csc-divider" style="margin:12px 0"></div>
+            <div class="csc-line"><span class="csc-line-key">Sous-total</span><span class="csc-line-val" id="coSubtotal">—</span></div>
+            <div class="csc-line"><span class="csc-line-key">Livraison</span><span class="csc-line-val free" id="coShipping">Gratuite</span></div>
+            <div class="csc-divider"></div>
+            <div class="csc-total">
+              <span class="csc-total-label">Total</span>
+              <span class="csc-total-val" id="coTotal">—</span>
+            </div>
+            <button class="csc-checkout-btn" id="placeOrderBtn" onclick="placeOrder()">
+              <i class="fas fa-lock"></i> Confirmer et payer
+            </button>
+            <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:rgba(202,159,145,0.3)">
+              En confirmant, vous acceptez nos CGV
+            </div>
+          </div>
+          <div class="csc-trust">
+            <div class="csc-trust-item"><i class="fas fa-shield-alt"></i> Paiement chiffré SSL 256-bit</div>
+            <div class="csc-trust-item"><i class="fas fa-undo"></i> Retour gratuit 30 jours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Order Confirmation (hidden) -->
+<section class="buyer-content-white" id="orderConfirm" style="display:none">
+  <div class="wrap" style="max-width:640px;text-align:center;padding:80px 20px">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,0.1);border:2px solid rgba(34,197,94,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:2rem;color:#16a34a;animation:pulse-dot 2s ease-in-out infinite">
+      <i class="fas fa-check"></i>
+    </div>
+    <h1 style="font-family:'Cormorant',serif;font-size:2.4rem;font-weight:400;color:var(--ink);margin-bottom:12px">Commande <em style="color:var(--paprika)">confirmée !</em></h1>
+    <p style="font-size:1rem;color:var(--muted);margin-bottom:8px;line-height:1.7">Merci pour votre achat. Votre commande a été enregistrée avec succès.</p>
+    <p style="font-family:'Special Elite',cursive;font-size:1.1rem;color:var(--honey);margin-bottom:40px" id="confirmOrderNum">Commande #GLD-2042</p>
+
+    <div style="background:rgba(184,168,158,0.08);border:1px solid rgba(184,168,158,0.2);border-radius:16px;padding:32px;margin-bottom:40px;text-align:left">
+      <div style="font-family:'Cormorant',serif;font-size:1.15rem;color:var(--ink);margin-bottom:16px">Prochaines étapes</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.68rem;color:#3b82f6"><i class="fas fa-envelope"></i></div>
+          <span style="font-size:0.85rem;color:var(--ink)">Un email de confirmation a été envoyé</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(168,85,247,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.68rem;color:#7c3aed"><i class="fas fa-box"></i></div>
+          <span style="font-size:0.85rem;color:var(--ink)">Le vendeur prépare votre commande</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(34,197,94,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.68rem;color:#16a34a"><i class="fas fa-truck"></i></div>
+          <span style="font-size:0.85rem;color:var(--ink)">Vous recevrez un numéro de suivi par email</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="orders.html" class="be-cta">Voir mes commandes <span>→</span></a>
+      <a href="../../catalogue.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:8px;border:1px solid var(--biscuit);color:var(--ink);font-size:0.82rem;font-weight:400;letter-spacing:0.06em;transition:all 0.3s">Continuer les achats</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand"><div class="flogo">G<span>old</span></div><p>La marketplace de référence pour la musique vintage.</p></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Gold Marketplace</span></div>
+  </div>
+</footer>
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../../js/auth-system.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+let selectedDelivery = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('checkout');
+  const user = GoldAuth.getUser();
+  if (!user) { window.location.href = '../../auth/sign-in.html'; return; }
+
+  // Prefill
+  document.getElementById('coFirstName').value = user.firstName || '';
+  document.getElementById('coLastName').value = user.lastName || '';
+
+  // Card formatting
+  document.getElementById('coCard').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').substring(0, 16);
+    this.value = v.replace(/(.{4})/g, '$1 ').trim();
+  });
+  document.getElementById('coExpiry').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+    this.value = v;
+  });
+  document.getElementById('coCvv').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').substring(0, 3);
+  });
+
+  renderCheckoutSummary();
+});
+
+function renderCheckoutSummary() {
+  const cart = GoldAuth.getCart();
+  const itemsEl = document.getElementById('coItems');
+  let subtotal = 0;
+
+  itemsEl.innerHTML = cart.map(item => {
+    const sub = (item.price || 0) * (item.qty || 1);
+    subtotal += sub;
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(161,190,199,0.06)">
+        <div style="width:40px;height:40px;border-radius:8px;background:rgba(161,190,199,0.08);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${item.emoji||'🎵'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.82rem;color:rgba(202,159,145,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</div>
+          <div style="font-size:0.68rem;color:rgba(202,159,145,0.35)">x${item.qty||1}</div>
+        </div>
+        <div style="font-size:0.88rem;color:var(--honey);flex-shrink:0">${sub.toFixed(2)} €</div>
+      </div>
+    `;
+  }).join('');
+
+  updateTotals(subtotal);
+}
+
+function updateTotals(subtotal) {
+  if (!subtotal) {
+    const cart = GoldAuth.getCart();
+    subtotal = cart.reduce((s,i) => s + (i.price||0)*(i.qty||1), 0);
+  }
+  const total = subtotal + selectedDelivery;
+  document.getElementById('coSubtotal').textContent = subtotal.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('coShipping').textContent = selectedDelivery === 0 ? 'Gratuite' : selectedDelivery.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('coShipping').className = 'csc-line-val' + (selectedDelivery === 0 ? ' free' : '');
+  document.getElementById('coTotal').textContent = total.toFixed(2).replace('.',',') + ' €';
+}
+
+function selectDelivery(el, type) {
+  document.querySelectorAll('.address-card').forEach(c => {
+    if (c.closest('.ss-body')?.querySelector('[onclick*="selectDelivery"]')) {
+      c.classList.remove('selected');
+      c.querySelector('.delivery-dot').style.background = 'transparent';
+      c.style.borderColor = '';
+    }
+  });
+  el.classList.add('selected');
+  el.querySelector('.delivery-dot').style.background = 'var(--paprika)';
+  el.parentElement.querySelector('.delivery-dot')?.closest('.address-card');
+  selectedDelivery = parseFloat(el.dataset.price || 0);
+  updateTotals();
+}
+
+function selectPayment(el, type) {
+  el.closest('.ss-body').querySelectorAll('.address-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('.pay-dot').style.background = 'transparent';
+  });
+  el.classList.add('selected');
+  el.querySelector('.pay-dot').style.background = 'var(--paprika)';
+  document.getElementById('cardFields').style.display = type === 'card' ? 'block' : 'none';
+}
+
+function placeOrder() {
+  // Validate required fields
+  const required = document.querySelectorAll('#checkoutForm .buyer-input[required]');
+  let valid = true;
+  required.forEach(input => {
+    if (!input.value.trim()) {
+      input.style.borderColor = 'rgba(239,68,68,0.5)';
+      valid = false;
+    } else {
+      input.style.borderColor = '';
+    }
+  });
+  if (!valid) {
+    showToast('⚠️ Veuillez remplir tous les champs obligatoires');
+    document.querySelector('.buyer-input[required]:not([value]),.buyer-input[required][value=""]')?.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  const btn = document.getElementById('placeOrderBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement en cours…';
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '0.7';
+
+  setTimeout(() => {
+    // Generate order number
+    const orderNum = 'GLD-' + (2000 + Math.floor(Math.random()*999));
+    document.getElementById('confirmOrderNum').textContent = 'Commande #' + orderNum;
+
+    // Clear cart
+    GoldAuth.clearCart();
+    updateCartBadges();
+
+    // Show confirmation
+    document.getElementById('checkoutForm').style.display = 'none';
+    document.getElementById('orderConfirm').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }, 2200);
+}
+</script>
+</body>
+</html>

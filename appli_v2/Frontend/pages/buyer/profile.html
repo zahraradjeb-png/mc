@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil — Gold</title>
+  <meta name="description" content="Votre profil acheteur sur Gold, la marketplace de musique vintage.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/buyer.css">
+</head>
+<body>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" placeholder="Rechercher vinyles, artistes, instruments…">
+  </div>
+  <div class="search-hints">
+    <span>Pink Floyd</span><span>Fender 1965</span><span>Jazz Vinyl</span><span>Beatles</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar scrolled" id="navbar">
+  <div class="nav-wrap">
+    <a href="../../index.html" class="logo">G<span>old</span></a>
+  </div>
+</header>
+<div class="mob-nav" id="mobNav"></div>
+
+<!-- PAGE HEADER -->
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb">
+          <a href="../../index.html">Accueil</a>
+          <span class="bph-sep">›</span>
+          <span>Mon profil</span>
+        </div>
+        <h1 class="bph-title">Mon <em>Profil</em></h1>
+        <p class="bph-subtitle">Gérez vos informations personnelles et suivez votre activité</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section class="buyer-content">
+  <div class="wrap">
+
+    <!-- Profile Hero Card -->
+    <div class="profile-hero-card" id="profileCard">
+      <div class="phc-banner"></div>
+      <div class="phc-body">
+        <div class="phc-avatar" id="profileAvatar">--</div>
+        <div class="phc-info">
+          <div>
+            <div class="phc-name" id="profileName">Chargement...</div>
+            <div class="phc-email" id="profileEmail"></div>
+            <div class="phc-joined" id="profileJoined">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Membre depuis —</span>
+            </div>
+          </div>
+          <button class="phc-edit-btn" onclick="openEditModal()">
+            <i class="fas fa-pen"></i> Modifier le profil
+          </button>
+        </div>
+        <div class="phc-bio" id="profileBio">
+          <i class="fas fa-quote-left" style="color:var(--honey);opacity:0.4;margin-right:8px;font-size:0.75rem"></i>
+          Passionné de musique vintage et collectionneur.
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="buyer-stats-row" style="margin-bottom:40px">
+      <div class="buyer-stat-card">
+        <div class="bsc-icon"><i class="fas fa-box"></i></div>
+        <div class="bsc-num" id="statOrders">0</div>
+        <div class="bsc-label">Commandes</div>
+      </div>
+      <div class="buyer-stat-card">
+        <div class="bsc-icon"><i class="fas fa-heart"></i></div>
+        <div class="bsc-num" id="statFavs">0</div>
+        <div class="bsc-label">Favoris</div>
+      </div>
+      <div class="buyer-stat-card">
+        <div class="bsc-icon"><i class="fas fa-star"></i></div>
+        <div class="bsc-num" id="statReviews">0</div>
+        <div class="bsc-label">Avis laissés</div>
+      </div>
+      <div class="buyer-stat-card">
+        <div class="bsc-icon"><i class="fas fa-store"></i></div>
+        <div class="bsc-num" id="statSellers">0</div>
+        <div class="bsc-label">Vendeurs suivis</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="buyer-section">
+      <div class="buyer-section-header">
+        <h2 class="bsh-title">Accès <em>rapide</em></h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+        <a href="orders.html" class="order-card" style="text-decoration:none;margin:0">
+          <div class="oc-body" style="display:flex;align-items:center;gap:16px;padding:24px">
+            <div class="bsc-icon" style="margin:0;background:rgba(59,130,246,0.08);color:#3b82f6"><i class="fas fa-box"></i></div>
+            <div>
+              <div style="font-weight:500;color:var(--ink);margin-bottom:2px">Mes commandes</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Suivre vos achats →</div>
+            </div>
+          </div>
+        </a>
+        <a href="favorites.html" class="order-card" style="text-decoration:none;margin:0">
+          <div class="oc-body" style="display:flex;align-items:center;gap:16px;padding:24px">
+            <div class="bsc-icon" style="margin:0;background:rgba(239,68,68,0.06);color:#dc2626"><i class="fas fa-heart"></i></div>
+            <div>
+              <div style="font-weight:500;color:var(--ink);margin-bottom:2px">Mes favoris</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Votre wishlist →</div>
+            </div>
+          </div>
+        </a>
+        <a href="reviews.html" class="order-card" style="text-decoration:none;margin:0">
+          <div class="oc-body" style="display:flex;align-items:center;gap:16px;padding:24px">
+            <div class="bsc-icon" style="margin:0;background:rgba(168,85,247,0.08);color:#7c3aed"><i class="fas fa-star"></i></div>
+            <div>
+              <div style="font-weight:500;color:var(--ink);margin-bottom:2px">Mes avis</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Vos évaluations →</div>
+            </div>
+          </div>
+        </a>
+        <a href="settings.html" class="order-card" style="text-decoration:none;margin:0">
+          <div class="oc-body" style="display:flex;align-items:center;gap:16px;padding:24px">
+            <div class="bsc-icon" style="margin:0"><i class="fas fa-cog"></i></div>
+            <div>
+              <div style="font-weight:500;color:var(--ink);margin-bottom:2px">Paramètres</div>
+              <div style="font-size:0.78rem;color:var(--muted)">Gérer votre compte →</div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="buyer-section" style="margin-top:40px">
+      <div class="buyer-section-header">
+        <h2 class="bsh-title">Activité <em>récente</em></h2>
+        <a href="orders.html" class="sec-more">Tout voir →</a>
+      </div>
+      <div id="recentActivity">
+        <div class="buyer-empty">
+          <div class="be-icon">🎵</div>
+          <div class="be-title">Aucune activité récente</div>
+          <div class="be-desc">Commencez à explorer notre catalogue pour trouver des trésors musicaux uniques.</div>
+          <a href="../../catalogue.html" class="be-cta">Découvrir le catalogue <span>→</span></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand">
+        <div class="flogo">G<span>old</span></div>
+        <p>La marketplace de référence pour la musique vintage.</p>
+        <div class="fsocials">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-x-twitter"></i></a>
+        </div>
+      </div>
+      <div class="fcol"><div class="fctitle">Marketplace</div><a href="../../catalogue.html">Catalogue</a><a href="../../catalogue.html?new=1">Nouveautés</a><a href="../../catalogue.html?rare=1">Éditions rares</a></div>
+      <div class="fcol"><div class="fctitle">Mon compte</div><a href="orders.html">Mes commandes</a><a href="favorites.html">Mes favoris</a><a href="settings.html">Paramètres</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a><a href="#">Lun–Ven 9h–18h</a></div>
+    </div>
+    <div class="fbot">
+      <span>© 2026 Gold Marketplace</span>
+      <div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span><span>APPLE PAY</span></div>
+    </div>
+  </div>
+</footer>
+
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../../js/auth-system.js"></script>
+<script src="../../js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('profile');
+
+  const user = GoldAuth.getUser();
+  if (!user) {
+    window.location.href = '../../auth/sign-in.html';
+    return;
+  }
+
+  // Populate profile
+  const initials = (user.firstName||'U')[0].toUpperCase() + ((user.lastName||'')[0]||'').toUpperCase();
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileName').textContent = (user.firstName||'') + ' ' + (user.lastName||'');
+  document.getElementById('profileEmail').textContent = user.email || '';
+
+  if (user.created_at) {
+    const d = new Date(user.created_at);
+    document.getElementById('profileJoined').innerHTML = `<i class="fas fa-calendar-alt"></i><span>Membre depuis ${d.toLocaleDateString('fr-FR', {month:'long', year:'numeric'})}</span>`;
+  }
+
+  // Stats
+  const favs = GoldAuth.getFavs();
+  document.getElementById('statFavs').textContent = favs.length;
+
+  // Try fetch orders count from API
+  const uid = user.id_user || user.id;
+  fetch(`http://localhost:8000/api/acheteurs/${uid}/commandes`)
+    .then(r => r.json())
+    .then(orders => {
+      document.getElementById('statOrders').textContent = Array.isArray(orders) ? orders.length : 0;
+    }).catch(() => {});
+
+  fetch(`http://localhost:8000/api/acheteurs/${uid}/avis`)
+    .then(r => r.json())
+    .then(reviews => {
+      document.getElementById('statReviews').textContent = Array.isArray(reviews) ? reviews.length : 0;
+    }).catch(() => {});
+
+  // Animate stats
+  document.querySelectorAll('.buyer-stat-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 200 + i * 100);
+  });
+});
+
+function openEditModal() {
+  showToast('✏️ Fonctionnalité de modification bientôt disponible');
+}
+</script>
+</body>
+</html>
