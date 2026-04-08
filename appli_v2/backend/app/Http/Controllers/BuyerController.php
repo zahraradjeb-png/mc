@@ -4,42 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 class BuyerController extends Controller
 {
-    public function __construct()
-    {
-        $this->ensureTablesExist();
-    }
-
-    private function ensureTablesExist()
-    {
-        // Table Favoris
-        if (!Schema::hasTable('favoris')) {
-            Schema::create('favoris', function (Blueprint $table) {
-                $table->id();
-                $table->integer('id_user');
-                $table->integer('id_produit');
-                $table->timestamps();
-            });
-        }
-
-        // Table Notifications
-        if (!Schema::hasTable('notifications')) {
-            Schema::create('notifications', function (Blueprint $table) {
-                $table->id();
-                $table->integer('id_user');
-                $table->string('titre');
-                $table->text('contenu');
-                $table->string('type')->default('info'); // info, success, warning, order
-                $table->boolean('est_lue')->default(false);
-                $table->timestamps();
-            });
-        }
-    }
-
     /**
      * Get buyer favorites.
      */

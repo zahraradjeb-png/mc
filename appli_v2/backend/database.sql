@@ -120,6 +120,37 @@ CREATE TABLE `cds` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `favoris`
+--
+
+CREATE TABLE `favoris` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `titre` varchar(255) NOT NULL,
+  `contenu` text NOT NULL,
+  `type` varchar(255) DEFAULT 'info',
+  `est_lue` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `commande`
 --
 
@@ -142,7 +173,8 @@ CREATE TABLE `commande_produit` (
   `id_commande` int(11) NOT NULL,
   `id_produit` int(11) NOT NULL,
   `quantite` int(11) DEFAULT 1,
-  `prix_unitaire` decimal(10,2) NOT NULL
+  `prix_unitaire` decimal(10,2) NOT NULL,
+  `statut` enum('EN_PREPARATION','EXPEDIE','LIVRE','ANNULE') DEFAULT 'EN_PREPARATION'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -217,6 +249,7 @@ CREATE TABLE `produit` (
   `titre` varchar(200) NOT NULL,
   `description` text DEFAULT NULL,
   `prix` decimal(10,2) NOT NULL,
+  `quantite` int(11) DEFAULT 1,
   `decennie` varchar(10) DEFAULT NULL,
   `annee` year(4) DEFAULT NULL,
   `artiste` varchar(200) DEFAULT NULL,
@@ -224,6 +257,18 @@ CREATE TABLE `produit` (
   `etat` enum('NEUF','BON','ACCEPTABLE','ABIME') DEFAULT 'BON',
   `est_disponible` tinyint(1) DEFAULT 1,
   `date_ajout` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `produit_photo`
+--
+
+CREATE TABLE `produit_photo` (
+  `id_photo` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `chemin` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -257,7 +302,10 @@ INSERT INTO `users` (`id_user`, `nom`, `prenom`, `email`, `mdp`, `role`) VALUES
 CREATE TABLE `vendeur` (
   `id_user` int(11) NOT NULL,
   `nom_boutique` varchar(150) NOT NULL,
-  `description` text DEFAULT NULL
+  `description` text DEFAULT NULL,
+  `categorie_principale` varchar(100) DEFAULT NULL,
+  `localisation` varchar(150) DEFAULT NULL,
+  `photo_profil` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -400,6 +448,19 @@ ALTER TABLE `cds`
   ADD PRIMARY KEY (`id_produit`);
 
 --
+-- Index pour la table `favoris`
+--
+ALTER TABLE `favoris`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `favoris_unique` (`id_user`,`id_produit`),
+  ADD KEY `id_produit` (`id_produit`);
+
+--
+-- Index pour la table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_user` (`id_user`);
 -- Index pour la table `commande`
 --
 ALTER TABLE `commande`
@@ -456,6 +517,13 @@ ALTER TABLE `produit`
   ADD KEY `id_vendeur` (`id_vendeur`);
 
 --
+-- Index pour la table `produit_photo`
+--
+ALTER TABLE `produit_photo`
+  ADD PRIMARY KEY (`id_photo`),
+  ADD KEY `id_produit` (`id_produit`);
+
+--
 -- Index pour la table `users`
 --
 ALTER TABLE `users`
@@ -491,6 +559,18 @@ ALTER TABLE `categorie`
   MODIFY `id_categorie` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `favoris`
+--
+ALTER TABLE `favoris`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `commande`
 --
 ALTER TABLE `commande`
@@ -513,6 +593,12 @@ ALTER TABLE `panier`
 --
 ALTER TABLE `produit`
   MODIFY `id_produit` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT pour la table `produit_photo`
+--
+ALTER TABLE `produit_photo`
+  MODIFY `id_photo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `users`
@@ -563,6 +649,19 @@ ALTER TABLE `cds`
   ADD CONSTRAINT `cds_ibfk_1` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE;
 
 --
+-- Contraintes pour la table `favoris`
+--
+ALTER TABLE `favoris`
+  ADD CONSTRAINT `favoris_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE CASCADE,
+  ADD CONSTRAINT `favoris_ibfk_2` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`) ON DELETE CASCADE;
+
+--
 -- Contraintes pour la table `commande`
 --
 ALTER TABLE `commande`
@@ -606,6 +705,12 @@ ALTER TABLE `panier_produit`
 --
 ALTER TABLE `poster`
   ADD CONSTRAINT `poster_ibfk_1` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `produit_photo`
+--
+ALTER TABLE `produit_photo`
+  ADD CONSTRAINT `produit_photo_ibfk_1` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `produit`
