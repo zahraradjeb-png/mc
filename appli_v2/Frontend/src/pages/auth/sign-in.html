@@ -796,7 +796,7 @@
   // Already logged in
   try {
     const u = JSON.parse(localStorage.getItem('gold_user'));
-    if (u) window.location.href = u.role === 'seller' ? '../pages/seller/dashboard.html' : 'profile.html';
+    if (u) window.location.href = u.role === 'seller' ? '../seller/dashboard.html' : 'profile.html';
   } catch(e) {}
 </script>
 </body>

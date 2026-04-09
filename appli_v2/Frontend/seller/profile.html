@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperçu Boutique — Gold Seller Studio</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Seller Design System -->
+  <link rel="stylesheet" href="styles/seller-base.css">
+  <link rel="stylesheet" href="styles/seller-layout.css">
+  <link rel="stylesheet" href="styles/seller-profile.css">
+</head>
+
+<body class="seller-studio">
+
+  <div class="studio-layout">
+    <div id="sidebar-container"></div>
+
+    <main class="studio-main animate-slide" style="padding: 0;">
+      <!-- Twitter Style Container -->
+      <div class="profile-container">
+        
+        <!-- 1. Cover/Banner -->
+        <div class="profile-cover" id="p-banner"></div>
+
+        <!-- 2. Avatar & Actions -->
+        <div class="profile-avatar-wrapper">
+            <div class="profile-avatar-img" id="p-avatar">M</div>
+            <div class="profile-actions">
+                <button class="btn-profile-outline">Partager</button>
+                <a href="settings.html" class="btn-gold-studio" style="padding: 10px 24px; border-radius: 50px;">Modifier</a>
+            </div>
+        </div>
+
+        <!-- 3. Profile Info -->
+        <div class="profile-info">
+            <h1 class="p-name-txt" id="p-name">Ma Boutique Deluxe</h1>
+            <div class="p-handle-txt" id="p-handle">@maboutiquedeluxe</div>
+            
+            <div style="font-size:0.85rem; color:var(--studio-muted); display:flex; gap:16px; margin-bottom:16px;">
+                <span id="p-location"><i class="fas fa-map-marker-alt" style="margin-right:6px"></i><span class="txt">Non renseigné</span></span>
+                <span id="p-category"><i class="fas fa-cubes" style="margin-right:6px"></i><span class="txt">Non renseigné</span></span>
+            </div>
+            
+            <p class="p-bio-txt" id="p-bio">
+                Chargement de la description...
+            </p>
+
+            <div class="p-stats-row">
+                <div class="p-stat-item"><b id="stat-followers">4.2k</b> <span>Abonnés</span></div>
+                <div class="p-stat-item"><b id="stat-sales">128</b> <span>Ventes</span></div>
+                <div class="p-stat-item"><b id="stat-rating">4.9</b> <span>Note</span></div>
+            </div>
+        </div>
+
+        <!-- 4. Tabs Navigation -->
+        <nav class="profile-tabs-nav">
+            <button class="tab-nav-btn active" data-tab="products">Produits</button>
+            <button class="tab-nav-btn" data-tab="reviews">Avis</button>
+            <button class="tab-nav-btn" data-tab="about">À propos</button>
+        </nav>
+
+        <!-- 5. Feed Content -->
+        <div class="profile-feed-container">
+            <!-- Products Tab -->
+            <section id="tab-products" class="feed-section active">
+                <div class="products-feed-grid" id="products-feed">
+                    <!-- Products will be injected here -->
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; opacity: 0.5;">
+                        <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews Tab -->
+            <section id="tab-reviews" class="feed-section">
+                <div id="reviews-feed" style="opacity: 0.6; text-align: center; padding: 40px;">
+                    Aucun avis pour le moment.
+                </div>
+            </section>
+
+            <!-- About Tab -->
+            <section id="tab-about" class="feed-section">
+                <div class="studio-card" style="line-height:1.7;">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Histoire de la boutique</h3>
+                    <p id="p-full-bio">
+                        Détails complets de la boutique...
+                    </p>
+                </div>
+            </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Common Libraries -->
+  <script src="../js/auth-system.js"></script>
+  
+  <!-- Modular Services -->
+  <script src="services/seller-auth.js"></script>
+  <script src="services/products.service.js"></script>
+  
+  <!-- Shared Components -->
+  <script src="components/sidebar.js"></script>
+  <script src="components/header.js"></script>
+  <script src="components/seller-layout.js"></script>
+  
+  <!-- Page Logic -->
+  <script src="scripts/profile.js"></script>
+</body>
+</html>

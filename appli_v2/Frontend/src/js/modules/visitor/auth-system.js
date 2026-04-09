@@ -42,8 +42,8 @@ const GoldAuth = {
 /* ── root path helper (works from nested src/pages/) ── */
 function _root() {
   const p = window.location.pathname;
-  // Two levels deep: pages/seller/ or pages/buyer/
-  if (p.includes('/pages/seller/') || p.includes('/pages/buyer/')) return '../../';
+  // seller/ or buyer/ (1 level deep from Frontend root)
+  if (p.includes('/seller/') || p.includes('/buyer/')) return '../';
   // Root level: index.html, catalogue.html...
   return '';
 }
@@ -244,15 +244,15 @@ function buildSellerDrawer(user, root) {
 
     <div class="gsd-body">
       <div class="gsd-section-label">Gestion</div>
-      <a href="${root}pages/seller/orders.html"       class="gsd-link"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
-      <a href="${root}pages/seller/dashboard.html"    class="gsd-link"><i class="fas fa-store"></i> Ma boutique</a>
-      <a href="${root}pages/seller/products/create.html"  class="gsd-link"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
-      <a href="${root}pages/seller/reviews.html"      class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
+      <a href="${root}seller/orders.html"       class="gsd-link"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
+      <a href="${root}seller/dashboard.html"    class="gsd-link"><i class="fas fa-store"></i> Ma boutique</a>
+      <a href="${root}seller/products/create.html"  class="gsd-link"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
+      <a href="${root}seller/reviews.html"      class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
 
       <div class="gsd-sep"></div>
       <div class="gsd-section-label">Compte</div>
-      <a href="${root}pages/seller/dashboard.html"   class="gsd-link"><i class="fas fa-chart-line"></i> Tableau de bord</a>
-      <a href="${root}pages/seller/settings.html"    class="gsd-link"><i class="fas fa-user-cog"></i> Paramètres</a>
+      <a href="${root}seller/dashboard.html"   class="gsd-link"><i class="fas fa-chart-line"></i> Tableau de bord</a>
+      <a href="${root}seller/settings.html"    class="gsd-link"><i class="fas fa-user-cog"></i> Paramètres</a>
     </div>
 
     <button class="gsd-logout" id="gsdLogout">
@@ -413,15 +413,15 @@ function buildMobileNav() {
   let links = user.role==='seller' ? `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}pages/seller/orders.html">Mes commandes</a>
-    <a href="${root}pages/seller/dashboard.html">Ma boutique</a>
-    <a href="${root}pages/seller/products/create.html">+ Ajouter un produit</a>
-    <a href="${root}pages/seller/reviews.html">Avis clients</a>` : `
+    <a href="${root}seller/orders.html">Mes commandes</a>
+    <a href="${root}seller/dashboard.html">Ma boutique</a>
+    <a href="${root}seller/products/create.html">+ Ajouter un produit</a>
+    <a href="${root}seller/reviews.html">Avis clients</a>` : `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}pages/buyer/cart.html">Mon panier</a>
-    <a href="${root}pages/buyer/profile.html">Mon profil</a>
-    <a href="${root}pages/buyer/orders.html">Mes commandes</a>`;
+    <a href="${root}buyer/cart.html">Mon panier</a>
+    <a href="${root}buyer/profile.html">Mon profil</a>
+    <a href="${root}buyer/orders.html">Mes commandes</a>`;
 
   return `
     <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(229,166,87,0.15)">

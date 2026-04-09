@@ -1357,7 +1357,7 @@
             document.getElementById('successDesc').textContent = 'Votre profil vendeur est prêt. Vous allez être redirigé...';
           }
           setTimeout(() => { 
-            let nextUrl = role === 'VENDEUR' ? '../pages/seller/dashboard.html' : '../index.html'; 
+            let nextUrl = role === 'VENDEUR' ? '../seller/dashboard.html' : '../index.html'; 
             window.location.href = nextUrl; 
           }, 2500);
         } else {

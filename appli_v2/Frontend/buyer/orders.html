@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Commandes — Gold</title>
+  <meta name="description" content="Suivez toutes vos commandes sur Gold, la marketplace de musique vintage.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/buyer.css">
+</head>
+<body>
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher…"></div>
+  <div class="search-hints"><span>Pink Floyd</span><span>Fender 1965</span><span>Jazz Vinyl</span></div>
+</div>
+
+<header class="navbar scrolled" id="navbar">
+  <div class="nav-wrap"><a href="../index.html" class="logo">G<span>old</span></a></div>
+</header>
+<div class="mob-nav" id="mobNav"></div>
+
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb">
+          <a href="../index.html">Accueil</a><span class="bph-sep">›</span>
+          <a href="profile.html">Mon compte</a><span class="bph-sep">›</span>
+          <span>Mes commandes</span>
+        </div>
+        <h1 class="bph-title">Mes <em>Commandes</em></h1>
+        <p class="bph-subtitle">Suivez l'état de vos achats et gérez vos commandes</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="buyer-content">
+  <div class="wrap">
+
+    <!-- Filters -->
+    <div class="buyer-filters" id="orderFilters">
+      <button class="bf-tab active" data-filter="all">Toutes <span class="bf-count" id="countAll">0</span></button>
+      <button class="bf-tab" data-filter="pending">En attente</button>
+      <button class="bf-tab" data-filter="confirmed">Confirmées</button>
+      <button class="bf-tab" data-filter="shipped">Expédiées</button>
+      <button class="bf-tab" data-filter="delivered">Livrées</button>
+      <button class="bf-tab" data-filter="cancelled">Annulées</button>
+    </div>
+
+    <!-- Orders List -->
+    <div id="ordersList">
+      <!-- Loading -->
+      <div id="ordersLoading" style="text-align:center;padding:60px">
+        <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--honey);margin-bottom:16px;display:block"></i>
+        <span style="color:var(--muted);font-size:0.88rem">Chargement de vos commandes…</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand"><div class="flogo">G<span>old</span></div><p>La marketplace de référence pour la musique vintage.</p></div>
+      <div class="fcol"><div class="fctitle">Marketplace</div><a href="../catalogue.html">Catalogue</a><a href="../catalogue.html?new=1">Nouveautés</a></div>
+      <div class="fcol"><div class="fctitle">Mon compte</div><a href="profile.html">Mon profil</a><a href="favorites.html">Mes favoris</a><a href="settings.html">Paramètres</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Gold Marketplace</span><div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span></div></div>
+  </div>
+</footer>
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../js/auth-system.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const STATUS_MAP = {
+  'en_attente': { label: 'En attente', css: 'pending', icon: 'fa-clock' },
+  'confirmee': { label: 'Confirmée', css: 'confirmed', icon: 'fa-check' },
+  'expediee': { label: 'Expédiée', css: 'shipped', icon: 'fa-truck' },
+  'livree': { label: 'Livrée', css: 'delivered', icon: 'fa-check-double' },
+  'annulee': { label: 'Annulée', css: 'cancelled', icon: 'fa-times' },
+  'remboursee': { label: 'Remboursée', css: 'refunded', icon: 'fa-undo' },
+};
+
+let allOrders = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('orders');
+  const user = GoldAuth.getUser();
+  if (!user) { window.location.href = '../auth/sign-in.html'; return; }
+  loadOrders(user);
+  setupFilters();
+});
+
+async function loadOrders(user) {
+  const uid = user.id_user || user.id;
+  try {
+    const res = await fetch(`http://localhost:8000/api/acheteurs/${uid}/commandes`);
+    if (res.ok) {
+      allOrders = await res.json();
+      if (!Array.isArray(allOrders)) allOrders = allOrders.data || [];
+    }
+  } catch(e) {
+    // Demo orders if API unavailable
+    allOrders = getDemoOrders();
+  }
+
+  document.getElementById('countAll').textContent = allOrders.length;
+  renderOrders(allOrders);
+}
+
+function renderOrders(orders) {
+  const container = document.getElementById('ordersList');
+
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div class="buyer-empty">
+        <div class="be-icon">📦</div>
+        <div class="be-title">Aucune commande trouvée</div>
+        <div class="be-desc">Vous n'avez pas encore passé de commande. Explorez notre catalogue pour trouver des pièces uniques !</div>
+        <a href="../catalogue.html" class="be-cta">Découvrir le catalogue <span>→</span></a>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = orders.map((order, i) => {
+    const status = STATUS_MAP[order.statut] || STATUS_MAP['en_attente'];
+    const date = order.created_at ? new Date(order.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'}) : '—';
+    const items = order.produits || order.items || [];
+    const total = order.total || items.reduce((s,p) => s + (p.prix || p.price || 0) * (p.quantite || p.qty || 1), 0);
+
+    return `
+      <div class="order-card reveal" style="animation-delay:${i*0.06}s">
+        <div class="oc-header">
+          <div>
+            <div class="oc-number">Commande #${order.numero || order.id || (1000+i)}</div>
+            <div class="oc-date">${date}</div>
+          </div>
+          <span class="oc-status ${status.css}">
+            <i class="fas ${status.icon}"></i> ${status.label}
+          </span>
+        </div>
+        <div class="oc-body">
+          <div class="oc-items">
+            ${items.slice(0,3).map(p => `
+              <div class="oc-item">
+                <div class="oc-item-thumb">${p.image ? `<img src="${p.image}" onerror="this.style.display='none'">` : '🎵'}</div>
+                <div class="oc-item-info">
+                  <div class="oc-item-name">${p.nom || p.name || 'Produit'}</div>
+                  <div class="oc-item-meta">${p.categorie || p.category || 'Vinyle'} · x${p.quantite || p.qty || 1}</div>
+                </div>
+                <div class="oc-item-price">${(p.prix || p.price || 0).toFixed(2)} €</div>
+              </div>
+            `).join('')}
+            ${items.length > 3 ? `<div style="font-size:0.78rem;color:var(--muted);padding-left:76px">+ ${items.length - 3} autre(s) article(s)</div>` : ''}
+          </div>
+        </div>
+        <div class="oc-footer">
+          <div class="oc-seller">
+            <div class="oc-seller-av">${(order.vendeur_nom || 'GS')[0]}</div>
+            <span>${order.vendeur_nom || 'Gold Store'}</span>
+          </div>
+          <div class="oc-total">${total.toFixed(2)} €</div>
+          <div class="oc-actions">
+            <a href="order-details.html?id=${order.id || i}" class="oc-btn">Détails</a>
+            ${status.css === 'delivered' ? `<button class="oc-btn oc-btn-primary" onclick="leaveReview(${order.id||i})"><i class="fas fa-star"></i> Avis</button>` : ''}
+            ${status.css === 'shipped' ? `<button class="oc-btn" onclick="trackOrder(${order.id||i})"><i class="fas fa-truck"></i> Suivre</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Animate in
+  container.querySelectorAll('.order-card').forEach((card, i) => {
+    card.style.opacity = '0'; card.style.transform = 'translateY(16px)';
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.style.opacity = '1'; card.style.transform = 'translateY(0)';
+    }, 100 + i * 80);
+  });
+}
+
+function setupFilters() {
+  document.querySelectorAll('.bf-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.bf-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      const FILTER_MAP = {
+        all: null, pending: 'en_attente', confirmed: 'confirmee',
+        shipped: 'expediee', delivered: 'livree', cancelled: 'annulee'
+      };
+      const filtered = filter === 'all' ? allOrders : allOrders.filter(o => o.statut === FILTER_MAP[filter]);
+      renderOrders(filtered);
+    });
+  });
+}
+
+function leaveReview(orderId) {
+  showToast('⭐ Redirection vers la page d\'avis…');
+}
+
+function trackOrder(orderId) {
+  window.location.href = `order-details.html?id=${orderId}`;
+}
+
+function getDemoOrders() {
+  return [
+    {
+      id: 1001, numero: 'GLD-1001', statut: 'livree',
+      created_at: '2026-03-28T10:00:00Z', total: 163.99,
+      vendeur_nom: 'Jean-Pierre V.',
+      produits: [
+        { nom: 'Led Zeppelin IV', categorie: 'Vinyle · 1971', prix: 89.99, quantite: 1 },
+        { nom: 'The Wall', categorie: 'Vinyle · 1979', prix: 74.00, quantite: 1 }
+      ]
+    },
+    {
+      id: 1002, numero: 'GLD-1002', statut: 'expediee',
+      created_at: '2026-04-02T14:30:00Z', total: 55.00,
+      vendeur_nom: 'Marie-Louise R.',
+      produits: [
+        { nom: 'Kind of Blue', categorie: 'Vinyle · 1959', prix: 55.00, quantite: 1 }
+      ]
+    },
+    {
+      id: 1003, numero: 'GLD-1003', statut: 'en_attente',
+      created_at: '2026-04-05T09:15:00Z', total: 21.00,
+      vendeur_nom: 'TomKaz Records',
+      produits: [
+        { nom: 'Thriller', categorie: 'Cassette · 1982', prix: 21.00, quantite: 1 }
+      ]
+    },
+  ];
+}
+</script>
+</body>
+</html>

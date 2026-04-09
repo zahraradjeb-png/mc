@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres du compte — Gold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/buyer.css">
+</head>
+<body>
+<div class="search-overlay" id="searchOverlay"><button class="search-close">&times;</button><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher…"></div></div>
+<header class="navbar scrolled" id="navbar"><div class="nav-wrap"><a href="../index.html" class="logo">G<span>old</span></a></div></header>
+<div class="mob-nav" id="mobNav"></div>
+
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb"><a href="../index.html">Accueil</a><span class="bph-sep">›</span><a href="profile.html">Mon compte</a><span class="bph-sep">›</span><span>Paramètres</span></div>
+        <h1 class="bph-title"><em>Paramètres</em> du compte</h1>
+        <p class="bph-subtitle">Gérez vos informations, adresses et préférences</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="buyer-content">
+  <div class="wrap" style="max-width:860px">
+
+    <!-- Personal Info -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-user"></i></div>
+        <div class="ss-title">Informations personnelles</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <span class="ss-row-label">Prénom</span>
+          <span class="ss-row-value" id="setFirstName">—</span>
+          <span class="ss-row-action" onclick="editField('firstName')">Modifier</span>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Nom</span>
+          <span class="ss-row-value" id="setLastName">—</span>
+          <span class="ss-row-action" onclick="editField('lastName')">Modifier</span>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Bio</span>
+          <span class="ss-row-value" id="setBio" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Passionné de musique vintage</span>
+          <span class="ss-row-action" onclick="editField('bio')">Modifier</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-envelope"></i></div>
+        <div class="ss-title">Coordonnées</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <span class="ss-row-label">Email</span>
+          <span class="ss-row-value" id="setEmail">—</span>
+          <span class="ss-row-action" onclick="editField('email')">Modifier</span>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Téléphone</span>
+          <span class="ss-row-value" id="setPhone">Non renseigné</span>
+          <span class="ss-row-action" onclick="editField('phone')">Ajouter</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Addresses -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="ss-title">Adresses de livraison</div>
+      </div>
+      <div class="ss-body">
+        <div id="addressList">
+          <div class="address-card selected" style="margin-bottom:12px">
+            <div class="ac-name">Adresse principale</div>
+            <div class="ac-text">12 Rue de la Musique<br>75011 Paris, France</div>
+            <div class="ac-default"><i class="fas fa-check-circle" style="font-size:0.6rem"></i> Adresse par défaut</div>
+          </div>
+        </div>
+        <button class="oc-btn" style="margin-top:12px;display:flex;align-items:center;gap:8px" onclick="addAddress()">
+          <i class="fas fa-plus"></i> Ajouter une adresse
+        </button>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-lock"></i></div>
+        <div class="ss-title">Sécurité</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <span class="ss-row-label">Mot de passe</span>
+          <span class="ss-row-value">•••••••••</span>
+          <span class="ss-row-action" onclick="changePassword()">Changer</span>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Authentification 2FA</span>
+          <span class="ss-row-value" style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:0.72rem;color:#dc2626">Désactivée</span>
+          </span>
+          <span class="ss-row-action" onclick="showToast('🔐 Configuration 2FA bientôt disponible')">Activer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-credit-card"></i></div>
+        <div class="ss-title">Moyens de paiement</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:28px;background:rgba(184,168,158,0.15);border:1px solid rgba(184,168,158,0.3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--muted)">VISA</div>
+            <span class="ss-row-label">•••• •••• •••• 4242</span>
+          </div>
+          <span class="ss-row-value" style="font-size:0.75rem;color:#16a34a">Par défaut</span>
+          <span class="ss-row-action" onclick="showToast('💳 Gestion des cartes bientôt disponible')">Gérer</span>
+        </div>
+        <button class="oc-btn" style="margin-top:12px;display:flex;align-items:center;gap:8px" onclick="showToast('💳 Ajout de carte bientôt disponible')">
+          <i class="fas fa-plus"></i> Ajouter un moyen de paiement
+        </button>
+      </div>
+    </div>
+
+    <!-- Notifications Preferences -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-bell"></i></div>
+        <div class="ss-title">Préférences de notifications</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <span class="ss-row-label">Mises à jour de commandes</span>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Promotions & offres spéciales</span>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Baisse de prix sur les favoris</span>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Nouveautés des vendeurs suivis</span>
+          <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Newsletter hebdomadaire</span>
+          <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy -->
+    <div class="settings-section">
+      <div class="ss-header">
+        <div class="ss-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="ss-title">Confidentialité</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <span class="ss-row-label">Profil visible publiquement</span>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ss-row">
+          <span class="ss-row-label">Afficher mes avis avec mon nom</span>
+          <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="settings-section" style="border-color:rgba(239,68,68,0.2)">
+      <div class="ss-header" style="background:rgba(239,68,68,0.03)">
+        <div class="ss-icon" style="background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.15);color:#dc2626"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="ss-title" style="color:#dc2626">Zone de danger</div>
+      </div>
+      <div class="ss-body">
+        <div class="ss-row">
+          <div>
+            <span class="ss-row-label">Supprimer mon compte</span>
+            <div style="font-size:0.75rem;color:var(--faint);margin-top:2px">Cette action est irréversible</div>
+          </div>
+          <button class="oc-btn" style="color:#dc2626;border-color:rgba(239,68,68,0.3)" onclick="showToast('⚠️ Contactez le support pour supprimer votre compte')">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand"><div class="flogo">G<span>old</span></div><p>La marketplace de référence pour la musique vintage.</p></div>
+      <div class="fcol"><div class="fctitle">Mon compte</div><a href="profile.html">Mon profil</a><a href="orders.html">Mes commandes</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Gold Marketplace</span></div>
+  </div>
+</footer>
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../js/auth-system.js"></script>
+<script src="../js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('settings');
+  const user = GoldAuth.getUser();
+  if (!user) { window.location.href = '../auth/sign-in.html'; return; }
+
+  document.getElementById('setFirstName').textContent = user.firstName || '—';
+  document.getElementById('setLastName').textContent = user.lastName || '—';
+  document.getElementById('setEmail').textContent = user.email || '—';
+  if (user.phone) document.getElementById('setPhone').textContent = user.phone;
+
+  // Animate sections
+  document.querySelectorAll('.settings-section').forEach((sec, i) => {
+    sec.style.opacity = '0';
+    sec.style.transform = 'translateY(16px)';
+    setTimeout(() => {
+      sec.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      sec.style.opacity = '1';
+      sec.style.transform = 'translateY(0)';
+    }, 150 + i * 80);
+  });
+});
+
+function editField(field) {
+  const user = GoldAuth.getUser();
+  const labels = { firstName:'Prénom', lastName:'Nom', email:'Email', phone:'Téléphone', bio:'Bio' };
+  const current = user[field] || '';
+  const val = prompt(`Modifier votre ${labels[field]}:`, current);
+  if (val !== null && val.trim()) {
+    user[field] = val.trim();
+    GoldAuth.setUser(user);
+    const elMap = { firstName:'setFirstName', lastName:'setLastName', email:'setEmail', phone:'setPhone', bio:'setBio' };
+    if (elMap[field]) document.getElementById(elMap[field]).textContent = val.trim();
+    showToast(`✓ ${labels[field]} mis à jour`);
+
+    // Sync with API
+    try {
+      const uid = user.id_user || user.id;
+      fetch(`http://localhost:8000/api/acheteurs/${uid}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: val.trim() })
+      }).catch(() => {});
+    } catch(e) {}
+  }
+}
+
+function changePassword() {
+  showToast('🔑 Changement de mot de passe bientôt disponible');
+}
+
+function addAddress() {
+  showToast('📍 Ajout d\'adresse bientôt disponible');
+}
+</script>
+</body>
+</html>

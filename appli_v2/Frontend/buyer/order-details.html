@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détails Commande — Gold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/buyer.css">
+</head>
+<body>
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher…"></div>
+</div>
+<header class="navbar scrolled" id="navbar"><div class="nav-wrap"><a href="../index.html" class="logo">G<span>old</span></a></div></header>
+<div class="mob-nav" id="mobNav"></div>
+
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb">
+          <a href="../index.html">Accueil</a><span class="bph-sep">›</span>
+          <a href="orders.html">Mes commandes</a><span class="bph-sep">›</span>
+          <span id="breadOrderNum">Commande</span>
+        </div>
+        <h1 class="bph-title" id="pageTitle">Commande <em>#—</em></h1>
+        <p class="bph-subtitle" id="pageSubtitle">Détails et suivi de votre commande</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="buyer-content">
+  <div class="wrap">
+
+    <!-- Timeline -->
+    <div class="order-card" style="margin-bottom:32px">
+      <div class="oc-header">
+        <div>
+          <div class="oc-number" id="detailOrderNum">Commande #—</div>
+          <div class="oc-date" id="detailDate">—</div>
+        </div>
+        <span class="oc-status" id="detailStatus">—</span>
+      </div>
+      <div class="oc-body">
+        <div class="order-timeline" id="orderTimeline"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start">
+
+      <!-- Products -->
+      <div>
+        <div class="buyer-section-header"><h2 class="bsh-title">Articles <em>commandés</em></h2></div>
+        <div id="orderProducts">
+          <div style="text-align:center;padding:40px;color:var(--muted)">
+            <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--honey)"></i>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap" id="orderActions"></div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <!-- Delivery Info -->
+        <div class="settings-section" style="margin-bottom:20px">
+          <div class="ss-header">
+            <div class="ss-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="ss-title">Adresse de livraison</div>
+          </div>
+          <div class="ss-body" id="deliveryAddress">
+            <div style="color:var(--muted);font-size:0.88rem;line-height:1.7">
+              <strong style="color:var(--ink)">Adresse par défaut</strong><br>
+              12 Rue de la Musique<br>
+              75011 Paris, France
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="settings-section" style="margin-bottom:20px">
+          <div class="ss-header">
+            <div class="ss-icon"><i class="fas fa-credit-card"></i></div>
+            <div class="ss-title">Paiement</div>
+          </div>
+          <div class="ss-body">
+            <div class="ss-row"><span class="ss-row-label">Méthode</span><span class="ss-row-value">Carte •••• 4242</span></div>
+            <div class="ss-row"><span class="ss-row-label">Sous-total</span><span class="ss-row-value" id="paySubtotal">—</span></div>
+            <div class="ss-row"><span class="ss-row-label">Livraison</span><span class="ss-row-value" style="color:#16a34a">Gratuite</span></div>
+            <div class="ss-row" style="border-bottom:none">
+              <span class="ss-row-label" style="font-weight:500;color:var(--ink)">Total</span>
+              <span class="ss-row-value" style="font-family:'Cormorant',serif;font-size:1.3rem;font-weight:600;color:var(--paprika)" id="payTotal">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller -->
+        <div class="settings-section">
+          <div class="ss-header">
+            <div class="ss-icon"><i class="fas fa-store"></i></div>
+            <div class="ss-title">Vendeur</div>
+          </div>
+          <div class="ss-body">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="oc-seller-av" style="width:40px;height:40px;font-size:0.85rem" id="sellerAv">JP</div>
+              <div>
+                <div style="font-weight:500;color:var(--ink)" id="sellerName">Jean-Pierre V.</div>
+                <div style="font-size:0.75rem;color:var(--honey)">★★★★★ · Vendeur certifié</div>
+              </div>
+            </div>
+            <button class="oc-btn" style="width:100%;justify-content:center;margin-top:16px;display:flex;gap:8px;align-items:center">
+              <i class="fas fa-envelope"></i> Contacter le vendeur
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand"><div class="flogo">G<span>old</span></div><p>La marketplace de référence pour la musique vintage.</p></div>
+      <div class="fcol"><div class="fctitle">Mon compte</div><a href="orders.html">Mes commandes</a><a href="profile.html">Mon profil</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Gold Marketplace</span></div>
+  </div>
+</footer>
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../js/auth-system.js"></script>
+<script src="../js/main.js"></script>
+<script>
+const TIMELINE_STEPS = [
+  { key: 'en_attente', label: 'Commande passée', icon: 'fa-shopping-bag' },
+  { key: 'confirmee', label: 'Confirmée', icon: 'fa-check' },
+  { key: 'expediee', label: 'Expédiée', icon: 'fa-truck' },
+  { key: 'livree', label: 'Livrée', icon: 'fa-check-double' },
+];
+const STATUS_ORDER = ['en_attente','confirmee','expediee','livree'];
+const STATUS_MAP = {
+  en_attente: { label:'En attente', css:'pending' },
+  confirmee: { label:'Confirmée', css:'confirmed' },
+  expediee: { label:'Expédiée', css:'shipped' },
+  livree: { label:'Livrée', css:'delivered' },
+  annulee: { label:'Annulée', css:'cancelled' },
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('orders');
+  const user = GoldAuth.getUser();
+  if (!user) { window.location.href = '../auth/sign-in.html'; return; }
+
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('id') || '1001';
+  loadOrderDetails(user, orderId);
+});
+
+async function loadOrderDetails(user, orderId) {
+  let order;
+  try {
+    const uid = user.id_user || user.id;
+    const res = await fetch(`http://localhost:8000/api/acheteurs/${uid}/commandes/${orderId}`);
+    if (res.ok) order = await res.json();
+  } catch(e) {}
+
+  if (!order) {
+    order = {
+      id: orderId, numero: 'GLD-'+orderId, statut: 'expediee',
+      created_at: '2026-04-02T14:30:00Z', total: 163.99,
+      vendeur_nom: 'Jean-Pierre V.',
+      produits: [
+        { nom: 'Led Zeppelin IV', categorie: 'Vinyle · 1971', prix: 89.99, quantite: 1 },
+        { nom: 'The Wall', categorie: 'Vinyle · 1979', prix: 74.00, quantite: 1 }
+      ]
+    };
+  }
+
+  renderOrderDetails(order);
+}
+
+function renderOrderDetails(order) {
+  const status = STATUS_MAP[order.statut] || STATUS_MAP['en_attente'];
+  const date = order.created_at ? new Date(order.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'}) : '—';
+  const items = order.produits || order.items || [];
+  const total = order.total || items.reduce((s,p) => s + (p.prix||0)*(p.quantite||1), 0);
+
+  document.getElementById('breadOrderNum').textContent = '#'+(order.numero||order.id);
+  document.getElementById('pageTitle').innerHTML = `Commande <em>#${order.numero||order.id}</em>`;
+  document.getElementById('detailOrderNum').textContent = 'Commande #'+(order.numero||order.id);
+  document.getElementById('detailDate').textContent = date;
+  document.getElementById('detailStatus').className = 'oc-status ' + status.css;
+  document.getElementById('detailStatus').innerHTML = `<i class="fas fa-circle" style="font-size:0.4rem"></i> ${status.label}`;
+  document.getElementById('paySubtotal').textContent = total.toFixed(2)+' €';
+  document.getElementById('payTotal').textContent = total.toFixed(2)+' €';
+
+  if (order.vendeur_nom) {
+    document.getElementById('sellerName').textContent = order.vendeur_nom;
+    document.getElementById('sellerAv').textContent = order.vendeur_nom.split(' ').map(w=>w[0]).join('').substring(0,2);
+  }
+
+  // Timeline
+  const currentIdx = STATUS_ORDER.indexOf(order.statut);
+  document.getElementById('orderTimeline').innerHTML = TIMELINE_STEPS.map((step, i) => {
+    const cls = i < currentIdx ? 'done' : i === currentIdx ? 'active' : '';
+    return `
+      <div class="ot-step ${cls}">
+        <div class="ot-dot"><i class="fas ${step.icon}"></i></div>
+        <div class="ot-label">${step.label}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Products
+  document.getElementById('orderProducts').innerHTML = items.map(p => `
+    <div class="cart-item-card" style="margin-bottom:12px">
+      <div class="cic-thumb">${p.image ? `<img src="${p.image}">` : '🎵'}</div>
+      <div class="cic-info">
+        <div class="cic-meta">${p.categorie || 'Vinyle'}</div>
+        <div class="cic-name">${p.nom || p.name || 'Produit'}</div>
+        <div class="cic-seller">Quantité : ${p.quantite || 1}</div>
+      </div>
+      <div class="cic-right">
+        <div class="cic-price">${((p.prix||0)*(p.quantite||1)).toFixed(2)} €</div>
+        <div style="font-size:0.78rem;color:var(--muted)">${(p.prix||0).toFixed(2)} € / unité</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Actions
+  const actions = [];
+  if (order.statut === 'livree') {
+    actions.push(`<button class="oc-btn oc-btn-primary" onclick="showToast('⭐ Fonctionnalité avis bientôt disponible')"><i class="fas fa-star"></i> Laisser un avis</button>`);
+  }
+  actions.push(`<button class="oc-btn" onclick="showToast('📄 Téléchargement de la facture…')"><i class="fas fa-file-pdf"></i> Télécharger la facture</button>`);
+  if (['en_attente','confirmee'].includes(order.statut)) {
+    actions.push(`<button class="oc-btn" style="color:var(--paprika);border-color:rgba(103,51,47,0.3)" onclick="showToast('ℹ️ Contactez le support pour une annulation')"><i class="fas fa-times"></i> Demander annulation</button>`);
+  }
+  if (order.statut === 'livree') {
+    actions.push(`<button class="oc-btn" onclick="showToast('🔄 Demande de retour en cours de traitement')"><i class="fas fa-undo"></i> Demander un retour</button>`);
+  }
+  document.getElementById('orderActions').innerHTML = actions.join('');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Panier — Gold</title>
+  <meta name="description" content="Votre panier sur Gold, la marketplace de musique vintage.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/buyer.css">
+</head>
+<body>
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Rechercher…"></div>
+  <div class="search-hints"><span>Pink Floyd</span><span>Fender 1965</span><span>Jazz Vinyl</span></div>
+</div>
+<header class="navbar scrolled" id="navbar"><div class="nav-wrap"><a href="../index.html" class="logo">G<span>old</span></a></div></header>
+<div class="mob-nav" id="mobNav"></div>
+
+<section class="buyer-page-header">
+  <div class="wrap">
+    <div class="bph-inner">
+      <div>
+        <div class="bph-breadcrumb">
+          <a href="../index.html">Accueil</a><span class="bph-sep">›</span>
+          <span>Mon panier</span>
+        </div>
+        <h1 class="bph-title">Mon <em>Panier</em></h1>
+        <p class="bph-subtitle"><span id="cartCountHeader">0</span> article(s) dans votre panier</p>
+      </div>
+      <!-- Shipping progress -->
+      <div id="shippingProgress" style="max-width:320px;width:100%">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <i class="fas fa-truck" style="color:var(--honey);font-size:0.72rem"></i>
+          <span style="font-size:0.75rem;color:rgba(202,159,145,0.5)" id="shippingText">Livraison gratuite dès 60 €</span>
+        </div>
+        <div style="height:4px;background:rgba(202,159,145,0.12);border-radius:100px;overflow:hidden">
+          <div id="shippingBar" style="height:100%;width:0%;background:var(--honey);border-radius:100px;transition:width 0.5s ease"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="buyer-content">
+  <div class="wrap">
+
+    <!-- Empty State -->
+    <div id="emptyCart" style="display:none">
+      <div class="buyer-empty">
+        <div class="be-icon">🛒</div>
+        <div class="be-title">Votre panier est vide</div>
+        <div class="be-desc">Parcourez notre catalogue pour trouver des trésors musicaux uniques et ajouter vos coups de cœur.</div>
+        <a href="../catalogue.html" class="be-cta">Explorer le catalogue <span>→</span></a>
+      </div>
+    </div>
+
+    <!-- Cart Grid -->
+    <div class="cart-grid" id="cartGrid" style="display:none">
+
+      <!-- Items Column -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h2 style="font-family:'Cormorant',serif;font-size:1.4rem;font-weight:400;color:var(--ink)">Articles</h2>
+          <a href="../catalogue.html" style="font-size:0.78rem;color:var(--muted);border-bottom:1px solid var(--biscuit);padding-bottom:2px;transition:color 0.2s">
+            ← Continuer les achats
+          </a>
+        </div>
+
+        <div class="cart-items-list" id="cartItemsList"></div>
+      </div>
+
+      <!-- Summary Sidebar -->
+      <div>
+        <div class="cart-summary-card">
+          <div class="csc-header">
+            <div class="csc-title">Résumé de commande</div>
+          </div>
+          <div class="csc-body">
+            <div class="csc-line">
+              <span class="csc-line-key">Sous-total (<span id="sumCount">0</span> articles)</span>
+              <span class="csc-line-val" id="sumSubtotal">0,00 €</span>
+            </div>
+            <div class="csc-line">
+              <span class="csc-line-key">Livraison</span>
+              <span class="csc-line-val" id="sumShipping">—</span>
+            </div>
+            <div class="csc-line">
+              <span class="csc-line-key">Réduction</span>
+              <span class="csc-line-val" id="sumDiscount">—</span>
+            </div>
+
+            <!-- Promo -->
+            <div class="promo-row">
+              <input type="text" class="promo-input-field" id="promoInput" placeholder="Code promo ex: RETRO10">
+              <button class="promo-apply-btn" id="promoApply">Appliquer</button>
+            </div>
+            <div id="promoSuccess" style="display:none;margin-top:8px;font-size:0.78rem;color:#16a34a;display:flex;align-items:center;gap:6px">
+              <i class="fas fa-check-circle"></i> Code RETRO10 appliqué — 10% de réduction
+            </div>
+
+            <div class="csc-divider"></div>
+
+            <div class="csc-total">
+              <span class="csc-total-label">Total</span>
+              <span class="csc-total-val" id="sumTotal">0,00 €</span>
+            </div>
+
+            <a href="checkout.html" class="csc-checkout-btn" id="checkoutBtn">
+              <i class="fas fa-lock"></i> Passer commande
+            </a>
+
+            <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:rgba(202,159,145,0.3)">
+              Paiement 100% sécurisé · Retours 30 jours
+            </div>
+          </div>
+          <div class="csc-trust">
+            <div class="csc-trust-item"><i class="fas fa-shield-alt"></i> Paiement sécurisé SSL</div>
+            <div class="csc-trust-item"><i class="fas fa-certificate"></i> Authenticité certifiée</div>
+            <div class="csc-trust-item"><i class="fas fa-undo"></i> Retour gratuit sous 30 jours</div>
+            <div class="csc-trust-item"><i class="fas fa-headset"></i> Support 7j/7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbrand"><div class="flogo">G<span>old</span></div><p>La marketplace de référence pour la musique vintage.</p></div>
+      <div class="fcol"><div class="fctitle">Marketplace</div><a href="../catalogue.html">Catalogue</a><a href="../catalogue.html?new=1">Nouveautés</a></div>
+      <div class="fcol"><div class="fctitle">Mon compte</div><a href="profile.html">Mon profil</a><a href="orders.html">Mes commandes</a><a href="settings.html">Paramètres</a></div>
+      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a></div>
+    </div>
+    <div class="fbot"><span>© 2026 Gold Marketplace</span><div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span><span>APPLE PAY</span></div></div>
+  </div>
+</footer>
+<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+
+<script src="../js/auth-system.js"></script>
+<script src="../js/main.js"></script>
+<script>
+let cartItems = [];
+let promoApplied = false;
+const PROMO_CODE = 'RETRO10';
+const PROMO_DISCOUNT = 0.10;
+const FREE_SHIPPING = 60;
+
+document.addEventListener('DOMContentLoaded', () => {
+  initGoldNavbar('cart');
+  loadCart();
+
+  document.getElementById('promoApply').addEventListener('click', applyPromo);
+  document.getElementById('promoInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') applyPromo();
+  });
+});
+
+function loadCart() {
+  cartItems = GoldAuth.getCart().map((item, i) => ({
+    id: item.id || 'item-'+i,
+    name: item.name || 'Produit',
+    price: item.price || 0,
+    qty: item.qty || 1,
+    emoji: item.emoji || '🎵',
+    meta: item.meta || 'Vinyle',
+    artist: item.artist || '',
+    image: item.image || null,
+    maxQty: 5
+  }));
+
+  renderCart();
+}
+
+function renderCart() {
+  const empty = document.getElementById('emptyCart');
+  const grid = document.getElementById('cartGrid');
+  const count = cartItems.reduce((s,i) => s + i.qty, 0);
+
+  document.getElementById('cartCountHeader').textContent = count;
+
+  if (cartItems.length === 0) {
+    empty.style.display = 'block';
+    grid.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.style.display = '';
+
+  const list = document.getElementById('cartItemsList');
+  list.innerHTML = cartItems.map((item, i) => `
+    <div class="cart-item-card" id="cart-${item.id}" style="opacity:0;transform:translateY(12px);transition:opacity 0.3s ease ${i*0.06}s, transform 0.3s ease ${i*0.06}s">
+      <div class="cic-thumb">
+        ${item.image ? `<img src="${item.image}" onerror="this.style.display='none';this.parentElement.textContent='${item.emoji}'">` : item.emoji}
+      </div>
+      <div class="cic-info">
+        <div class="cic-meta">${item.meta}</div>
+        <div class="cic-name">${item.name}</div>
+        <div class="cic-seller">${item.artist || 'Gold Marketplace'}</div>
+      </div>
+      <div class="cic-right">
+        <div>
+          <div class="cic-price">${(item.price * item.qty).toFixed(2).replace('.',',')} €</div>
+          ${item.qty > 1 ? `<div style="font-size:0.72rem;color:var(--muted)">${item.price.toFixed(2)} € / unité</div>` : ''}
+        </div>
+        <div class="cic-qty">
+          <button class="cic-qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <div class="cic-qty-val">${item.qty}</div>
+          <button class="cic-qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+        <div class="cic-actions">
+          <button class="cic-action-btn fav" title="Sauvegarder" onclick="moveToFav('${item.id}')"><i class="far fa-heart"></i></button>
+          <button class="cic-action-btn" title="Supprimer" onclick="removeItem('${item.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Animate in
+  requestAnimationFrame(() => {
+    list.querySelectorAll('.cart-item-card').forEach(card => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    });
+  });
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const subtotal = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+  const shipping = subtotal >= FREE_SHIPPING ? 0 : 4.90;
+  const discount = promoApplied ? subtotal * PROMO_DISCOUNT : 0;
+  const total = subtotal - discount + shipping;
+  const count = cartItems.reduce((s, i) => s + i.qty, 0);
+
+  document.getElementById('sumCount').textContent = count;
+  document.getElementById('sumSubtotal').textContent = subtotal.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('sumShipping').textContent = shipping === 0 ? 'Gratuite 🎉' : shipping.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('sumShipping').className = 'csc-line-val' + (shipping === 0 ? ' free' : '');
+  document.getElementById('sumDiscount').textContent = discount > 0 ? '−' + discount.toFixed(2).replace('.',',') + ' €' : '—';
+  document.getElementById('sumDiscount').className = 'csc-line-val' + (discount > 0 ? ' discount' : '');
+  document.getElementById('sumTotal').textContent = total.toFixed(2).replace('.',',') + ' €';
+
+  // Shipping progress
+  const pct = Math.min((subtotal / FREE_SHIPPING) * 100, 100);
+  document.getElementById('shippingBar').style.width = pct + '%';
+  if (subtotal >= FREE_SHIPPING) {
+    document.getElementById('shippingText').textContent = '✓ Livraison gratuite débloquée !';
+    document.getElementById('shippingText').style.color = '#16a34a';
+  } else {
+    const remaining = (FREE_SHIPPING - subtotal).toFixed(2);
+    document.getElementById('shippingText').textContent = `Plus que ${remaining} € pour la livraison gratuite`;
+    document.getElementById('shippingText').style.color = '';
+  }
+}
+
+function syncCart() {
+  const simplified = cartItems.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, emoji: i.emoji, meta: i.meta, artist: i.artist, image: i.image }));
+  localStorage.setItem('gold_cart', JSON.stringify(simplified));
+  updateCartBadges();
+}
+
+function changeQty(id, delta) {
+  const item = cartItems.find(i => i.id == id);
+  if (!item) return;
+  const newQty = item.qty + delta;
+  if (newQty < 1) { removeItem(id); return; }
+  if (newQty > item.maxQty) { showToast(`⚠️ Maximum ${item.maxQty} exemplaires`); return; }
+  item.qty = newQty;
+  syncCart(); renderCart();
+}
+
+function removeItem(id) {
+  const el = document.getElementById('cart-' + id);
+  if (el) {
+    el.style.transition = 'all 0.35s ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(30px)';
+    el.style.maxHeight = el.offsetHeight + 'px';
+    setTimeout(() => {
+      el.style.maxHeight = '0';
+      el.style.padding = '0';
+      el.style.margin = '0';
+      el.style.overflow = 'hidden';
+      setTimeout(() => {
+        cartItems = cartItems.filter(i => i.id != id);
+        syncCart(); renderCart();
+        showToast('Article retiré du panier');
+      }, 200);
+    }, 150);
+  }
+}
+
+function moveToFav(id) {
+  const item = cartItems.find(i => i.id == id);
+  if (item) {
+    GoldAuth.toggleFav(String(item.id));
+    showToast('♥ Sauvegardé dans vos favoris');
+  }
+  removeItem(id);
+}
+
+function applyPromo() {
+  const input = document.getElementById('promoInput');
+  const code = input.value.trim().toUpperCase();
+  if (code === PROMO_CODE) {
+    promoApplied = true;
+    document.getElementById('promoSuccess').style.display = 'flex';
+    input.disabled = true;
+    input.style.borderColor = '#16a34a';
+    document.getElementById('promoApply').textContent = '✓';
+    document.getElementById('promoApply').style.background = 'rgba(34,197,94,0.15)';
+    document.getElementById('promoApply').style.color = '#16a34a';
+    updateSummary();
+    showToast('🎉 Code promo appliqué ! −10%');
+  } else {
+    input.style.borderColor = 'rgba(239,68,68,0.5)';
+    showToast('❌ Code promo invalide');
+    setTimeout(() => input.style.borderColor = '', 2000);
+  }
+}
+</script>
+</body>
+</html>

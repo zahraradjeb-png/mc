@@ -42,8 +42,8 @@ const GoldAuth = {
 /* ── root path helper (works from nested src/pages/) ── */
 function _root() {
   const p = window.location.pathname;
-  // Legacy pages/seller/ or pages/buyer/ (2 levels deep)
-  if (p.includes('/pages/seller/') || p.includes('/pages/buyer/')) return '../../';
+  // seller/ or buyer/ (1 level deep from Frontend root)
+  if (p.includes('/seller/') || p.includes('/buyer/')) return '../';
   // src/pages/acheteur/ fallback (legacy)
   if (p.includes('/src/pages/acheteur/')) return '../../../';
   // Visiteur: src/pages/visiteur/ (3 levels deep)
@@ -248,15 +248,15 @@ function buildSellerDrawer(user, root) {
 
     <div class="gsd-body">
       <div class="gsd-section-label">Gestion Studio</div>
-      <a href="${root}pages/seller/dashboard.html"   class="gsd-link"><i class="fas fa-th-large"></i> Tableau de bord</a>
-      <a href="${root}pages/seller/products.html"    class="gsd-link"><i class="fas fa-boxes"></i> Mes produits</a>
-      <a href="${root}pages/seller/orders.html"      class="gsd-link"><i class="fas fa-shopping-cart"></i> Commandes</a>
-      <a href="${root}pages/seller/reviews.html"     class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
+      <a href="${root}seller/dashboard.html"   class="gsd-link"><i class="fas fa-th-large"></i> Tableau de bord</a>
+      <a href="${root}seller/products.html"    class="gsd-link"><i class="fas fa-boxes"></i> Mes produits</a>
+      <a href="${root}seller/orders.html"      class="gsd-link"><i class="fas fa-shopping-cart"></i> Commandes</a>
+      <a href="${root}seller/reviews.html"     class="gsd-link"><i class="fas fa-star"></i> Avis clients</a>
 
       <div class="gsd-sep"></div>
       <div class="gsd-section-label">Boutique</div>
-      <a href="${root}pages/seller/finance.html"     class="gsd-link"><i class="fas fa-wallet"></i> Finances</a>
-      <a href="${root}pages/seller/settings.html"    class="gsd-link"><i class="fas fa-cog"></i> Paramètres</a>
+      <a href="${root}seller/finance.html"     class="gsd-link"><i class="fas fa-wallet"></i> Finances</a>
+      <a href="${root}seller/settings.html"    class="gsd-link"><i class="fas fa-cog"></i> Paramètres</a>
     </div>
 
     <button class="gsd-logout" id="gsdLogout">
@@ -343,13 +343,13 @@ function buildNavbar(active='home') {
     navR = `
       <div class="nav-r">
         <button class="ni search-trigger"><i class="fas fa-search"></i></button>
-        <a href="${root}pages/buyer/favorites.html" class="ni" style="position:relative" title="Favoris">
+        <a href="${root}buyer/favorites.html" class="ni" style="position:relative" title="Favoris">
           <i class="fas fa-heart"></i>${favBadge}
         </a>
-        <a href="${root}pages/buyer/cart.html" class="ni cart-icon" style="position:relative" title="Panier">
+        <a href="${root}buyer/cart.html" class="ni cart-icon" style="position:relative" title="Panier">
           <i class="fas fa-shopping-bag"></i>${badge}
         </a>
-        <a href="${root}pages/buyer/notifications.html" class="ni notif-trigger" style="position:relative" title="Notifications">
+        <a href="${root}buyer/notifications.html" class="ni notif-trigger" style="position:relative" title="Notifications">
           <i class="fas fa-bell"></i>
           <span class="cbadge notif-badge" style="display:none">0</span>
         </a>
@@ -361,14 +361,14 @@ function buildNavbar(active='home') {
             <i class="fas fa-chevron-down" style="font-size:.42rem;opacity:.5;margin-left:4px"></i>
           </button>
           <div class="drop gold-drop-profile">
-            <a href="${root}pages/buyer/profile.html"><i class="fas fa-user"></i> Mon profil</a>
-            <a href="${root}pages/buyer/orders.html"><i class="fas fa-box"></i> Mes commandes</a>
-            <a href="${root}pages/buyer/cart.html"><i class="fas fa-shopping-bag"></i> Mon panier <span style="opacity:.5">(${count})</span></a>
-            <a href="${root}pages/buyer/favorites.html"><i class="fas fa-heart"></i> Mes favoris</a>
-            <a href="${root}pages/buyer/reviews.html"><i class="fas fa-star"></i> Mes avis</a>
-            <a href="${root}pages/buyer/notifications.html"><i class="fas fa-bell"></i> Notifications</a>
+            <a href="${root}buyer/profile.html"><i class="fas fa-user"></i> Mon profil</a>
+            <a href="${root}buyer/orders.html"><i class="fas fa-box"></i> Mes commandes</a>
+            <a href="${root}buyer/cart.html"><i class="fas fa-shopping-bag"></i> Mon panier <span style="opacity:.5">(${count})</span></a>
+            <a href="${root}buyer/favorites.html"><i class="fas fa-heart"></i> Mes favoris</a>
+            <a href="${root}buyer/reviews.html"><i class="fas fa-star"></i> Mes avis</a>
+            <a href="${root}buyer/notifications.html"><i class="fas fa-bell"></i> Notifications</a>
             <div class="dd"></div>
-            <a href="${root}pages/buyer/settings.html"><i class="fas fa-cog"></i> Paramètres</a>
+            <a href="${root}buyer/settings.html"><i class="fas fa-cog"></i> Paramètres</a>
             <a href="${root}auth-entry.html?role=seller" style="color:var(--honey,#A1BEC7)"><i class="fas fa-store"></i> Devenir vendeur</a>
             <div class="dd"></div>
             <a href="#" class="gold-logout" style="color:#B53324"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
@@ -424,19 +424,19 @@ function buildMobileNav() {
   let links = (user.role==='seller' || user.role==='VENDEUR') ? `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}src/pages/visiteur/catalogue.html">Catalogue</a>
-    <a href="${root}pages/seller/dashboard.html">Seller Studio</a>
-    <a href="${root}pages/seller/products.html">Mes produits</a>
-    <a href="${root}pages/seller/orders.html">Commandes</a>
-    <a href="${root}pages/seller/reviews.html">Avis clients</a>` : `
+    <a href="${root}seller/dashboard.html">Seller Studio</a>
+    <a href="${root}seller/products.html">Mes produits</a>
+    <a href="${root}seller/orders.html">Commandes</a>
+    <a href="${root}seller/reviews.html">Avis clients</a>` : `
     <a href="${root}index.html">Accueil</a>
     <a href="${root}catalogue.html">Catalogue</a>
-    <a href="${root}pages/buyer/profile.html">Mon profil</a>
-    <a href="${root}pages/buyer/orders.html">Mes commandes</a>
-    <a href="${root}pages/buyer/cart.html">Mon panier</a>
-    <a href="${root}pages/buyer/favorites.html">Mes favoris</a>
-    <a href="${root}pages/buyer/reviews.html">Mes avis</a>
-    <a href="${root}pages/buyer/notifications.html">Notifications</a>
-    <a href="${root}pages/buyer/settings.html">Paramètres</a>`;
+    <a href="${root}buyer/profile.html">Mon profil</a>
+    <a href="${root}buyer/orders.html">Mes commandes</a>
+    <a href="${root}buyer/cart.html">Mon panier</a>
+    <a href="${root}buyer/favorites.html">Mes favoris</a>
+    <a href="${root}buyer/reviews.html">Mes avis</a>
+    <a href="${root}buyer/notifications.html">Notifications</a>
+    <a href="${root}buyer/settings.html">Paramètres</a>`;
 
   return `
     <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(229,166,87,0.15)">
@@ -702,7 +702,7 @@ function initCartAndFavButtons() {
     e.preventDefault();
     if (!GoldAuth.isLoggedIn()) { requireLogin('acheter ce produit'); return; }
     const root = _root();
-    window.location.href = root + 'pages/buyer/cart.html';
+    window.location.href = root + 'buyer/cart.html';
   });
 
   /* Fav buttons */
