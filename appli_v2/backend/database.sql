@@ -255,6 +255,7 @@ CREATE TABLE `produit` (
   `artiste` varchar(200) DEFAULT NULL,
   `rarete` enum('COMMUN','RARE','TRES_RARE','COLLECTOR') DEFAULT 'COMMUN',
   `etat` enum('NEUF','BON','ACCEPTABLE','ABIME') DEFAULT 'BON',
+  `statut` varchar(50) DEFAULT 'EN_ATTENTE',
   `est_disponible` tinyint(1) DEFAULT 1,
   `date_ajout` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -291,7 +292,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id_user`, `nom`, `prenom`, `email`, `mdp`, `role`) VALUES
-(1, 'zehnati', 'alicia', 'alicia@gmail.com', '$2y$10$LT8BxGjpB376xpORn8P8h.4MYvVcMUXQXlrN92fI7YK0PLmD6qNBa', 'ACHETEUR');
+(1, 'zehnati', 'alicia', 'alicia@gmail.com', '$2y$10$LT8BxGjpB376xpORn8P8h.4MYvVcMUXQXlrN92fI7YK0PLmD6qNBa', 'ACHETEUR'),
+(2, 'Admin', 'Gold', 'admin@gold.fr', '$2y$10$LT8BxGjpB376xpORn8P8h.4MYvVcMUXQXlrN92fI7YK0PLmD6qNBa', 'ADMIN');
 
 -- --------------------------------------------------------
 
@@ -318,6 +320,21 @@ CREATE TABLE `vinyle` (
   `id_produit` int(11) NOT NULL,
   `label` varchar(150) DEFAULT NULL,
   `genre` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `avis`
+--
+
+CREATE TABLE `avis` (
+  `id_avis` int(11) NOT NULL,
+  `id_produit` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `note` int(11) NOT NULL,
+  `commentaire` text DEFAULT NULL,
+  `date_avis` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -543,6 +560,14 @@ ALTER TABLE `vinyle`
   ADD PRIMARY KEY (`id_produit`);
 
 --
+-- Index pour la table `avis`
+--
+ALTER TABLE `avis`
+  ADD PRIMARY KEY (`id_avis`),
+  ADD KEY `id_produit` (`id_produit`),
+  ADD KEY `id_user` (`id_user`);
+
+--
 -- AUTO_INCREMENT pour les tables déchargées
 --
 
@@ -604,7 +629,13 @@ ALTER TABLE `produit_photo`
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT pour la table `avis`
+--
+ALTER TABLE `avis`
+  MODIFY `id_avis` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Contraintes pour les tables déchargées
