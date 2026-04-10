@@ -83,19 +83,29 @@ const ProductsController = {
   },
 
   _productCard(p, idx) {
-    const id          = p.id_produit || p.id;
-    const isAvailable = p.est_disponible == 1 && p.quantite > 0;
-    const imgSrc      = ProductService.resolveImage(p);
-    const price       = parseFloat(p.prix || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
-    const rarity      = (p.rarete || 'COMMUN').replace(/_/g, ' ');
-    const etat        = p.etat || 'BON';
+    const isValidated = p.real_statut === 'VALIDEE';
+    const isPending   = p.real_statut === 'EN_ATTENTE';
+    const isRefused   = p.real_statut === 'REFUSEE';
+    const id      = p.id_produit || p.id;
+    const imgSrc  = ProductService.resolveImage(p);
+    const price   = parseFloat(p.prix || 0).toFixed(2);
+    const rarity  = (p.rarete || 'COMMUN').replace('_', ' ');
+    const etat    = (p.etat || 'BON').replace('_', ' ');
+    
+    // Un produit n'est "Disponible" (affiché aux clients) que s'il est validé ET disponible ET en stock
+    const isActuallyLive = isValidated && p.est_disponible == 1 && p.quantite > 0;
 
     return `
-      <div class="management-card animate-slide" style="animation-delay:${idx * 0.04}s">
-        <div class="m-card-img-wrap">
-          <span class="m-card-badge ${isAvailable ? 'badge-available' : 'badge-indisponible'}">
-            ${isAvailable ? 'Disponible' : 'Indisponible'}
-          </span>
+      <div class="management-card animate-slide glass-card" style="animation-delay:${idx * 0.04}s; background: var(--studio-panel); border: 1px solid var(--studio-border);">
+        <div class="m-card-img-wrap" style="background: hsla(38, 70%, 55%, 0.05);">
+          <div style="position:absolute; top:10px; left:10px; z-index:5; display:flex; flex-direction:column; gap:6px">
+            <span class="m-card-badge ${isActuallyLive ? 'badge-available' : 'badge-indisponible'}" style="font-weight:700; letter-spacing:0.5px;">
+              ${isActuallyLive ? 'Catalogué (Live)' : (p.quantite == 0 ? 'Stock épuisé' : 'Non visible')}
+            </span>
+            <span class="m-card-badge" style="background:${isValidated ? 'hsla(140, 70%, 50%, 0.2)' : (isRefused ? 'hsla(0, 80%, 50%, 0.2)' : 'hsla(38, 70%, 55%, 0.2)')}; color:${isValidated ? '#4ade80' : (isRefused ? '#f87171' : '#fbbf24')}; border: 1px solid currentColor; font-weight:800; font-size:0.6rem; letter-spacing:1px; text-transform:uppercase;">
+              ${isValidated ? 'Validé' : (isRefused ? 'Refusé' : 'En attente')}
+            </span>
+          </div>
           ${imgSrc
             ? `<img src="${imgSrc}" class="m-card-img" alt="${p.titre || ''}"
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
@@ -105,29 +115,29 @@ const ProductsController = {
           </div>
         </div>
 
-        <div class="m-card-content">
-          <h3 class="m-card-title">${p.titre || p.nom || '—'}</h3>
-          <span class="m-card-subtitle">${p.artiste || 'Artiste inconnu'} · ${p.categorie || 'Article'}</span>
+        <div class="m-card-content" style="padding:18px;">
+          <h3 class="m-card-title" style="font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--studio-white); margin-bottom:4px;">${p.titre || p.nom || '—'}</h3>
+          <span class="m-card-subtitle" style="font-family:'Outfit',sans-serif; color:var(--studio-muted); font-size:0.8rem; margin-bottom:12px; display:block;">${p.artiste || 'Artiste inconnu'} · <span style="color:var(--studio-honey)">${p.categorie || 'Article'}</span></span>
 
-          <div class="m-card-tags">
-            <span class="m-tag">${rarity}</span>
-            <span class="m-tag">${etat}</span>
+          <div class="m-card-tags" style="margin-bottom:16px;">
+            <span class="m-tag" style="background:hsla(38, 70%, 55%, 0.1); border: 1px solid hsla(38, 70%, 55%, 0.2); color:var(--studio-honey);">${rarity}</span>
+            <span class="m-tag" style="background:hsla(35, 40%, 20%, 0.2); border: 1px solid var(--studio-border); color:var(--studio-muted);">${etat}</span>
           </div>
 
-          <div class="m-card-stats">
-            <span class="m-price">${price} €</span>
-            <span class="m-stock">Stock : <b style="color:${p.quantite > 3 ? '#4ade80' : '#f87171'}">${p.quantite || 0}</b></span>
+          <div class="m-card-stats" style="border-top: 1px solid var(--studio-border); padding-top:14px; margin-top:14px;">
+            <span class="m-price" style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:700; color:var(--studio-white);">${price} €</span>
+            <span class="m-stock" style="font-size:0.8rem; color:var(--studio-muted);">Stock : <b style="color:${p.quantite > 3 ? 'var(--studio-success)' : 'var(--studio-error)'}">${p.quantite || 0}</b></span>
           </div>
 
-          <div class="m-card-actions">
-            <a href="product-details.html?id=${id}" class="m-btn-icon" title="Voir détails">
-              <i class="fas fa-eye"></i>
+          <div class="m-card-actions" style="margin-top:16px; gap:8px;">
+            <a href="product-details.html?id=${id}" class="m-btn-icon glass-card" title="Voir détails" style="background:hsla(35, 40%, 20%, 0.2); border:1px solid var(--studio-border); color:var(--studio-honey);">
+              <i class="fas fa-eye"></i> Details
             </a>
-            <a href="edit-product.html?id=${id}" class="m-btn-icon" title="Modifier">
-              <i class="fas fa-edit"></i>
+            <a href="edit-product.html?id=${id}" class="m-btn-icon glass-card" title="Modifier" style="background:hsla(35, 40%, 20%, 0.2); border:1px solid var(--studio-border); color:var(--studio-honey);">
+              <i class="fas fa-edit"></i> Editer
             </a>
-            <button class="m-btn-icon delete" title="Supprimer"
-              onclick="ProductsController.confirmDelete(${id}, '${(p.titre||'').replace(/'/g,"\\'")}')">
+            <button class="m-btn-icon delete glass-card" title="Supprimer" style="background:hsla(0, 80%, 50%, 0.1); border:1px solid hsla(0, 80%, 50%, 0.2); color:var(--studio-error);"
+               onclick="ProductsController.confirmDelete(${id}, '${(p.titre||'').replace(/'/g,"\\'")}')">
               <i class="fas fa-trash"></i>
             </button>
           </div>

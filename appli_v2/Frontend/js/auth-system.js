@@ -7,10 +7,11 @@
 const GoldAuth = {
   getUser()  { try { return JSON.parse(localStorage.getItem('gold_user')); } catch { return null; } },
   setUser(u) { localStorage.setItem('gold_user', JSON.stringify(u)); },
-  logout()   { localStorage.removeItem('gold_user'); window.location.href = _root() + 'index.html'; },
+  logout()   { localStorage.removeItem('gold_user'); window.location.href = _root() + 'auth-entry.html'; },
   isLoggedIn(){ return !!this.getUser(); },
   isBuyer()  { const u=this.getUser(); return u?.role==='ACHETEUR' || u?.role==='buyer'; },
-  isSeller() { const u=this.getUser(); return u?.role==='VENDEUR' || u?.role==='seller'; },
+  isSeller() { const u=this.getUser(); return u?.role==='VENDEUR' || u?.role==='seller' || u?.role==='admin' || u?.role==='ADMIN'; },
+  isAdmin()  { const u=this.getUser(); return u?.role==='ADMIN' || u?.role==='admin'; },
 
   /* Cart */
   getCart()  { try { return JSON.parse(localStorage.getItem('gold_cart'))||[]; } catch { return []; } },
@@ -43,7 +44,7 @@ const GoldAuth = {
 function _root() {
   const p = window.location.pathname;
   // seller/ or buyer/ (1 level deep from Frontend root)
-  if (p.includes('/seller/') || p.includes('/buyer/')) return '../';
+  if (p.includes('/seller/') || p.includes('/buyer/') || p.includes('/admin/')) return '../';
   // src/pages/acheteur/ fallback (legacy)
   if (p.includes('/src/pages/acheteur/')) return '../../../';
   // Visiteur: src/pages/visiteur/ (3 levels deep)

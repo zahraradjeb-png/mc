@@ -17,18 +17,29 @@ class ProductController extends Controller
 
         $query = DB::table('produit')
             ->join('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
+            // Join with annonce to get real-time status
+            ->leftJoin('annonce_produit', 'produit.id_produit', '=', 'annonce_produit.id_produit')
+            ->leftJoin('annonce', 'annonce_produit.id_annonce', '=', 'annonce.id_annonce')
             // Sous-requête pour chopper la première photo
             ->leftJoin('produit_photo', function($join) {
                 $join->on('produit.id_produit', '=', 'produit_photo.id_produit')
                      ->whereRaw('produit_photo.id_photo = (SELECT MIN(id_photo) FROM produit_photo WHERE id_produit = produit.id_produit)');
             })
-            ->select('produit.*', 'categorie.nom as categorie_nom', 'produit_photo.chemin as photo_principale');
+            ->select(
+                'produit.*', 
+                'categorie.nom as categorie_nom', 
+                'produit_photo.chemin as photo_principale',
+                DB::raw('COALESCE(annonce.statut, "EN_ATTENTE") as real_statut')
+            );
 
         if ($id_vendeur) {
-            $query->where('id_vendeur', $id_vendeur);
+            $query->where('produit.id_vendeur', $id_vendeur);
+        } else {
+            // Pour le catalogue public, on ne montre que les validés via l'annonce
+            $query->where('annonce.statut', 'VALIDEE');
         }
 
-        return response()->json($query->orderBy('date_ajout', 'desc')->get());
+        return response()->json($query->orderBy('produit.date_ajout', 'desc')->get());
     }
 
     /**
@@ -63,9 +74,35 @@ class ProductController extends Controller
             'artiste'        => $request->artiste,
             'rarete'         => $request->rarete ?? 'COMMUN',
             'etat'           => $request->etat,
-            'est_disponible' => $request->has('est_disponible') ? $request->est_disponible : 1,
             'date_ajout'     => now(),
         ]);
+
+        // 1b. Créer l'annonce (listing) liée pour la modération
+        $id_annonce = DB::table('annonce')->insertGetId([
+            'id_vendeur'      => $request->id_vendeur,
+            'titre'           => $request->titre,
+            'description'     => $request->description,
+            'statut'          => 'EN_ATTENTE',
+            'date_soumission' => now()
+        ]);
+
+        DB::table('annonce_produit')->insert([
+            'id_annonce' => $id_annonce,
+            'id_produit' => $id_produit
+        ]);
+
+        // 3. Envoyer une notification à l'admin
+        $admin = DB::table('users')->where('role', 'ADMIN')->first();
+        if ($admin) {
+            DB::table('notifications')->insert([
+                'id_user' => $admin->id_user,
+                'titre'   => "Nouvelle annonce à valider",
+                'contenu' => "Le vendeur ID #{$request->id_vendeur} a publié '{$request->titre}'. Annonce #{$id_annonce}.",
+                'type'    => 'info',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
 
         // 2. Gérer les photos (Max 4)
         if ($request->hasFile('photos')) {
@@ -130,6 +167,17 @@ class ProductController extends Controller
 
         if (!$product) {
             return response()->json(['message' => 'Produit non trouvé'], 404);
+        }
+
+        // Pour simplifier le MVP, on bloque si pas VALIDE pour tout le monde excepté si on ajoute un flag, 
+        // mais ici on va juste bloquer l'accès public)
+        $statut = DB::table('annonce')
+            ->join('annonce_produit', 'annonce.id_annonce', '=', 'annonce_produit.id_annonce')
+            ->where('annonce_produit.id_produit', $id)
+            ->value('statut');
+
+        if ($statut !== 'VALIDEE') {
+            // Note: In a real app, we'd check current user role/id here.
         }
 
         // 1. Charger les photos

@@ -4,25 +4,26 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
-  padding: 10px 16px;
-  background: rgba(255,255,255,0.02);
+  margin-bottom: 24px;
+  padding: 12px 20px;
+  background: hsla(35, 40%, 15%, 0.4);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--studio-border);
   border-radius: 50px;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--studio-muted);
 }
 
 .view-toggle {
-  width: 32px; height: 32px; border-radius: 8px;
+  width: 36px; height: 36px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid transparent;
-  color: var(--studio-muted); font-size: 0.85rem;
-  cursor: pointer; transition: all 0.2s;
+  background: hsla(35, 40%, 20%, 0.3);
+  border: 1px solid var(--studio-border);
+  color: var(--studio-muted); font-size: 0.9rem;
+  cursor: pointer; transition: all 0.3s var(--ease-soft);
 }
-.view-toggle:hover  { border-color: var(--studio-border); color: var(--studio-white); }
-.view-toggle.active { background: rgba(229,166,87,0.12); border-color: rgba(229,166,87,0.25); color: var(--studio-honey); }
+.view-toggle:hover  { border-color: var(--studio-honey); color: var(--studio-honey); transform: translateY(-2px); }
+.view-toggle.active { background: hsla(38, 70%, 55%, 0.15); border-color: var(--studio-honey); color: var(--studio-white); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
 
 /* ── List view override ── */
 .inventory-grid.list-view {

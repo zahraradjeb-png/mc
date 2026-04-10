@@ -37,7 +37,6 @@ Route::get('/categories', function () {
     return response()->json($categories);
 });
 
-// ── Vendeurs ──
 Route::get('/vendeurs', function () {
     $vendeurs = DB::table('vendeur')
         ->join('users', 'users.id_user', '=', 'vendeur.id_user')
@@ -46,8 +45,20 @@ Route::get('/vendeurs', function () {
     return response()->json($vendeurs);
 });
 
+// ── Admin ──
+use App\Http\Controllers\AdminController;
+Route::get('/admin/stats', [AdminController::class, 'getStats']);
+Route::get('/admin/produits/en-attente', [AdminController::class, 'getPendingProducts']);
+Route::get('/admin/ventes', [AdminController::class, 'getRecentSales']);
+Route::get('/admin/commandes', [AdminController::class, 'getAllSales']);
+Route::get('/admin/users', [AdminController::class, 'getUsers']);
+Route::get('/admin/notifications', [AdminController::class, 'getNotifications']);
+Route::get('/admin/catalogue-recent', [AdminController::class, 'getRecentCatalogue']);
+Route::post('/admin/produits/{id}/moderer', [AdminController::class, 'moderateProduct']);
+
 use App\Http\Controllers\AuthController;
 
 Route::post('/inscription', [AuthController::class, 'inscription']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+

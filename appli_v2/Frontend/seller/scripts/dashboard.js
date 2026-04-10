@@ -51,34 +51,33 @@ const DashboardController = {
 
     row.innerHTML = `
       ${this._kpiCard({
-        icon: 'fas fa-boxes', iconClass: 'gold',
-        value: stats.total_products || 0,
-        label: 'Total Articles',
-        trend: '', trendClass: 'neutral',
-        barPct: activePercent, barColor: 'gold',
-        sparkData
+        icon: 'fas fa-check-circle', iconClass: 'green',
+        value: stats.validated_ads || 0,
+        label: 'Annonces Validées',
+        trend: 'Visibles en ligne', trendClass: 'up',
+        barPct: stats.total_products > 0 ? Math.round(((stats.validated_ads||0) / stats.total_products) * 100) : 0, barColor: 'green'
       })}
       ${this._kpiCard({
-        icon: 'fas fa-shopping-cart', iconClass: 'green',
+        icon: 'fas fa-hourglass-half', iconClass: 'amber',
+        value: stats.pending_validation || 0,
+        label: 'En attente',
+        trend: 'Modération en cours', trendClass: 'neutral',
+        barPct: stats.total_products > 0 ? Math.round(((stats.pending_validation||0) / stats.total_products) * 100) : 0, barColor: 'amber'
+      })}
+      ${this._kpiCard({
+        icon: 'fas fa-times-circle', iconClass: 'red',
+        value: stats.refused_ads || 0,
+        label: 'Annonces Refusées',
+        trend: 'À corriger', trendClass: 'down',
+        barPct: stats.total_products > 0 ? Math.round(((stats.refused_ads||0) / stats.total_products) * 100) : 0, barColor: 'red'
+      })}
+      ${this._kpiCard({
+        icon: 'fas fa-shopping-cart', iconClass: 'gold',
         value: stats.total_orders || 0,
         label: 'Commandes',
-        trend: stats.pending_orders > 0 ? `${stats.pending_orders} en attente` : 'Tout est expédié', 
+        trend: stats.pending_orders > 0 ? `${stats.pending_orders} à préparer` : 'Tout est prêt', 
         trendClass: stats.pending_orders > 0 ? 'down' : 'up',
-        barPct: 100, barColor: 'green'
-      })}
-      ${this._kpiCard({
-        icon: 'fas fa-euro-sign', iconClass: 'green',
-        value: (stats.month_revenue || 0) + ' €',
-        label: 'Revenus ce mois',
-        trend: 'Ventes réelles', trendClass: 'neutral',
-        barPct: 100, barColor: 'green'
-      })}
-      ${this._kpiCard({
-        icon: 'fas fa-star', iconClass: 'gold',
-        value: parseFloat(stats.avg_rating || 0).toFixed(1) + ' ★',
-        label: 'Note Clients',
-        trend: stats.avg_rating > 0 ? 'Avis réels calculés' : 'Aucun avis', trendClass: 'neutral',
-        barPct: Math.round(((stats.avg_rating||0) / 5) * 100), barColor: 'gold'
+        barPct: 100, barColor: 'gold'
       })}
     `;
 
@@ -99,16 +98,16 @@ const DashboardController = {
       : `<div class="kpi-bar"><div class="kpi-bar-fill ${barColor}" data-width="${barPct}" style="width:0%"></div></div>`;
 
     return `
-      <div class="kpi-card animate-fade">
+      <div class="kpi-card animate-fade glass-card" style="background: var(--studio-panel); border: 1px solid var(--studio-border);">
         <div class="kpi-top">
-          <div class="kpi-icon ${iconClass}"><i class="${icon}"></i></div>
-          <span class="kpi-trend ${trendClass}">
+          <div class="kpi-icon ${iconClass}" style="border: 1px solid var(--studio-border);"><i class="${icon}"></i></div>
+          <span class="kpi-trend ${trendClass}" style="backdrop-filter: blur(5px); border: 1px solid var(--studio-border);">
             <i class="fas fa-arrow-${trendClass === 'up' ? 'up' : trendClass === 'down' ? 'down' : 'right'}"></i>
             ${trend}
           </span>
         </div>
-        <div class="kpi-value">${value}</div>
-        <div class="kpi-label">${label}</div>
+        <div class="kpi-value" style="font-family:'Cormorant Garamond',serif; color:var(--studio-white);">${value}</div>
+        <div class="kpi-label" style="color:var(--studio-muted); font-weight:600; letter-spacing:1px;">${label}</div>
         <div class="kpi-bar-row">${bars}</div>
       </div>`;
   },
@@ -127,11 +126,11 @@ const DashboardController = {
 
        // Afficher seulement les 4 dernières commandes en tant qu'activité
        list.innerHTML = orders.slice(0, 4).map(o => `
-          <div class="activity-item">
-            <i class="fas fa-shopping-cart ai-icon" style="color:#22C55E"></i>
+          <div class="activity-item glass-card" style="background: hsla(35, 40%, 20%, 0.15); border: 1px solid var(--studio-border);">
+            <i class="fas fa-shopping-cart ai-icon" style="color:var(--studio-success)"></i>
             <div class="ai-body">
-              <b>Achat réel</b> : 1x ${o.titre || 'Produit'} par ${o.acheteur_prenom || 'Un client'}.
-              <span class="ai-time">${o.date_commande || 'Récemment'}</span>
+              <b style="color:var(--studio-white)">Achat réel</b> : 1x <span style="color:var(--studio-honey)">${o.titre || 'Produit'}</span> par ${o.acheteur_prenom || 'Un client'}.
+              <span class="ai-time" style="color:var(--studio-muted); opacity:0.6;">${o.date_commande || 'Récemment'}</span>
             </div>
           </div>
        `).join('');
@@ -182,19 +181,26 @@ const DashboardController = {
       }
       el.innerHTML = recent.map(p => {
         const img = ProductService.resolveImage(p);
-        const isAvailable = p.est_disponible == 1 && p.quantite > 0;
+        const isValidated = p.real_statut === 'VALIDEE';
+        const isPending = p.real_statut === 'EN_ATTENTE';
+        const isAvailable = isValidated && p.est_disponible == 1 && p.quantite > 0;
+        
+        let statusText = isAvailable ? 'En ligne' : (isPending ? 'En attente' : (isValidated ? 'Stock épuisé' : (p.real_statut === 'REFUSEE' ? 'Refusé' : 'Hors ligne')));
+        let statusColor = isAvailable ? 'var(--studio-success)' : (isPending ? 'var(--studio-warning)' : 'var(--studio-error)');
+        let statusBg = isAvailable ? 'hsla(140, 70%, 50%, 0.12)' : (isPending ? 'hsla(38, 70%, 55%, 0.12)' : 'hsla(0, 80%, 50%, 0.12)');
+
         return `
-          <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--studio-border);border-radius:10px;margin-bottom:8px;transition:background 0.2s;"
-               onmouseenter="this.style.background='rgba(229,166,87,0.04)'" onmouseleave="this.style.background='rgba(255,255,255,0.02)'">
-            <div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex-shrink:0;background:rgba(229,166,87,0.08)">
-              ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover" alt="${p.titre}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--studio-honey);font-size:1.2rem;">♪</div>`}
+          <div class="glass-card" style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:hsla(35, 40%, 15%, 0.3); border:1px solid var(--studio-border); border-radius:12px; margin-bottom:8px; transition:all 0.3s ease;"
+               onmouseenter="this.style.borderColor='var(--studio-honey)'; this.style.transform='translateX(4px)';" onmouseleave="this.style.borderColor='var(--studio-border)'; this.style.transform='translateX(0)';">
+            <div style="width:48px; height:48px; border-radius:10px; overflow:hidden; flex-shrink:0; background:var(--accent-glow); border:1px solid var(--studio-border);">
+              ${img ? `<img src="${img}" style="width:100%; height:100%; object-fit:cover" alt="${p.titre}">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--studio-honey); font-size:1.2rem;">♪</div>`}
             </div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:0.87rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.titre || p.nom}</div>
-              <div style="font-size:0.72rem;color:var(--studio-muted)">${p.artiste || ''} • ${parseFloat(p.prix || 0).toFixed(2)} €</div>
+            <div style="flex:1; min-width:0">
+              <div style="font-size:0.9rem; font-weight:700; color:var(--studio-white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:'Outfit',sans-serif;">${p.titre || p.nom}</div>
+              <div style="font-size:0.75rem; color:var(--studio-muted); font-family:'Outfit',sans-serif;">${p.artiste || 'Artiste'} • <span style="color:var(--studio-honey); font-weight:600;">${parseFloat(p.prix || 0).toFixed(2)} €</span></div>
             </div>
-            <span style="font-size:0.6rem;font-weight:700;padding:2px 8px;border-radius:50px;${isAvailable ? 'background:rgba(34,197,94,0.12);color:#4ade80' : 'background:rgba(239,68,68,0.12);color:#f87171'}">
-              ${isAvailable ? 'En ligne' : 'Hors ligne'}
+            <span style="font-size:0.65rem; font-weight:700; padding:4px 10px; border-radius:50px; background:${statusBg}; color:${statusColor}; border:1px solid ${statusBg}; text-transform:uppercase; letter-spacing:0.5px;">
+              ${statusText}
             </span>
           </div>`;
       }).join('');

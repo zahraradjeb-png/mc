@@ -164,15 +164,26 @@ class SellerController extends Controller
         // 1. Total Products
         $totalProducts = DB::table('produit')->where('id_vendeur', $id)->count();
 
-        // 2. Pending Orders (Items in 'EN_PREPARATION')
+        // 2. Ad Stats from 'annonce' table
+        $adStats = DB::table('annonce')
+            ->where('id_vendeur', $id)
+            ->select('statut', DB::raw('count(*) as total'))
+            ->groupBy('statut')
+            ->get()
+            ->pluck('total', 'statut');
+
+        $pendingValidation = $adStats['EN_ATTENTE'] ?? 0;
+        $validatedAds = $adStats['VALIDEE'] ?? 0;
+        $refusedAds = $adStats['REFUSEE'] ?? 0;
+
+        // 3. Pending Orders (Items in 'EN_PREPARATION')
         $pendingOrders = DB::table('commande_produit')
             ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
             ->where('produit.id_vendeur', $id)
             ->where('commande_produit.statut', 'EN_PREPARATION')
             ->count();
 
-        // 3. Monthly Revenue (Price * Quantity for all completed sales this month)
-        // For simplicity: all items that are NOT CANCELLED and from this month
+        // 4. Monthly Revenue
         $monthRevenue = DB::table('commande_produit')
             ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
             ->join('commande', 'commande_produit.id_commande', '=', 'commande.id_commande')
@@ -181,28 +192,37 @@ class SellerController extends Controller
             ->whereMonth('commande.date_commande', now()->month)
             ->sum(DB::raw('commande_produit.prix_unitaire * commande_produit.quantite'));
 
-        // 5. Total Orders (at least one item in any order)
+        // 5. Total Orders
         $totalOrdersCount = DB::table('commande_produit')
             ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
             ->where('produit.id_vendeur', $id)
             ->distinct('commande_produit.id_commande')
             ->count('commande_produit.id_commande');
 
-        // 4. Avg Rating
-        $avgRatingArr = DB::table('avis')
-            ->join('produit', 'avis.id_produit', '=', 'produit.id_produit')
-            ->where('produit.id_vendeur', $id)
-            ->select(DB::raw('AVG(note) as average'))
-            ->first();
+        // 6. Avg Rating — Wrapped in try-catch because table 'avis' might be missing
+        $avgRating = 0;
+        try {
+            $avgRatingArr = DB::table('avis')
+                ->join('produit', 'avis.id_produit', '=', 'produit.id_produit')
+                ->where('produit.id_vendeur', $id)
+                ->select(DB::raw('AVG(note) as average'))
+                ->first();
 
-        $avgRating = ($avgRatingArr && $avgRatingArr->average) ? round($avgRatingArr->average, 1) : 0;
+            $avgRating = ($avgRatingArr && $avgRatingArr->average) ? round($avgRatingArr->average, 1) : 0;
+        } catch (\Exception $e) {
+            // Table doesn't exist yet or other query error
+            $avgRating = 0;
+        }
 
         return response()->json([
-            'total_products' => $totalProducts,
-            'pending_orders' => $pendingOrders,
-            'month_revenue'  => number_format($monthRevenue, 2, ',', ' '),
-            'avg_rating'     => $avgRating,
-            'total_orders'   => $totalOrdersCount
+            'total_products'     => $totalProducts,
+            'pending_validation' => $pendingValidation,
+            'validated_ads'      => $validatedAds,
+            'refused_ads'        => $refusedAds,
+            'pending_orders'     => $pendingOrders,
+            'month_revenue'      => number_format($monthRevenue, 2, ',', ' '),
+            'avg_rating'         => $avgRating,
+            'total_orders'       => $totalOrdersCount
         ]);
     }
 

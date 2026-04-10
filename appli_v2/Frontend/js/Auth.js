@@ -81,10 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const subtitleEl = document.getElementById('auth-subtitle');
       if (titleEl && mode === 'seller') {
         titleEl.innerHTML = 'Espace <em>Vendeur</em>';
-        if (subtitleEl) subtitleEl.innerHTML = 'Accédez à votre dashboard vendeur. <a href="register.html">Créer un compte</a>';
+        if (subtitleEl) subtitleEl.innerHTML = 'Accédez à votre dashboard vendeur. <a href="sign-up.html">Créer un compte</a>';
       } else if (titleEl) {
         titleEl.innerHTML = 'Bon retour <em>parmi nous</em>';
-        if (subtitleEl) subtitleEl.innerHTML = 'Pas encore inscrit ? <a href="register.html">Créer un compte</a>';
+        if (subtitleEl) subtitleEl.innerHTML = 'Pas encore inscrit ? <a href="sign-up.html">Créer un compte</a>';
       }
     });
   });
@@ -141,22 +141,33 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
     }
 
-    setTimeout(() => {
-      const isSeller = document.querySelector('.auth-mode-btn[data-mode="seller"].active');
-      // Save user in localStorage
-      const emailVal = document.getElementById('email')?.value || '';
-      const nameParts = emailVal.split('@')[0].split('.');
-      const user = {
-        role: isSeller ? 'seller' : 'buyer',
-        firstName: nameParts[0] ? nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1) : 'Utilisateur',
-        lastName: nameParts[1] ? nameParts[1].charAt(0).toUpperCase() + nameParts[1].slice(1) : '',
-        email: emailVal,
-        shopName: isSeller ? (emailVal.split('@')[0] + ' Shop') : null,
-        joinDate: new Date().toISOString()
-      };
-      localStorage.setItem('gold_user', JSON.stringify(user));
-      window.location.href = 'index.html';
-    }, 1800);
+    fetch("http://127.0.0.1:8000/api/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, mdp: password })
+})
+.then(res => res.json())
+.then(data => {
+  if (data.user) {
+    localStorage.setItem("gold_user", JSON.stringify(data.user));
+
+    // Redirection selon le rôle
+    if (data.user.role === "ADMIN") {
+      window.location.href = "../admin/dashboard.html";
+    } else if (data.user.role === "VENDEUR") {
+      window.location.href = "../seller/products.html";
+    } else if (data.user.role === "ACHETEUR") {
+      window.location.href = "../index.html";
+    }
+  } else {
+    showAuthToast(data.message || "Erreur de connexion", "warn");
+  }
+})
+.catch(err => {
+  console.error(err);
+  showAuthToast("Impossible de contacter le serveur", "warn");
+});
+
   });
 
   /* ── Register form submit ── */

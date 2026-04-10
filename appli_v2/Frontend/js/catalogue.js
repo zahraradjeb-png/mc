@@ -16,30 +16,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }[c] || '<i class="fas fa-music"></i>');
 
   /* ─── PRODUCTS ─── */
-  const products = [
-    { id:1,  name:'Led Zeppelin IV',           artist:'Led Zeppelin',        cat:'vinyles',     price:89.99,   oldPrice:110,  year:1971, badge:'rare', condition:'excellent', rating:5, seller:{init:'JP',name:'Jean-Pierre',rating:4.9}, desc:'Édition originale UK Atlantic 1971. Pressage exceptionnel, pochette en très bon état.' },
-    { id:2,  name:'The Wall',                  artist:'Pink Floyd',           cat:'vinyles',     price:74.00,   oldPrice:null, year:1979, badge:'new',  condition:'parfait',   rating:5, seller:{init:'ML',name:'Marie-L.',  rating:5.0}, desc:'Double vinyle 180g repress. Son cristallin, l\'album définitif du rock progressif.' },
-    { id:3,  name:'Thriller',                  artist:'Michael Jackson',      cat:'cassettes',   price:21.00,   oldPrice:30,   year:1982, badge:'sale', condition:'bon',       rating:4, seller:{init:'TK',name:'TomKaz',    rating:4.7}, desc:'Cassette originale Epic Records 1982. Vintage Walkman compatible. Incontournable.' },
-    { id:4,  name:'Fender Stratocaster \'65',  artist:'Instrument vintage',   cat:'instruments', price:1240.00, oldPrice:null, year:1965, badge:'rare', condition:'excellent', rating:5, seller:{init:'RA',name:'RétroArt',  rating:4.8}, desc:'Strat sunburst 3-tone, hardware original. Certificat d\'authenticité fourni.' },
-    { id:5,  name:'Kind of Blue',              artist:'Miles Davis',          cat:'vinyles',     price:55.00,   oldPrice:70,   year:1959, badge:'rare', condition:'excellent', rating:5, seller:{init:'SB',name:'SoundBox',  rating:4.9}, desc:'Pressage Columbia 6-eye 1959. Le jazz dans toute sa splendeur. Indispensable.' },
-    { id:6,  name:'Abbey Road',                artist:'The Beatles',          cat:'vinyles',     price:64.00,   oldPrice:null, year:1969, badge:'new',  condition:'parfait',   rating:5, seller:{init:'VM',name:'VinyMania', rating:5.0}, desc:'Réédition Apple Records. Masterisé pour le vinyle par Miles Showell.' },
-    { id:7,  name:'Nevermind',                 artist:'Nirvana',              cat:'vinyles',     price:48.00,   oldPrice:60,   year:1991, badge:null,   condition:'bon',       rating:4, seller:{init:'GR',name:'GrooveRoom',rating:4.6}, desc:'Pressage DGC Records. La révolution grunge en vinyle. Excellent état général.' },
-    { id:8,  name:'Dictaphone vintage',        artist:'Instrument années 70', cat:'instruments', price:180.00,  oldPrice:220,  year:1975, badge:'rare', condition:'bon',       rating:4, seller:{init:'AT',name:'AtelierTon',rating:4.5}, desc:'Magnétophone à cassette portatif Grundig. Fonctionne parfaitement, collection.' },
-    { id:9,  name:'Cassette vierge TDK SA',    artist:'Collection 80s',       cat:'cassettes',   price:15.00,   oldPrice:null, year:1985, badge:null,   condition:'parfait',   rating:5, seller:{init:'CS',name:'CassoStore',rating:4.8}, desc:'Lot de 10 cassettes vierges TDK SA 90. Jamais utilisées, packaging original.' },
-    { id:10, name:'Pink Floyd Poster',         artist:'The Wall Tour 1980',   cat:'posters',     price:35.00,   oldPrice:50,   year:1980, badge:'rare', condition:'bon',       rating:4, seller:{init:'AP',name:'ArtPoster', rating:4.7}, desc:'Affiche de concert originale 60x90cm. Légère usure aux coins, encadrement conseillé.' },
-    { id:11, name:'Dark Side of the Moon',     artist:'Pink Floyd',           cat:'vinyles',     price:95.00,   oldPrice:120,  year:1973, badge:'rare', condition:'excellent', rating:5, seller:{init:'JP',name:'Jean-Pierre',rating:4.9}, desc:'Pressage MFSL Ultradisc. Housse en parfait état. La Rolls-Royce du vinyle.' },
-    { id:12, name:'Jimi Hendrix Experience',   artist:'Woodstock Live',       cat:'posters',     price:45.00,   oldPrice:null, year:1969, badge:'new',  condition:'parfait',   rating:5, seller:{init:'AP',name:'ArtPoster', rating:4.7}, desc:'Reproduction haute qualité lithographie sur papier 300g. Format 50x70cm.' },
-    { id:13, name:'Gibson Les Paul Standard',  artist:'Instrument vintage',   cat:'instruments', price:3200.00, oldPrice:3800, year:1968, badge:'rare', condition:'excellent', rating:5, seller:{init:'LG',name:'LuthierG.', rating:5.0}, desc:'Corps en acajou d\'origine, micros PAF. Une pièce de collection exceptionnelle.' },
-    { id:14, name:'Michael Jackson — Bad',     artist:'Michael Jackson',      cat:'cassettes',   price:18.00,   oldPrice:25,   year:1987, badge:null,   condition:'bon',       rating:4, seller:{init:'TK',name:'TomKaz',    rating:4.7}, desc:'Cassette Epic originale 1987. Sound Quality impeccable. Jaquette intacte.' },
-    { id:15, name:'Rolling Stones Poster',     artist:'Sticky Fingers Tour',  cat:'posters',     price:28.00,   oldPrice:null, year:1971, badge:null,   condition:'bon',       rating:3, seller:{init:'AP',name:'ArtPoster', rating:4.7}, desc:'Affiche de tournée américaine 1971. Document historique d\'une époque iconique.' },
-    { id:16, name:'Rumours',                   artist:'Fleetwood Mac',        cat:'vinyles',     price:42.00,   oldPrice:55,   year:1977, badge:null,   condition:'excellent', rating:5, seller:{init:'VM',name:'VinyMania', rating:5.0}, desc:'Warner Bros pressage UK 1977. La production impeccable de Richard Dashut.' },
-    { id:17, name:'Sony Walkman WM-2',         artist:'Électronique vintage', cat:'electronique',price:120.00,  oldPrice:150,  year:1982, badge:'rare', condition:'excellent', rating:5, seller:{init:'SB',name:'SoundBox',  rating:4.9}, desc:'Walkman Sony original 1982 en état de marche. Livré avec écouteurs d\'époque.' },
-    { id:18, name:'Ampli Marantz 2270',        artist:'Électronique vintage', cat:'electronique',price:680.00,  oldPrice:800,  year:1973, badge:'rare', condition:'excellent', rating:5, seller:{init:'AT',name:'AtelierTon',rating:4.5}, desc:'Amplificateur stéréo Marantz 2270 révisé. Son chaud et puissant, pièce de collection.' },
-    { id:19, name:'Dark Side — CD',            artist:'Pink Floyd',           cat:'cd',          price:22.00,   oldPrice:30,   year:1992, badge:'new',  condition:'parfait',   rating:5, seller:{init:'JP',name:'Jean-Pierre',rating:4.9}, desc:'CD pressage original EMI 1992. Première édition numérique remasterisée. Livret complet.' },
-    { id:20, name:'Thriller — CD Édition Spéciale', artist:'Michael Jackson', cat:'cd',          price:18.00,   oldPrice:null, year:2001, badge:null,   condition:'parfait',   rating:4, seller:{init:'TK',name:'TomKaz',    rating:4.7}, desc:'CD édition spéciale avec bonus tracks et livret étendu. Packaging original intact.' },
-  ];
+  let products = [];
+  let filtered = [];
 
-  let filtered = [...products];
+  async function fetchProducts() {
+    try {
+      const response = await fetch('http://localhost:8000/api/produits');
+      const data = await response.json();
+      
+      // Adapt backend data to frontend format
+      products = data.map(p => ({
+        id: p.id_produit,
+        name: p.titre,
+        artist: p.artiste || 'Artiste inconnu',
+        cat: p.categorie_nom?.toLowerCase() || 'autres',
+        price: parseFloat(p.prix),
+        oldPrice: null, // Backend doesn't have this yet
+        year: p.annee || p.decennie || 'N/A',
+        badge: p.rarete?.toLowerCase() === 'rare' ? 'rare' : null,
+        condition: p.etat?.toLowerCase() || 'bon',
+        rating: 5, // Mock rating as backend doesn't have it
+        seller: {
+          init: (p.vendeur_nom || 'V')[0],
+          name: p.vendeur_nom || 'Vendeur Gold',
+          rating: 4.8
+        },
+        desc: p.description,
+        photo: p.photo_principale || null
+      }));
+
+      filtered = [...products];
+      renderProducts();
+    } catch (err) {
+      console.error('Erreur fetch produits:', err);
+      showToast('Impossible de charger les produits', 'error');
+    }
+  }
+
+  /* Initial call */
+  fetchProducts();
   let currentView = 'grid';
   let currentPage = 1;
   const perPage = 9;
@@ -292,8 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     grid.innerHTML = items.map((p,i) => `
       <article class="prod-card-catalogue" data-id="${p.id}" style="animation-delay:${i*0.06}s;cursor:pointer">
-        <div class="pcc-thumb">
-          <div class="prod-thumb-img">${catIcon(p.cat)}</div>
+          <div class="pcc-thumb">
+            ${p.photo ? `<img src="http://localhost:8000/${p.photo}" class="prod-thumb-img" style="object-fit:cover" />` : `<div class="prod-thumb-img">${catIcon(p.cat)}</div>`}
           <div class="pcc-badges">
             ${p.badge==='rare'?'<span class="prod-badge b-rare">Rare</span>':''}
             ${p.badge==='new'?'<span class="prod-badge b-new">Nouveau</span>':''}
