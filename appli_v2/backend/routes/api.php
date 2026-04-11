@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 
 // ── Produits ──
 Route::get('/produits', [ProductController::class, 'index']);
+Route::get('/produits-populaires', [ProductController::class, 'getPopular']);
 Route::post('/produits', [ProductController::class, 'store']);
 Route::get('/produits/{id}', [ProductController::class, 'show']);
 Route::post('/produits-update/{id}', [ProductController::class, 'update']);
@@ -19,6 +20,7 @@ Route::put('/vendeurs/{id}', [\App\Http\Controllers\SellerController::class, 'up
 Route::post('/vendeurs/{id}/photo', [\App\Http\Controllers\SellerController::class, 'uploadPhoto']);
 Route::get('/vendeurs/{id}/avis', [\App\Http\Controllers\SellerController::class, 'getReviews']);
 Route::get('/vendeurs/{id}/commandes', [\App\Http\Controllers\SellerController::class, 'getOrders']);
+Route::put('/vendeurs/{vendeurId}/commandes/{orderId}/valider', [\App\Http\Controllers\SellerController::class, 'validerCommande']);
 Route::put('/vendeurs/{vendeurId}/commandes/{orderId}/produit/{productId}/status', [\App\Http\Controllers\SellerController::class, 'updateOrderItemStatus']);
 Route::get('/vendeurs/{id}/stats', [\App\Http\Controllers\SellerController::class, 'getStats']);
 Route::get('/vendeurs/{id}/finance', [\App\Http\Controllers\SellerController::class, 'getFinance']);
@@ -31,19 +33,26 @@ Route::get('/acheteurs/{id}/notifications', [\App\Http\Controllers\BuyerControll
 Route::put('/acheteurs/{id}/notifications/{notifId}/lue', [\App\Http\Controllers\BuyerController::class, 'markAsRead']);
 Route::get('/acheteurs/{id}/commandes', [\App\Http\Controllers\BuyerController::class, 'getOrders']);
 
+// ── Panier ──
+use App\Http\Controllers\PanierController;
+Route::get('/panier/{id_acheteur}', [PanierController::class, 'index']);
+Route::post('/panier', [PanierController::class, 'store']);
+Route::put('/panier/ligne/{id_panier}/{id_produit}', [PanierController::class, 'update']);
+Route::delete('/panier/ligne/{id_panier}/{id_produit}', [PanierController::class, 'destroy']);
+Route::delete('/panier/clear/{id_acheteur}', [PanierController::class, 'clear']);
+
+// ── Commandes (acheteur) ──
+Route::post('/commandes', [\App\Http\Controllers\CommandeController::class, 'store']);
+Route::put('/acheteurs/{acheteurId}/commandes/{orderId}/annuler', [\App\Http\Controllers\CommandeController::class, 'cancel']);
+
 // ── Catégories ──
 Route::get('/categories', function () {
     $categories = DB::table('categorie')->get();
     return response()->json($categories);
 });
 
-Route::get('/vendeurs', function () {
-    $vendeurs = DB::table('vendeur')
-        ->join('users', 'users.id_user', '=', 'vendeur.id_user')
-        ->select('vendeur.*', 'users.nom', 'users.prenom')
-        ->get();
-    return response()->json($vendeurs);
-});
+Route::get('/vendeurs', [\App\Http\Controllers\SellerController::class, 'index']);
+Route::get('/vendeurs-overview', [\App\Http\Controllers\SellerController::class, 'getSellersWithProducts']);
 
 // ── Admin ──
 use App\Http\Controllers\AdminController;

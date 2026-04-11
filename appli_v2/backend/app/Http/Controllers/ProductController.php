@@ -17,10 +17,8 @@ class ProductController extends Controller
 
         $query = DB::table('produit')
             ->join('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
-            // Join with annonce to get real-time status
             ->leftJoin('annonce_produit', 'produit.id_produit', '=', 'annonce_produit.id_produit')
             ->leftJoin('annonce', 'annonce_produit.id_annonce', '=', 'annonce.id_annonce')
-            // Sous-requête pour chopper la première photo
             ->leftJoin('produit_photo', function($join) {
                 $join->on('produit.id_produit', '=', 'produit_photo.id_produit')
                      ->whereRaw('produit_photo.id_photo = (SELECT MIN(id_photo) FROM produit_photo WHERE id_produit = produit.id_produit)');
@@ -29,17 +27,50 @@ class ProductController extends Controller
                 'produit.*', 
                 'categorie.nom as categorie_nom', 
                 'produit_photo.chemin as photo_principale',
-                DB::raw('COALESCE(annonce.statut, "EN_ATTENTE") as real_statut')
+                DB::raw('COALESCE(annonce.statut, produit.statut, "EN_ATTENTE") as real_statut')
             );
 
         if ($id_vendeur) {
             $query->where('produit.id_vendeur', $id_vendeur);
         } else {
-            // Pour le catalogue public, on ne montre que les validés via l'annonce
-            $query->where('annonce.statut', 'VALIDEE');
+            // Pour le catalogue public, on montre les validés (soit par annonce, soit directement)
+            $query->where(function($q) {
+                $q->where('annonce.statut', 'VALIDEE')
+                  ->orWhere('produit.statut', 'VALIDEE');
+            });
         }
 
         return response()->json($query->orderBy('produit.date_ajout', 'desc')->get());
+    }
+
+    /**
+     * Get 8 to 12 popular (latest validated) products for the home page.
+     */
+    public function getPopular()
+    {
+        $products = DB::table('produit')
+            ->join('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
+            ->leftJoin('annonce_produit', 'produit.id_produit', '=', 'annonce_produit.id_produit')
+            ->leftJoin('annonce', 'annonce_produit.id_annonce', '=', 'annonce.id_annonce')
+            ->leftJoin('produit_photo', function($join) {
+                $join->on('produit.id_produit', '=', 'produit_photo.id_produit')
+                     ->whereRaw('produit_photo.id_photo = (SELECT MIN(id_photo) FROM produit_photo WHERE id_produit = produit.id_produit)');
+            })
+            ->where(function($q) {
+                $q->where('annonce.statut', 'VALIDEE')
+                  ->orWhere('produit.statut', 'VALIDEE');
+            })
+            ->select(
+                'produit.*',
+                'categorie.nom as categorie_nom',
+                'produit_photo.chemin as photo_principale',
+                DB::raw('COALESCE(annonce.statut, produit.statut, "VALIDEE") as real_statut')
+            )
+            ->orderBy('produit.date_ajout', 'desc')
+            ->limit(12)
+            ->get();
+
+        return response()->json($products);
     }
 
     /**

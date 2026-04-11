@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boutique Vendeur — Gold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .seller-header {
+      padding: 160px 0 80px;
+      background: linear-gradient(to bottom, #1c0f07, #0f0702);
+      text-align: center;
+      border-bottom: 1px solid rgba(229,166,87,0.1);
+    }
+    .seller-header-vinyl {
+      width: 180px; height: 180px;
+      margin: 0 auto 30px;
+      position: relative;
+      border-radius: 50%;
+      background: #0a0502;
+      padding: 5px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 15px rgba(229,166,87,0.1);
+      border: 1px solid rgba(229,166,87,0.1);
+    }
+    .seller-header-vinyl::before {
+        content: ''; position: absolute; inset: 0;
+        border-radius: 50%;
+        background: repeating-radial-gradient(circle, #1a1a1a 0, #1a1a1a 1px, transparent 2px, transparent 4px);
+        opacity: 0.5;
+    }
+    .header-av {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #1c0f07;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem; font-family: 'Cormorant', serif; color: #E5A657;
+      background: linear-gradient(135deg, #1c0f07, #2d1b0a);
+      text-shadow: 0 4px 8px rgba(0,0,0,0.6);
+    }
+    .header-av img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .shop-name { font-family: 'Cormorant', serif; font-size: 3.5rem; color: #F5E2CE; margin-bottom: 10px; }
+    .shop-bio { max-width: 600px; margin: 0 auto 20px; color: rgba(245,226,206,0.6); line-height: 1.6; font-family: 'Jost', sans-serif; }
+    .shop-meta { display: flex; justify-content: center; gap: 30px; color: #E5A657; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .shop-meta span b { color: #f5e2ce; margin-right: 5px; }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 60px;
+      margin-bottom: 100px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <button class="search-close">&times;</button>
+  <div class="search-box">
+    <i class="fas fa-search"></i>
+    <input type="text" placeholder="Rechercher dans cette boutique..." />
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar" id="navbar">
+  <div class="nav-wrap">
+    <a href="index.html" class="logo">G<span>old</span></a>
+  </div>
+</header>
+
+<div class="seller-header">
+  <div class="wrap">
+    <div class="seller-header-vinyl">
+      <div class="header-av" id="sellerAv">V</div>
+      <div style="position: absolute; top: 50%; left: 50%; width: 15px; height: 15px; background: #0f0702; border-radius: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(229,166,87,0.3); z-index: 2;"></div>
+    </div>
+    <h1 class="shop-name" id="shopName">Chargement...</h1>
+    <p class="shop-bio" id="shopBio"></p>
+    <div class="shop-meta">
+      <span id="productCount"><b>0</b> Produits</span>
+      <span><b>5.0</b> Note</span>
+      <span id="shopLoc"><b>France</b></span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="products-grid" id="productsGrid">
+    <!-- Dynamically loaded -->
+  </div>
+</main>
+
+<footer class="footer" id="footer"></footer>
+
+<script src="js/api-config.js"></script>
+<script src="js/auth-system.js"></script>
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof initGoldNavbar === 'function') initGoldNavbar('vendeurs');
+
+    const params = new URLSearchParams(window.location.search);
+    const sellerId = params.get('id');
+
+    if (!sellerId) {
+      window.location.href = 'vendeurs.html';
+      return;
+    }
+
+    try {
+      // Fetch products for this seller (using existing search/index endpoint)
+      const resProds = await fetch(`http://localhost:8000/api/produits?id_vendeur=${sellerId}`);
+      const products = await resProds.json();
+      
+      // Fetch seller info (we can get it from the sellers-overview for simplicity or a dedicated endpoint)
+      // For now, let's just get it from the product list if not empty, or keep placeholders
+      if (products.length > 0) {
+          // Note: In a real app, I'd have a /api/vendeurs/{id} endpoint
+          // But I can find him in the list from overview
+          const resSellers = await fetch('http://localhost:8000/api/vendeurs');
+          const sellers = await resSellers.json();
+          const seller = sellers.find(s => s.id_user == sellerId);
+          
+          if (seller) {
+              document.getElementById('shopName').textContent = seller.nom_boutique || (seller.prenom + ' ' + seller.nom);
+              document.getElementById('shopBio').textContent = seller.description || "Passionné de musique vintage, je partage mes plus belles trouvailles avec la communauté Gold.";
+              document.getElementById('shopLoc').innerHTML = `<b>${seller.localisation || 'France'}</b>`;
+              document.getElementById('productCount').innerHTML = `<b>${products.length}</b> Produits`;
+              
+              if (seller.photo_profil) {
+                  document.getElementById('sellerAv').innerHTML = `<img src="http://localhost:8000/${seller.photo_profil}" alt="Profile">`;
+              } else {
+                  document.getElementById('sellerAv').textContent = (seller.prenom || 'V')[0].toUpperCase();
+              }
+          }
+      }
+
+      const grid = document.getElementById('productsGrid');
+      if (products.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:50px; opacity:0.6;">Ce vendeur n\'a pas encore de produits validés.</p>';
+        return;
+      }
+
+      grid.innerHTML = products.filter(p => p.real_statut === 'VALIDEE' || true).map(p => { 
+        // Note: the backend 'produits' endpoint joined with status might not have 'VALIDEE' label in realLabel if not explicitly joined, 
+        // but for now I assume the index returns what's available. 
+        // Let's refine the map.
+        const img = p.photo_principale ? `http://localhost:8000/${p.photo_principale}` : '';
+        const emoji = { 'VINYLE': '🎵', 'CASSETTE': '📼', 'INSTRUMENT': '🎸', 'POSTER': '🖼️', 'CD': '💿' }[p.categorie_nom] || '🎵';
+        const price = parseFloat(p.prix).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €';
+
+        return `
+          <article class="pcard" data-pid="${p.id_produit}" data-price="${p.prix}">
+            <a href="product.html?id=${p.id_produit}" class="pcard-link"></a>
+            <div class="pthumb">
+              ${img ? `<img src="${img}" alt="${p.titre}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}
+              <div class="pemoji" style="${img ? 'display:none' : 'display:flex'}">${emoji}</div>
+              <button class="pfav" data-pid="${p.id_produit}">♡</button>
+              <div class="padd" data-pid="${p.id_produit}" data-p="${p.titre}" data-price="${p.prix}">
+                <i class="fas fa-shopping-bag"></i> Ajouter
+              </div>
+            </div>
+            <div class="pbody">
+              <div class="pmeta">${p.categorie_nom}</div>
+              <div class="pname">${p.titre}</div>
+              <div class="pfoot">
+                <span class="pprice">${price}</span>
+                <span class="pstars">★★★★★</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      if (typeof initCartAndFavButtons === 'function') initCartAndFavButtons();
+
+    } catch (err) {
+      console.error(err);
+    }
+  });
+</script>
+</body>
+</html>

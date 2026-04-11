@@ -19,7 +19,8 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // «null» = pages file:// (navigateur envoie Origin: null)
+    'allowed_origins' => ['*', 'null'],
 
     'allowed_origins_patterns' => [],
 

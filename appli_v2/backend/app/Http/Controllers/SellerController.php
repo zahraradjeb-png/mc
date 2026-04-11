@@ -112,6 +112,8 @@ class SellerController extends Controller
             ->select(
                 'commande.id_commande',
                 'commande.date_commande',
+                'commande.statut as statut_commande',
+                'commande.montant_total',
                 'commande_produit.id_produit',
                 'commande_produit.quantite',
                 'commande_produit.prix_unitaire',
@@ -157,6 +159,38 @@ class SellerController extends Controller
     }
 
     /**
+     * Valide une commande (passage EN_ATTENTE → CONFIRMEE) si elle contient au moins un article du vendeur.
+     */
+    public function validerCommande($vendeurId, $orderId)
+    {
+        $orderId = (int) $orderId;
+        $vendeurId = (int) $vendeurId;
+
+        $hasMine = DB::table('commande_produit')
+            ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
+            ->where('commande_produit.id_commande', $orderId)
+            ->where('produit.id_vendeur', $vendeurId)
+            ->exists();
+
+        if (! $hasMine) {
+            return response()->json(['message' => 'Commande inaccessible pour ce vendeur.'], 403);
+        }
+
+        $updated = DB::table('commande')
+            ->where('id_commande', $orderId)
+            ->where('statut', 'EN_ATTENTE')
+            ->update(['statut' => 'CONFIRMEE']);
+
+        if ($updated === 0) {
+            return response()->json([
+                'message' => 'La commande n’est plus en attente (déjà traitée ou autre statut).',
+            ], 409);
+        }
+
+        return response()->json(['message' => 'Commande validée.']);
+    }
+
+    /**
      * Get real-time stats for the seller dashboard.
      */
     public function getStats($id)
@@ -164,11 +198,12 @@ class SellerController extends Controller
         // 1. Total Products
         $totalProducts = DB::table('produit')->where('id_vendeur', $id)->count();
 
-        // 2. Ad Stats from 'annonce' table
+        // 2. Ad Stats from 'annonce' table (linked to products)
         $adStats = DB::table('annonce')
-            ->where('id_vendeur', $id)
-            ->select('statut', DB::raw('count(*) as total'))
-            ->groupBy('statut')
+            ->join('annonce_produit', 'annonce.id_annonce', '=', 'annonce_produit.id_annonce')
+            ->where('annonce.id_vendeur', $id)
+            ->select('annonce.statut', DB::raw('count(*) as total'))
+            ->groupBy('annonce.statut')
             ->get()
             ->pluck('total', 'statut');
 
@@ -291,6 +326,60 @@ class SellerController extends Controller
             'transactions'    => $transactions,
             'total_orders'    => count($transactions)
         ]);
+    }
+
+    /**
+     * Get list of all sellers with basic info.
+     */
+    public function index()
+    {
+        $vendeurs = DB::table('vendeur')
+            ->join('users', 'vendeur.id_user', '=', 'users.id_user')
+            ->select('vendeur.*', 'users.prenom', 'users.nom', 'users.email')
+            ->get();
+            
+        return response()->json($vendeurs);
+    }
+
+    /**
+     * Get sellers with a preview of 4 validated products each.
+     */
+    public function getSellersWithProducts()
+    {
+        $sellers = DB::table('vendeur')
+            ->join('users', 'vendeur.id_user', '=', 'users.id_user')
+            ->select('vendeur.*', 'users.prenom', 'users.nom')
+            ->get();
+
+        $result = [];
+        foreach ($sellers as $seller) {
+            $products = DB::table('produit')
+                ->join('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
+                ->leftJoin('annonce_produit', 'produit.id_produit', '=', 'annonce_produit.id_produit')
+                ->leftJoin('annonce', 'annonce_produit.id_annonce', '=', 'annonce.id_annonce')
+                ->leftJoin('produit_photo', function($join) {
+                    $join->on('produit.id_produit', '=', 'produit_photo.id_produit')
+                         ->whereRaw('produit_photo.id_photo = (SELECT MIN(id_photo) FROM produit_photo WHERE id_produit = produit.id_produit)');
+                })
+                ->where('produit.id_vendeur', $seller->id_user)
+                ->where('annonce.statut', 'VALIDEE')
+                ->select(
+                    'produit.*',
+                    'categorie.nom as categorie_nom',
+                    'produit_photo.chemin as photo_principale',
+                    'annonce.statut as real_statut'
+                )
+                ->orderBy('produit.date_ajout', 'desc')
+                ->limit(4)
+                ->get();
+
+            $result[] = [
+                'seller' => $seller,
+                'products' => $products
+            ];
+        }
+
+        return response()->json($result);
     }
 
     /**

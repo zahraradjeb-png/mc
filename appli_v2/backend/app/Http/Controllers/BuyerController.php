@@ -77,30 +77,65 @@ class BuyerController extends Controller
     }
 
     /**
-     * Get buyer orders.
+     * Get buyer orders (groupées par id_commande, colonnes BDD : id_acheteur, montant_total).
      */
     public function getOrders($id)
     {
-        $orders = DB::table('commande')
+        $rows = DB::table('commande')
             ->join('commande_produit', 'commande.id_commande', '=', 'commande_produit.id_commande')
             ->join('produit', 'produit.id_produit', '=', 'commande_produit.id_produit')
             ->join('vendeur', 'vendeur.id_user', '=', 'produit.id_vendeur')
-            ->where('commande.id_user', $id)
+            ->where('commande.id_acheteur', (int) $id)
             ->select(
                 'commande.id_commande',
                 'commande.date_commande',
-                'commande.total',
+                'commande.statut',
+                'commande.montant_total',
                 'commande_produit.id_produit',
                 'commande_produit.quantite',
                 'commande_produit.prix_unitaire',
-                'commande_produit.statut as statut_item',
+                'commande_produit.statut as statut_ligne',
                 'produit.titre',
-                'produit.photo_principale',
                 'vendeur.nom_boutique'
             )
             ->orderBy('commande.date_commande', 'desc')
             ->get();
 
-        return response()->json($orders);
+        $grouped = [];
+        foreach ($rows as $row) {
+            $cid = (int) $row->id_commande;
+            if (! isset($grouped[$cid])) {
+                $grouped[$cid] = [
+                    'id'              => $cid,
+                    'id_commande'     => $cid,
+                    'numero'          => 'GLD-' . $cid,
+                    'date_commande'   => $row->date_commande,
+                    'created_at'      => $row->date_commande,
+                    'statut'          => strtolower((string) $row->statut),
+                    'montant_total'   => (float) $row->montant_total,
+                    'total'           => (float) $row->montant_total,
+                    'produits'        => [],
+                    '_boutiques'      => [],
+                ];
+            }
+            $grouped[$cid]['_boutiques'][$row->nom_boutique] = true;
+            $grouped[$cid]['produits'][] = [
+                'id_produit' => (int) $row->id_produit,
+                'nom'        => $row->titre,
+                'name'       => $row->titre,
+                'quantite'   => (int) $row->quantite,
+                'prix'       => (float) $row->prix_unitaire,
+                'statut_ligne' => $row->statut_ligne,
+            ];
+        }
+
+        foreach ($grouped as &$o) {
+            $shops = array_keys($o['_boutiques']);
+            $o['vendeur_nom'] = count($shops) > 1 ? 'Plusieurs vendeurs' : ($shops[0] ?? 'Marketplace');
+            unset($o['_boutiques']);
+        }
+        unset($o);
+
+        return response()->json(array_values($grouped));
     }
 }

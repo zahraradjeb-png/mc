@@ -73,11 +73,12 @@ public function login(Request $request)
     }
 
     $userData = [
-        'id'     => $user->id_user,
-        'nom'    => $user->nom,
-        'prenom' => $user->prenom,
-        'email'  => $user->email,
-        'role'   => $user->role
+        'id'      => $user->id_user,
+        'id_user' => $user->id_user,
+        'nom'     => $user->nom,
+        'prenom'  => $user->prenom,
+        'email'   => $user->email,
+        'role'    => $user->role
     ];
 
     // Si vendeur, récupérer ses infos spécifiques
