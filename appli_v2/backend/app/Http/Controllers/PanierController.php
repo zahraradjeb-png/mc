@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class PanierController extends Controller
 {
@@ -52,6 +53,8 @@ class PanierController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('Tentative ajout panier', ['data' => $request->all()]);
+        
         $validator = Validator::make($request->all(), [
             'id_acheteur'   => 'required|integer',
             'id_produit'    => 'required|integer',
@@ -77,12 +80,24 @@ class PanierController extends Controller
         $panier = DB::table('panier')->where('id_acheteur', $id_acheteur)->first();
         if (!$panier) {
             try {
+                // S'assurer que l'acheteur existe dans la table 'acheteur' (contrainte FK)
+                if (!DB::table('acheteur')->where('id_user', $id_acheteur)->exists()) {
+                    DB::table('acheteur')->insert([
+                        'id_user'   => $id_acheteur,
+                        'adresse'   => '',
+                        'telephone' => '',
+                    ]);
+                }
+
                 $id_panier = DB::table('panier')->insertGetId([
                     'id_acheteur' => $id_acheteur
                 ]);
             } catch (\Exception $e) {
-                // Au cas où une insertion parallèle aurait eu lieu
+                // Au cas où une insertion parallèle aurait eu lieu ou autre erreur
                 $panier = DB::table('panier')->where('id_acheteur', $id_acheteur)->first();
+                if (!$panier) {
+                    return response()->json(['message' => 'Erreur lors de la création du panier : ' . $e->getMessage()], 500);
+                }
                 $id_panier = $panier->id_panier;
             }
         } else {
@@ -95,15 +110,19 @@ class PanierController extends Controller
             ->where('id_produit', $id_produit)
             ->first();
 
+        $action = $request->input('action', 'add'); // 'add' (incrément) ou 'set' (fixe)
+
         if ($exists) {
+            $newQty = ($action === 'set') ? $qtyAdd : ($exists->quantite + $qtyAdd);
+            
             DB::table('panier_produit')
                 ->where('id_panier', $id_panier)
                 ->where('id_produit', $id_produit)
-                ->update(['quantite' => $exists->quantite + $qtyAdd]);
+                ->update(['quantite' => $newQty]);
 
             return response()->json([
-                'message' => 'Quantité mise à jour dans votre panier.',
-                'status'  => 'qty_incremented'
+                'message' => 'Quantité mise à jour.',
+                'status'  => 'qty_updated'
             ], 200);
         }
 
@@ -179,13 +198,5 @@ class PanierController extends Controller
             DB::table('panier')->where('id_panier', $panier->id_panier)->delete();
         }
         return response()->json(['message' => 'Panier vidé']);
-    }
-
-    private function deletePanierIfEmpty($id_panier)
-    {
-        $count = DB::table('panier_produit')->where('id_panier', $id_panier)->count();
-        if ($count === 0) {
-            DB::table('panier')->where('id_panier', $id_panier)->delete();
-        }
     }
 }

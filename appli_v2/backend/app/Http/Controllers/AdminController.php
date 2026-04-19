@@ -8,125 +8,136 @@ use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     /**
-     * Get platform stats for the admin dashboard.
+     * Stats globales de la plateforme.
      */
     public function getStats()
     {
-        $commissionRate = 0.08;
-        $totalVolume = DB::table('commandes')
-            ->where('statut', 'LIVREE')
-            ->sum('total_ttc');
-        
-        $totalFees = $totalVolume * $commissionRate;
-
-        $activeProducts = DB::table('produit')->where('statut', 'VALIDEE')->count();
-        $pendingProducts = DB::table('annonce')->where('statut', 'EN_ATTENTE')->count();
-
-        $sellersCount = DB::table('vendeur')->count();
-        $buyersCount = DB::table('acheteur')->count();
+        $commissionRate  = 0.08;
+        $totalVolume     = DB::table('commande')->where('statut', 'LIVREE')->sum('montant_total');
+        $totalFees       = $totalVolume * $commissionRate;
+        $activeProducts  = DB::table('produit')->where('statut', 'VALIDEE')->count();
+        $pendingProducts = DB::table('produit')->where('statut', 'EN_ATTENTE')->count();
+        $totalOrders     = DB::table('commande')->count();
+        $totalUsers      = DB::table('users')->count();
 
         return response()->json([
             'platform_fees'    => (float)$totalFees,
             'active_products'  => (int)$activeProducts,
             'pending_products' => (int)$pendingProducts,
-            'total_users'      => (int)($sellersCount + $buyersCount)
+            'total_users'      => (int)$totalUsers,
+            'total_orders'     => (int)$totalOrders
         ]);
     }
 
     /**
-     * Get products awaiting validation.
+     * Produits en attente de modération.
+     * produit.id_vendeur → vendeur.id_user → users.id_user
      */
     public function getPendingProducts()
     {
-        $products = DB::table('annonce')
-            ->join('annonce_produit', 'annonce.id_annonce', '=', 'annonce_produit.id_annonce')
-            ->join('produit', 'annonce_produit.id_produit', '=', 'produit.id_produit')
-            ->where('annonce.statut', 'EN_ATTENTE')
-            ->select('annonce.*', 'produit.prix', 'produit.titre', 'produit.id_vendeur')
-            ->orderBy('annonce.date_soumission', 'desc')
+        $products = DB::table('produit')
+            ->join('vendeur', 'produit.id_vendeur', '=', 'vendeur.id_user')
+            ->join('users',   'vendeur.id_user',    '=', 'users.id_user')
+            ->where('produit.statut', 'EN_ATTENTE')
+            ->select(
+                'produit.id_produit',
+                'produit.titre',
+                'produit.prix',
+                'produit.etat',
+                'produit.statut',
+                'produit.date_ajout',
+                'users.nom  as vendeur_nom',
+                'users.prenom as vendeur_prenom',
+                'vendeur.nom_boutique'
+            )
+            ->orderBy('produit.date_ajout', 'desc')
             ->get();
-            
+
         return response()->json($products);
     }
 
     /**
-     * Get ALL platform users.
+     * Liste de tous les utilisateurs.
      */
     public function getUsers()
     {
-        $users = DB::table('utilisateurs')
-            ->leftJoin('vendeur', 'utilisateurs.id_user', '=', 'vendeur.id_user')
-            ->select('utilisateurs.id_user', 'utilisateurs.nom', 'utilisateurs.prenom', 'utilisateurs.email', 'utilisateurs.role', 'vendeur.nom_boutique')
-            ->orderBy('utilisateurs.role', 'asc')
+        $users = DB::table('users')
+            ->leftJoin('vendeur', 'users.id_user', '=', 'vendeur.id_user')
+            ->select(
+                'users.id_user as id',
+                'users.nom',
+                'users.prenom',
+                'users.email',
+                'users.role',
+                'users.created_at',
+                'vendeur.nom_boutique'
+            )
+            ->orderBy('users.created_at', 'desc')
             ->get();
+
         return response()->json($users);
     }
 
     /**
-     * Get ALL platform sales.
+     * Toutes les commandes de la plateforme.
      */
     public function getAllOrders()
     {
-        $orders = DB::table('commandes')
-            ->join('utilisateurs', 'commandes.id_acheteur', '=', 'utilisateurs.id_user')
-            ->select('commandes.*', 'utilisateurs.nom as client_nom', 'utilisateurs.prenom as client_prenom')
-            ->orderBy('commandes.date_commande', 'desc')
+        $orders = DB::table('commande')
+            ->join('users', 'commande.id_acheteur', '=', 'users.id_user')
+            ->select(
+                'commande.id_commande',
+                'commande.id_acheteur',
+                'commande.date_commande',
+                'commande.statut',
+                'commande.montant_total',
+                'users.nom    as client_nom',
+                'users.prenom as client_prenom',
+                'users.email  as client_email'
+            )
+            ->orderBy('commande.date_commande', 'desc')
             ->get();
 
         return response()->json($orders);
     }
 
     /**
-     * Get recent catalogue additions.
+     * Derniers produits validés avec photo.
      */
     public function getRecentCatalogue()
     {
+        $photoSub = '(SELECT pp.chemin FROM produit_photo pp WHERE pp.id_produit = produit.id_produit ORDER BY pp.id_photo ASC LIMIT 1)';
+
         $products = DB::table('produit')
+            ->where('statut', 'VALIDEE')
+            ->select('produit.*', DB::raw($photoSub . ' as photo'))
             ->orderBy('id_produit', 'desc')
-            ->limit(10)
+            ->limit(12)
             ->get();
+
         return response()->json($products);
     }
 
     /**
-     * Get notifications.
-     */
-    public function getNotifications()
-    {
-        $notifications = DB::table('notifications')
-            ->orderBy('created_at', 'desc')
-            ->limit(15)
-            ->get();
-        
-        return response()->json($notifications);
-    }
-
-    /**
-     * Moderate a product.
+     * Modérer un produit (VALIDEE / REFUSEE).
      */
     public function moderateProduct(Request $request, $id)
     {
         $status = $request->action;
-        
-        DB::table('annonce')->where('id_annonce', $id)->update([
-            'statut' => $status,
-            'date_traitement' => now()
+
+        DB::table('produit')->where('id_produit', $id)->update([
+            'statut' => $status
         ]);
 
-        $link = DB::table('annonce_produit')->where('id_annonce', $id)->first();
-        if ($link) {
-            DB::table('produit')->where('id_produit', $link->id_produit)->update(['statut' => $status]);
-        }
-
-        return response()->json(['message' => "Statut mis à jour: {$status}"]);
+        return response()->json(['message' => "Statut mis à jour : {$status}"]);
     }
 
     /**
-     * Delete user.
+     * Supprimer un utilisateur.
      */
     public function deleteUser($id)
     {
-        DB::table('utilisateurs')->where('id_user', $id)->delete();
+        DB::table('users')->where('id_user', $id)->delete();
         return response()->json(['message' => 'Utilisateur supprimé']);
     }
 }

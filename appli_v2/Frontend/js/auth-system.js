@@ -46,7 +46,8 @@ const GoldAuth = {
               id_acheteur: buyerId,
               id_produit: item.id,
               prix_unitaire: item.price,
-              quantite: item.qty || 1
+              quantite: item.qty || 1,
+              action: 'set'
             })
           });
         } catch (e) { console.warn("Merge error for item", item.id, e); }
@@ -85,19 +86,30 @@ const GoldAuth = {
 
     // Si Acheteur, on envoie AU SERVEUR en plus
     const user = this.getUser();
-    if (user && this.isBuyer()) {
-      try {
-        await fetch(`${API_BASE}/panier`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_acheteur: user.id_user || user.id,
-            id_produit: id,
-            prix_unitaire: prod.price,
-            quantite: 1
-          })
-        });
-      } catch (e) { console.error("Server add error", e); }
+    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN')) {
+      const bId = user.id_user || user.id;
+      if (bId) {
+        try {
+          const res = await fetch(`${API_BASE}/panier`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id_acheteur: bId,
+              id_produit: id,
+              prix_unitaire: prod.price,
+              quantite: 1
+            })
+          });
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.error("Erreur Serveur Panier:", res.status, errData);
+          } else {
+            console.log("Panier synchronisé avec succès pour l'ID:", bId);
+          }
+        } catch (e) { 
+          console.error("Erreur réseau Panier:", e); 
+        }
+      }
     }
 
     showToast('Ajouté au panier !');
@@ -159,8 +171,15 @@ function showToast(msg, type='ok') {
     const msgEl = document.getElementById('tmsg') || t.querySelector('span') || t;
     msgEl.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    
+    setTimeout(() => {
+      t.classList.remove('show');
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(100px)';
+    }, 3000);
   } else {
-    alert(msg);
+    console.log("Toast:", msg);
   }
 }
