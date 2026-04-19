@@ -73,12 +73,18 @@ class PanierController extends Controller
             $qtyAdd = 99;
         }
 
-        // 1. Trouver ou créer le panier (header)
+        // 1. Trouver ou créer le panier (header) de façon unique
         $panier = DB::table('panier')->where('id_acheteur', $id_acheteur)->first();
         if (!$panier) {
-            $id_panier = DB::table('panier')->insertGetId([
-                'id_acheteur' => $id_acheteur
-            ]);
+            try {
+                $id_panier = DB::table('panier')->insertGetId([
+                    'id_acheteur' => $id_acheteur
+                ]);
+            } catch (\Exception $e) {
+                // Au cas où une insertion parallèle aurait eu lieu
+                $panier = DB::table('panier')->where('id_acheteur', $id_acheteur)->first();
+                $id_panier = $panier->id_panier;
+            }
         } else {
             $id_panier = $panier->id_panier;
         }
@@ -146,6 +152,23 @@ class PanierController extends Controller
     }
 
     /**
+     * Supprime un article du panier via l'ID de l'acheteur.
+     */
+    public function destroyByAcheteur($id_acheteur, $id_produit)
+    {
+        $panier = DB::table('panier')->where('id_acheteur', $id_acheteur)->first();
+        if ($panier) {
+            DB::table('panier_produit')
+                ->where('id_panier', $panier->id_panier)
+                ->where('id_produit', $id_produit)
+                ->delete();
+            
+            $this->deletePanierIfEmpty((int) $panier->id_panier);
+        }
+        return response()->json(['message' => 'Article retiré']);
+    }
+
+    /**
      * Vide tout le panier d'un acheteur.
      */
     public function clear($id_acheteur)
@@ -156,5 +179,13 @@ class PanierController extends Controller
             DB::table('panier')->where('id_panier', $panier->id_panier)->delete();
         }
         return response()->json(['message' => 'Panier vidé']);
+    }
+
+    private function deletePanierIfEmpty($id_panier)
+    {
+        $count = DB::table('panier_produit')->where('id_panier', $id_panier)->count();
+        if ($count === 0) {
+            DB::table('panier')->where('id_panier', $id_panier)->delete();
+        }
     }
 }

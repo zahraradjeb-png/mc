@@ -31,7 +31,7 @@ class CommandeController extends Controller
             $result = DB::transaction(function () use ($idAcheteur, $livraison, $request) {
                 $panier = DB::table('panier')->where('id_acheteur', $idAcheteur)->first();
                 if (!$panier) {
-                    throw new \RuntimeException('Panier vide.');
+                    throw new \RuntimeException('Panier introuvable pour cet utilisateur.');
                 }
 
                 $lignes = DB::table('panier_produit')
@@ -39,7 +39,7 @@ class CommandeController extends Controller
                     ->get();
 
                 if ($lignes->isEmpty()) {
-                    throw new \RuntimeException('Panier vide.');
+                    throw new \RuntimeException('Le panier en base de données est vide.');
                 }
 
                 if (! DB::table('acheteur')->where('id_user', $idAcheteur)->exists()) {

@@ -1,33 +1,33 @@
 :root {
-  /* ══ GOLD STUDIO DESIGN SYSTEM — High-End Warm Edition ══ */
-  --studio-bg:            #0f0a05;
-  --studio-surface:       #150e09;
-  --studio-panel:         hsla(28, 25%, 15%, 0.45);
-  --studio-border:        hsla(38, 70%, 55%, 0.22);
-  --studio-border-hover:  hsla(38, 70%, 55%, 0.45);
-  --studio-honey:         #D4AF37; /* Champagne Gold */
-  --studio-honey-dark:    #916f1b;
-  --studio-crimson:       #a04030;
-  --studio-gold-gradient: linear-gradient(135deg, #D4AF37 0%, #E5A657 55%, #916f1b 100%);
-  --studio-white:         #FAF3E0;
-  --studio-muted:         hsla(35, 60%, 75%, 0.55);
-  --studio-ink:           #0f0a05;
+  /* ══ RETRO MARKET DESIGN SYSTEM — Vintage Studio Edition ══ */
+  --studio-bg:            #0d090f;
+  --studio-surface:       #130f16;
+  --studio-panel:         rgba(255, 255, 255, 0.03);
+  --studio-border:        rgba(229, 166, 87, 0.15);
+  --studio-border-hover:  rgba(229, 166, 87, 0.35);
+  --studio-honey:         #e5a657; /* Amber Gold */
+  --studio-honey-dark:    #c07d30;
+  --studio-crimson:       #b53324; /* Rust Red */
+  --studio-gold-gradient: linear-gradient(135deg, #e5a657 0%, #feb47b 55%, #c07d30 100%);
+  --studio-white:         #f5e2ce; /* Parchment */
+  --studio-muted:         rgba(245, 226, 206, 0.45);
+  --studio-ink:           #0d090f;
 
   /* ── Accent Colors ── */
-  --studio-success:  #4ade80;
-  --studio-error:    #f87171;
-  --studio-warning:  #fbbf24;
-  --studio-info:     #60a5fa;
+  --studio-success:  #2ecc71;
+  --studio-error:    #e74c3c;
+  --studio-warning:  #f1c40f;
+  --studio-info:     #3498db;
 
   /* ── Transitions & Effects ── */
   --ease-soft:    cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
-  --glass:        blur(20px);
-  --glass-card:   hsla(28, 25%, 15%, 0.45);
-  --shadow-gold:  0 10px 40px rgba(212, 175, 55, 0.12);
-  --shadow-dark:  0 20px 60px rgba(0, 0, 0, 0.7);
-  --radius-card:  22px;
-  --radius-btn:   14px;
+  --glass:        blur(30px);
+  --glass-card:   rgba(255, 255, 255, 0.03);
+  --shadow-gold:  0 10px 40px rgba(229, 166, 87, 0.1);
+  --shadow-dark:  0 20px 60px rgba(0, 0, 0, 0.6);
+  --radius-card:  20px;
+  --radius-btn:   12px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,8 +36,8 @@
 body.seller-studio {
   background: var(--studio-bg);
   background-image:
-    radial-gradient(ellipse at 15% 15%, hsla(38, 70%, 55%, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 85% 85%, hsla(30, 60%, 40%, 0.05) 0%, transparent 55%);
+    radial-gradient(ellipse at 10% 10%, rgba(229, 166, 87, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 90%, rgba(181, 51, 36, 0.04) 0%, transparent 50%);
   color: var(--studio-white);
   font-family: 'Outfit', 'Jost', sans-serif;
   margin: 0;
@@ -328,3 +328,13 @@ h1, h2, h3, h4, .font-serif {
 .empty-state i      { font-size: 3.5rem; color: var(--studio-honey); opacity: 0.2; margin-bottom: 20px; display: block; }
 .empty-state h2     { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 10px; }
 .empty-state p      { color: var(--studio-muted); margin-bottom: 28px; font-size: 0.9rem; }
+
+/* ── Badge Status ── */
+.badge-status {
+  font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+  padding: 4px 10px; border-radius: 50px; display: inline-block; margin-bottom: 8px;
+  border: 1px solid currentColor;
+}
+.st-active  { color: var(--studio-success); background: rgba(46, 204, 113, 0.1); }
+.st-pending { color: var(--studio-warning); background: rgba(241, 196, 15, 0.1); }
+.st-inactive { color: var(--studio-error); background: rgba(231, 76, 60, 0.1); }

@@ -18,14 +18,11 @@ const DashboardController = {
 
     const sellerId = this.user.id_vendeur || this.user.vendeur?.id || this.user.id;
 
-    // Load all dashboard sections in parallel
+    // Load only KPIs and Recent Products
     await Promise.all([
       this.loadKPIs(sellerId),
       this.loadRecentProducts(sellerId)
     ]);
-
-    this.renderActivity(sellerId);
-    this.renderReviews(sellerId);
   },
 
   /* ── KPI Cards ── */
@@ -112,60 +109,6 @@ const DashboardController = {
       </div>`;
   },
 
-  /* ── Recent Activity ── */
-  async renderActivity(vendeurId) {
-    const list = document.getElementById('activity-list');
-    if (!list) return;
-
-    try {
-       const orders = await ProductService.getOrders(vendeurId);
-       if (!orders || orders.length === 0) {
-          list.innerHTML = `<p style="color:var(--studio-muted); font-size:0.85rem; text-align:center; padding:10px 0;">Aucune activité récente.</p>`;
-          return;
-       }
-
-       // Afficher seulement les 4 dernières commandes en tant qu'activité
-       list.innerHTML = orders.slice(0, 4).map(o => `
-          <div class="activity-item glass-card" style="background: hsla(35, 40%, 20%, 0.15); border: 1px solid var(--studio-border);">
-            <i class="fas fa-shopping-cart ai-icon" style="color:var(--studio-success)"></i>
-            <div class="ai-body">
-              <b style="color:var(--studio-white)">Achat réel</b> : 1x <span style="color:var(--studio-honey)">${o.titre || 'Produit'}</span> par ${o.acheteur_prenom || 'Un client'}.
-              <span class="ai-time" style="color:var(--studio-muted); opacity:0.6;">${o.date_commande || 'Récemment'}</span>
-            </div>
-          </div>
-       `).join('');
-
-    } catch (e) {
-       list.innerHTML = `<p style="color:var(--studio-muted); font-size:0.85rem;">Impossible de charger l'activité.</p>`;
-    }
-  },
-
-  /* ── Reviews Summary ── */
-  async renderReviews(vendeurId) {
-    const list = document.getElementById('reviews-mini');
-    if (!list) return;
-
-    try {
-      const reviews = await ProductService.getReviews(vendeurId);
-      if (!reviews || reviews.length === 0) {
-        list.innerHTML = `<p style="color:var(--studio-muted); font-size:0.85rem; text-align:center; padding:10px 0;">Aucun avis reçu pour le moment.</p>`;
-        return;
-      }
-
-      list.innerHTML = reviews.slice(0, 2).map(r => `
-        <div class="mini-review">
-          <div class="review-stars">${'★'.repeat(r.note || 5)}${'☆'.repeat(5 - (r.note || 5))}</div>
-          <p>« ${r.commentaire || ''} »</p>
-          <span class="review-author">— ${r.prenom || 'Client'}</span>
-        </div>
-      `).join('') + `
-        <a href="reviews.html" style="display:block;text-align:center;margin-top:12px;font-size:0.8rem;color:var(--studio-honey);opacity:0.8;">
-          Voir tous les avis →
-        </a>`;
-    } catch(e) {
-       list.innerHTML = `<p style="color:var(--studio-muted); font-size:0.85rem;">Impossible de charger les avis.</p>`;
-    }
-  },
 
   /* ── Recent Products ── */
   async loadRecentProducts(vendeurId) {

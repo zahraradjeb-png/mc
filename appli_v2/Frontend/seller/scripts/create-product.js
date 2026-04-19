@@ -22,18 +22,18 @@ const CreateProductController = {
 
   /* ── Category → show music fields ── */
   _initCategoryToggle() {
-    const sel         = document.getElementById('cat-select');
+    const sel = document.getElementById('cat-select');
     const musicFields = document.getElementById('music-fields');
-    const baseFields  = document.getElementById('music-base-fields');
-    const cdFields    = document.getElementById('cd-fields');
-    const casFields   = document.getElementById('cassette-fields');
+    const baseFields = document.getElementById('music-base-fields');
+    const cdFields = document.getElementById('cd-fields');
+    const casFields = document.getElementById('cassette-fields');
 
     if (!sel || !musicFields) return;
 
     sel.addEventListener('change', () => {
       const type = sel.options[sel.selectedIndex].getAttribute('data-type');
       const isMusic = ['VINYLE', 'CD', 'CASSETTE'].includes(type);
-      
+
       musicFields.style.display = isMusic ? 'block' : 'none';
       if (isMusic) {
         musicFields.classList.add('animate-slide');
@@ -49,8 +49,8 @@ const CreateProductController = {
 
   /* ── Image upload & preview ── */
   _initImageUpload() {
-    const inp     = document.getElementById('p-img');
-    const grid    = document.getElementById('preview-grid');
+    const inp = document.getElementById('p-img');
+    const grid = document.getElementById('preview-grid');
     const preview = document.getElementById('preview-container');
     if (!inp) return;
 
@@ -72,10 +72,10 @@ const CreateProductController = {
     const dropzone = document.getElementById('dropzone');
     if (!dropzone) return;
 
-    ['dragenter','dragover'].forEach(ev => {
+    ['dragenter', 'dragover'].forEach(ev => {
       dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
     });
-    ['dragleave','drop'].forEach(ev => {
+    ['dragleave', 'drop'].forEach(ev => {
       dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag-over'); });
     });
     dropzone.addEventListener('drop', e => {
@@ -85,7 +85,7 @@ const CreateProductController = {
       }
       this.selectedFiles = [...this.selectedFiles, ...files];
       const grid = document.getElementById('preview-grid');
-      const pv   = document.getElementById('preview-container');
+      const pv = document.getElementById('preview-container');
       this._renderPreviews(grid, pv);
     });
   },
@@ -108,7 +108,7 @@ const CreateProductController = {
         div.innerHTML = `
           ${idx === 0 ? '<span class="preview-badge">Principale</span>' : ''}
           <button type="button" class="preview-remove" data-idx="${idx}" title="Supprimer">×</button>
-          <img src="${e.target.result}" alt="Photo ${idx+1}">`;
+          <img src="${e.target.result}" alt="Photo ${idx + 1}">`;
         div.querySelector('.preview-remove').onclick = () => {
           this.selectedFiles.splice(idx, 1);
           this._renderPreviews(grid, container);
@@ -123,7 +123,7 @@ const CreateProductController = {
   _initQtyStepper() {
     const input = document.getElementById('p-quantite');
     const minus = document.getElementById('qty-minus');
-    const plus  = document.getElementById('qty-plus');
+    const plus = document.getElementById('qty-plus');
     if (!input) return;
 
     minus?.addEventListener('click', () => {
@@ -139,13 +139,13 @@ const CreateProductController = {
   _validate(form) {
     const errors = [];
     const titre = form.querySelector('[name="titre"]');
-    const desc  = form.querySelector('[name="description"]');
-    const cat   = form.querySelector('[name="id_categorie"]');
-    const prix  = form.querySelector('[name="prix"]');
+    const desc = form.querySelector('[name="description"]');
+    const cat = form.querySelector('[name="id_categorie"]');
+    const prix = form.querySelector('[name="prix"]');
 
-    if (!titre?.value.trim())        errors.push('Le titre est obligatoire.');
-    if (!desc?.value.trim())         errors.push('La description est obligatoire.');
-    if (!cat?.value)                 errors.push('Veuillez choisir une catégorie.');
+    if (!titre?.value.trim()) errors.push('Le titre est obligatoire.');
+    if (!desc?.value.trim()) errors.push('La description est obligatoire.');
+    if (!cat?.value) errors.push('Veuillez choisir une catégorie.');
     if (!prix?.value || parseFloat(prix.value) <= 0) errors.push('Le prix doit être supérieur à 0.');
     if (this.selectedFiles.length === 0) errors.push('Veuillez ajouter au moins une photo.');
 
@@ -160,7 +160,7 @@ const CreateProductController = {
   /* ── Form submit ── */
   _initFormSubmit() {
     const form = document.getElementById('create-product-form');
-    const btn  = document.getElementById('pub-btn');
+    const btn = document.getElementById('pub-btn');
     if (!form) return;
 
     form.addEventListener('submit', async e => {
@@ -174,7 +174,7 @@ const CreateProductController = {
 
       const originalHTML = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publication…';
-      btn.disabled  = true;
+      btn.disabled = true;
 
       const formData = new FormData(form);
       formData.set('id_vendeur', this.userId);
@@ -196,7 +196,7 @@ const CreateProductController = {
         setTimeout(() => window.location.href = 'products.html', 2000);
       } catch (err) {
         btn.innerHTML = originalHTML;
-        btn.disabled  = false;
+        btn.disabled = false;
         StudioToast.error(err.message || 'Erreur lors de la publication. Vérifiez la connexion au serveur.', 5000);
         console.error('[CreateProduct] Submit error:', err);
       }

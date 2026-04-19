@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Activité Visiteur — Retro Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/buyer.css">
+  <style>
+    :root {
+      --crumpet: #1c1719;
+      --ink: #f5e2ce;
+      --ink2: #272124;
+      --paprika: #8c6239;
+      --honey: #d4a373;
+      --biscuit: #383033;
+      --muted: rgba(245, 226, 206, 0.6);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--crumpet);
+      color: var(--ink);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    .logo {
+      font-family: 'Cormorant Garamond', serif !important;
+    }
+
+    .navbar {
+      background: rgba(28, 23, 25, 0.95) !important;
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--biscuit) !important;
+    }
+
+    .navbar.scrolled .nav-wrap {
+      background: rgba(28, 23, 25, 0.95) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      color: var(--ink) !important;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--honey) !important;
+    }
+
+    .buyer-page-header {
+      background: linear-gradient(135deg, rgba(28, 23, 25, 0.95) 0%, rgba(28, 23, 25, 0.85) 100%), url('assets/images/hero/third.jpg') center/cover;
+      border-bottom: 1px solid var(--biscuit);
+      padding: 100px 0 40px;
+    }
+
+    .bph-title {
+      color: #fff !important;
+      font-size: 3rem !important;
+    }
+
+    .bph-title em {
+      color: var(--honey) !important;
+      font-style: italic;
+    }
+
+    .activity-section {
+      background: var(--ink2);
+      border: 1px solid var(--biscuit);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    .as-title {
+      font-size: 1.4rem;
+      color: var(--honey);
+      border-bottom: 1px solid var(--biscuit);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .act-item {
+      border: 1px solid rgba(245, 226, 206, 0.1);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .act-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .act-product {
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .act-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: rgba(245, 226, 206, 0.85);
+      font-style: italic;
+    }
+
+    .empty-msg {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px 0;
+      font-style: italic;
+      font-size: 0.9rem;
+      border: 1px dashed rgba(245, 226, 206, 0.1);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="navbar scrolled" id="navbar">
+    <div class="nav-wrap">
+      <a href="index.html" class="logo">Retro<span>Market</span></a>
+      <!-- Conteneurs nécessaires pour le script de navigation -->
+      <div id="headerSearch" style="display:none"></div>
+      <div id="headerActions"></div>
+    </div>
+  </header>
+
+  <section class="buyer-page-header">
+    <div class="wrap">
+      <h1 class="bph-title">Mon <em>Activité</em></h1>
+      <p class="bph-subtitle">Retrouvez vos commentaires et signalements enregistrés sur ce navigateur.</p>
+    </div>
+  </section>
+
+  <section class="buyer-content" style="padding: 40px 0;">
+    <div class="wrap">
+      <div class="activity-section">
+        <h2 class="as-title"><i class="far fa-comment"></i> Mes commentaires</h2>
+        <div id="commentsContainer">
+          <div class="empty-msg">Chargement...</div>
+        </div>
+      </div>
+
+      <div class="activity-section">
+        <h2 class="as-title"><i class="far fa-flag"></i> Mes signalements</h2>
+        <div id="reportsContainer">
+          <div class="empty-msg">Chargement...</div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:40px;">
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:15px;">Créez un compte pour ne jamais perdre vos
+          données, même en changeant de navigateur.</p>
+        <a href="authentification/sign-up.html"
+          style="display:inline-block; padding:12px 25px; background:var(--honey); color:#111; border-radius:8px; font-weight:600; text-decoration:none;">S'inscrire
+          maintenant</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/api-config.js"></script>
+  <script src="js/auth-system.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialiser la navigation (en mode sécurisé)
+      try {
+        if (typeof initGoldNavbar === 'function') initGoldNavbar();
+      } catch (e) { console.error("Nav init error:", e); }
+
+      // 2. Charger les commentaires
+      const commentsContainer = document.getElementById('commentsContainer');
+      try {
+        const guestComments = JSON.parse(localStorage.getItem('guest_comments') || '[]');
+        if (guestComments.length === 0) {
+          commentsContainer.innerHTML = '<div class="empty-msg">Vous n\'avez laissé aucun commentaire pour le moment.</div>';
+        } else {
+          let html = '';
+          guestComments.slice().reverse().forEach(c => {
+            html += `
+            <div class="act-item">
+              <div class="act-header">
+                <span class="act-product">🎵 ${c.productName || 'Produit'}</span>
+                <span>${c.date || ''}</span>
+              </div>
+              <div class="act-text">"${c.text || ''}"</div>
+              <div style="margin-top:10px; text-align:right;">
+                <a href="catalogue.html" style="font-size:0.75rem; color:var(--honey); text-decoration:none;">Voir le produit →</a>
+              </div>
+            </div>`;
+          });
+          commentsContainer.innerHTML = html;
+        }
+      } catch (e) {
+        commentsContainer.innerHTML = '<div class="empty-msg" style="color:var(--paprika)">Erreur lors du chargement des commentaires.</div>';
+      }
+
+      // 3. Charger les signalements
+      const reportsContainer = document.getElementById('reportsContainer');
+      try {
+        const guestReports = JSON.parse(localStorage.getItem('guest_reports') || '[]');
+        if (guestReports.length === 0) {
+          reportsContainer.innerHTML = '<div class="empty-msg">Vous n\'avez signalé aucun produit.</div>';
+        } else {
+          let html = '';
+          guestReports.slice().reverse().forEach(r => {
+            html += `
+            <div class="act-item">
+              <div class="act-header" style="color:var(--paprika);">
+                <span class="act-product">⚠️ ${r.productName || 'Produit'}</span>
+                <span>${r.date || ''}</span>
+              </div>
+              <div class="act-text" style="font-style:italic; font-size:0.95rem; color:rgba(245,226,206,0.85);">Raison : "${r.reason || 'Non spécifiée'}"</div>
+            </div>`;
+          });
+          reportsContainer.innerHTML = html;
+        }
+      } catch (e) {
+        reportsContainer.innerHTML = '<div class="empty-msg" style="color:var(--paprika)">Erreur lors du chargement des signalements.</div>';
+      }
+    });
+  </script>
+</body>
+
+</html>

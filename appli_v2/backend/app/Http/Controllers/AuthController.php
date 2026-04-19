@@ -25,7 +25,9 @@ class AuthController extends Controller
             'prenom' => $request->prenom,
             'email'  => $request->email,
             'mdp'    => Hash::make($request->mdp),
-            'role'   => $request->role
+            'role'   => $request->role,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
 
         // Si vendeur → créer entrée dans table vendeur
@@ -55,49 +57,50 @@ class AuthController extends Controller
     }
 
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'mdp'   => 'required'
-    ]);
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'mdp'   => 'required'
+        ]);
 
-    $user = DB::table('users')
-                ->where('email', $request->email)
-                ->first();
+        $user = DB::table('users')
+                    ->where('email', $request->email)
+                    ->first();
 
-    if (!$user || !Hash::check($request->mdp, $user->mdp)) {
-        return response()->json([
-            'message' => 'Email ou mot de passe incorrect'
-        ], 401);
-    }
-
-    $userData = [
-        'id'      => $user->id_user,
-        'id_user' => $user->id_user,
-        'nom'     => $user->nom,
-        'prenom'  => $user->prenom,
-        'email'   => $user->email,
-        'role'    => $user->role
-    ];
-
-    // Si vendeur, récupérer ses infos spécifiques
-    if ($user->role === 'VENDEUR') {
-        $vendeur = DB::table('vendeur')->where('id_user', $user->id_user)->first();
-        if ($vendeur) {
-            $userData['nom_boutique'] = $vendeur->nom_boutique;
-            $userData['description']  = $vendeur->description;
-            $userData['categorie_principale'] = $vendeur->categorie_principale;
-            $userData['localisation'] = $vendeur->localisation;
-            $userData['photo_profil'] = $vendeur->photo_profil;
+        if (!$user || !Hash::check($request->mdp, $user->mdp)) {
+            return response()->json([
+                'message' => 'Email ou mot de passe incorrect'
+            ], 401);
         }
-    }
 
-    return response()->json([
-        'message' => 'Connexion réussie !',
-        'user'    => $userData
-    ], 200);
-}
+        $userData = [
+            'id'      => $user->id_user,
+            'id_user' => $user->id_user,
+            'nom'     => $user->nom,
+            'prenom'  => $user->prenom,
+            'email'   => $user->email,
+            'role'    => $user->role,
+            'created_at' => $user->created_at ?? now()
+        ];
+
+        // Si vendeur, récupérer ses infos spécifiques
+        if ($user->role === 'VENDEUR') {
+            $vendeur = DB::table('vendeur')->where('id_user', $user->id_user)->first();
+            if ($vendeur) {
+                $userData['nom_boutique'] = $vendeur->nom_boutique;
+                $userData['description']  = $vendeur->description;
+                $userData['categorie_principale'] = $vendeur->categorie_principale;
+                $userData['localisation'] = $vendeur->localisation;
+                $userData['photo_profil'] = $vendeur->photo_profil;
+            }
+        }
+
+        return response()->json([
+            'message' => 'Connexion réussie !',
+            'user'    => $userData
+        ], 200);
+    }
 
     public function resetPassword(Request $request)
     {
@@ -113,9 +116,44 @@ public function login(Request $request)
         }
 
         DB::table('users')->where('email', $request->email)->update([
-            'mdp' => Hash::make($request->nouveau_mdp)
+            'mdp' => Hash::make($request->nouveau_mdp),
+            'updated_at' => now()
         ]);
 
         return response()->json(['message' => 'Mot de passe modifié avec succès.'], 200);
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $request->validate([
+            'nom'    => 'required',
+            'prenom' => 'required',
+            'email'  => 'required|email'
+        ]);
+
+        DB::table('users')->where('id_user', $id)->update([
+            'nom'    => $request->nom,
+            'prenom' => $request->prenom,
+            'email'  => $request->email,
+            'bio'    => $request->bio ?? '',
+            'updated_at' => now()
+        ]);
+
+        // On renvoie les nouvelles infos pour mettre à jour le localStorage
+        $user = DB::table('users')->where('id_user', $id)->first();
+
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès',
+            'user' => [
+                'id' => $user->id_user,
+                'id_user' => $user->id_user,
+                'nom' => $user->nom,
+                'prenom' => $user->prenom,
+                'email' => $user->email,
+                'role' => $user->role,
+                'bio' => $user->bio,
+                'created_at' => $user->created_at
+            ]
+        ]);
     }
 }

@@ -12,13 +12,10 @@ const SellerHeader = {
         </div>
         <div class="header-right">
           <div class="header-actions" id="header-actions"></div>
-          <div class="header-utilities" style="background: hsla(28, 25%, 15%, 0.4); border: 1px solid var(--studio-border); padding: 6px; border-radius: 40px; backdrop-filter: blur(10px);">
+          <div class="header-utilities" style="background: rgba(255,255,255,0.03); border: 1px solid var(--studio-border); padding: 8px; border-radius: 40px; backdrop-filter: blur(20px);">
             <a href="notifications.html" class="util-icon" title="Notifications">
               <i class="fas fa-bell"></i>
               <span class="util-dot" style="background:var(--studio-error); border: 2px solid var(--studio-bg);"></span>
-            </a>
-            <a href="settings.html" class="util-icon" title="Paramètres">
-              <i class="fas fa-cog"></i>
             </a>
             <a href="profile.html" class="util-icon" title="Mon profil" style="
               background: hsla(38, 70%, 55%, 0.15); color: var(--studio-honey); border-radius: 50%; border: 1px solid var(--studio-border);">

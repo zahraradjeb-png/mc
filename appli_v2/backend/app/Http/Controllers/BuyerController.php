@@ -81,6 +81,8 @@ class BuyerController extends Controller
      */
     public function getOrders($id)
     {
+        $photoSub = '(SELECT pp.chemin FROM produit_photo pp WHERE pp.id_produit = produit.id_produit ORDER BY pp.id_photo ASC LIMIT 1)';
+
         $rows = DB::table('commande')
             ->join('commande_produit', 'commande.id_commande', '=', 'commande_produit.id_commande')
             ->join('produit', 'produit.id_produit', '=', 'commande_produit.id_produit')
@@ -96,7 +98,8 @@ class BuyerController extends Controller
                 'commande_produit.prix_unitaire',
                 'commande_produit.statut as statut_ligne',
                 'produit.titre',
-                'vendeur.nom_boutique'
+                'vendeur.nom_boutique',
+                DB::raw($photoSub . ' as photo')
             )
             ->orderBy('commande.date_commande', 'desc')
             ->get();
@@ -126,6 +129,7 @@ class BuyerController extends Controller
                 'quantite'   => (int) $row->quantite,
                 'prix'       => (float) $row->prix_unitaire,
                 'statut_ligne' => $row->statut_ligne,
+                'photo'      => $row->photo
             ];
         }
 

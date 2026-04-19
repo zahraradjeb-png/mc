@@ -23,10 +23,10 @@ const SellerSidebar = {
       </a>`;
 
     container.innerHTML = `
-      <aside class="studio-sidebar glass-card" id="studio-sidebar" style="background: hsla(28, 25%, 10%, 0.8); backdrop-filter: blur(25px); border-right: 1px solid var(--studio-border);">
+      <aside class="studio-sidebar glass-card" id="studio-sidebar" style="background: rgba(13, 9, 15, 0.85); backdrop-filter: blur(40px); border-right: 1px solid var(--studio-border);">
         <div class="sidebar-logo">
-          <span class="gold-logo-txt" style="font-family:'Cormorant Garamond',serif; font-size:1.7rem; letter-spacing: 0.05em;">GOLD <em style="font-style:normal; color:var(--studio-honey)">STUDIO</em></span>
-          <span class="gold-logo-badge" style="background: var(--studio-gold-gradient); color: #000; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Vendeur</span>
+          <span class="gold-logo-txt" style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing: 0.1em; color: #fff;">RETRO <em style="font-style:normal; color:var(--studio-honey)">MARKET</em></span>
+          <span class="gold-logo-badge" style="background: var(--studio-gold-gradient); color: #111; font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase;">Studio</span>
         </div>
 
         <nav class="sidebar-nav">

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Administrateur — Gold Studio</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/dashboard.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* ── FORCE DARK THEME (Anti-Rose) ── */
+    :root {
+      --gold: #e5a657 !important;
+      --cream: #f5e2ce !important;
+      --tobacco: #0d0603 !important; /* Noir profond */
+      --mahogany: #1c0f07 !important;
+      --rust: #b53324 !important;
+    }
+
+    body.dashboard-body {
+      background: #0d0603 !important;
+      color: #f5e2ce !important;
+    }
+
+    .sidebar-nav { background: #0d0603 !important; border-right: 1px solid rgba(229,166,87,0.2) !important; }
+    .dash-card { background: rgba(28, 15, 7, 0.95) !important; border: 1px solid rgba(229,166,87,0.15) !important; color: #f5e2ce !important; }
+    .kpi-card { background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(229,166,87,0.1) !important; }
+    
+    .toast {
+      position:fixed;bottom:28px;right:28px;background:#1c0f07;color:#F5E2CE;
+      border:1px solid var(--gold);border-radius:8px;padding:12px 20px;
+      z-index:9999;display:none;
+    }
+    .toast.show { display:flex; }
+
+    .modal-overlay {
+      position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:8000;
+      display:none;align-items:center;justify-content:center;backdrop-filter:blur(10px);
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:#0d0603;border:1px solid var(--gold);border-radius:12px;
+      padding:30px;max-width:800px;width:90%;position:relative;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+
+  <button class="dash-mobile-toggle" id="mobileToggle"><i class="fas fa-bars"></i></button>
+
+  <aside class="sidebar-nav" id="sidebarNav">
+    <a href="../index.html" class="sn-logo">
+      <span class="sn-logo-text" style="font-family:'Cormorant',serif;font-size:1.4rem;color:#F5E2CE">G<span style="color:#E5A657">old</span> Admin</span>
+    </a>
+
+    <div class="sn-user">
+      <div class="sn-avatar">AD</div>
+      <div>
+        <div class="sn-user-name">Administrateur Gold</div>
+        <div class="sn-user-badge"><i class="fas fa-shield-alt"></i> Contrôle Total</div>
+      </div>
+    </div>
+
+    <div class="sn-section-label">Gestion</div>
+    <a href="dashboard.html" class="sn-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="#" class="sn-link" id="nav-users-link"><i class="fas fa-users"></i> Utilisateurs</a>
+    <a href="#" class="sn-link" id="nav-orders-link"><i class="fas fa-shopping-cart"></i> Historique Ventes</a>
+
+    <div class="sn-section-label">Catalogue</div>
+    <a href="#" class="sn-link" id="nav-products-link"><i class="fas fa-gavel"></i> Modération</a>
+    
+    <div class="sn-bottom">
+      <a href="../auth-entry.html" class="sn-logout"><i class="fas fa-power-off"></i> Déconnexion</a>
+    </div>
+  </aside>
+
+  <div class="dashboard-main">
+    <div class="dash-topbar">
+      <div class="dash-topbar-left">
+        <div class="dash-page-title">Panneau d'administration</div>
+        <div class="dash-date" id="dash-date">...</div>
+      </div>
+      <div class="dash-topbar-right">
+        <button class="topbar-btn" id="notifBtn"><i class="fas fa-bell"></i></button>
+        <a href="../index.html" class="topbar-btn"><i class="fas fa-store"></i></a>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <!-- Banner -->
+      <div style="background:linear-gradient(135deg,#0d0603 0%,#1c0f07 100%);border:1px solid var(--gold);border-radius:12px;padding:30px;margin-bottom:28px;">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--gold);margin-bottom:5px">Système Retro Market</div>
+        <div style="font-family:'Cormorant',serif;font-size:1.8rem;font-weight:700;color:#fff">Console de gestion <em style="color:var(--gold)">activée</em></div>
+        <div style="font-size:.85rem;color:rgba(245,226,206,0.6)" id="admin-summary">Récupération des données en cours...</div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon amber"><i class="fas fa-coins"></i></div>
+          <div class="kpi-value" id="kpi-fees">0 €</div>
+          <div class="kpi-label">Revenus Plateforme</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon amber" style="color:#1e90ff"><i class="fas fa-users"></i></div>
+          <div class="kpi-value" id="kpi-users">0</div>
+          <div class="kpi-label">Utilisateurs inscrits</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon rust"><i class="fas fa-hourglass-start"></i></div>
+          <div class="kpi-value" id="kpi-pending" style="color:var(--rust)">0</div>
+          <div class="kpi-label">Annonces à modérer</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon amber" style="color:#2ecc71"><i class="fas fa-check-circle"></i></div>
+          <div class="kpi-value" id="kpi-active">0</div>
+          <div class="kpi-label">Annonces en ligne</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <!-- Moderation -->
+        <div class="dash-card">
+          <div class="dash-card-header"><div class="dash-card-title">File de Modération</div></div>
+          <div id="pending-list" style="margin-top:15px;display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+        <!-- Recent Ads -->
+        <div class="dash-card">
+          <div class="dash-card-header"><div class="dash-card-title">Dernières Annonces</div></div>
+          <div style="overflow-x:auto;margin-top:10px">
+            <table style="width:100%">
+              <thead><tr style="text-align:left;color:var(--gold);font-size:.7rem"><th>Titre</th><th>Prix</th><th style="text-align:right">Action</th></tr></thead>
+              <tbody id="recent-ads-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="usersModal"><div class="modal-box"><h3>Utilisateurs</h3><div id="users-body" style="margin-top:20px"></div><button class="btn-gold" onclick="closeModal('usersModal')" style="margin-top:20px">Fermer</button></div></div>
+  <div class="modal-overlay" id="ordersModal"><div class="modal-box"><h3>Ventes Globales</h3><div id="orders-body" style="margin-top:20px"></div><button class="btn-gold" onclick="closeModal('ordersModal')" style="margin-top:20px">Fermer</button></div></div>
+  <div class="notif-panel" id="notifPanel"><h4 style="color:var(--gold);margin-bottom:15px">Notifications</h4><div id="notif-body"></div></div>
+  <div class="toast" id="mainToast"></div>
+
+  <script src="../js/api-config.js"></script>
+  <script src="../js/auth-system.js"></script>
+  <script>
+    const showToast = (m) => { const t=document.getElementById('mainToast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+    const openModal = (id) => document.getElementById(id).classList.add('open');
+    const closeModal = (id) => document.getElementById(id).classList.remove('open');
+
+    async function loadData() {
+      try {
+        // Stats
+        const resStats = await fetch(`${API_BASE}/admin/stats`);
+        const s = await resStats.json();
+        document.getElementById('kpi-fees').textContent = s.platform_fees.toFixed(2) + ' €';
+        document.getElementById('kpi-users').textContent = s.total_users;
+        document.getElementById('kpi-pending').textContent = s.pending_products;
+        document.getElementById('kpi-active').textContent = s.active_products;
+        document.getElementById('admin-summary').innerHTML = `<strong>${s.pending_products}</strong> annonces attendent votre validation · <strong>${s.total_users}</strong> membres inscrits.`;
+
+        // Moderation
+        const resPending = await fetch(`${API_BASE}/admin/produits/en-attente`);
+        const pending = await resPending.json();
+        const pList = document.getElementById('pending-list');
+        pList.innerHTML = pending.length ? pending.map(a => `
+          <div style="background:rgba(255,255,255,0.02);padding:15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(229,166,87,0.1)">
+            <div><div style="font-weight:700">${a.titre}</div><div style="font-size:.75rem;color:var(--gold)">${a.prix} €</div></div>
+            <div style="display:flex;gap:8px">
+              <button onclick="moderate(${a.id_annonce}, 'VALIDEE')" style="background:var(--gold);border:none;padding:5px 10px;border-radius:4px;cursor:pointer;font-weight:700">Valider</button>
+              <button onclick="moderate(${a.id_annonce}, 'REFUSEE')" style="background:transparent;border:1px solid var(--rust);color:var(--rust);padding:5px 10px;border-radius:4px;cursor:pointer">Refuser</button>
+            </div>
+          </div>
+        `).join('') : '<div style="text-align:center;opacity:0.5">Aucune annonce en attente</div>';
+
+        // Recent Ads
+        const resRecent = await fetch(`${API_BASE}/admin/catalogue-recent`);
+        const recent = await resRecent.json();
+        document.getElementById('recent-ads-body').innerHTML = recent.map(p => `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.03)"><td style="padding:10px">${p.titre}</td><td style="padding:10px;color:var(--gold)">${p.prix} €</td><td style="text-align:right"><button onclick="showToast('Détails bientot dispo')" style="background:none;border:none;color:var(--gold);cursor:pointer">Voir</button></td></tr>
+        `).join('');
+
+      } catch(e) { console.error(e); }
+    }
+
+    async function moderate(id, action) {
+      if(!confirm(`Confirmer l'action : ${action} ?`)) return;
+      const res = await fetch(`${API_BASE}/admin/produits/${id}/moderer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      if(res.ok) { showToast('Catalogue mis à jour'); loadData(); }
+    }
+
+    async function loadUsers() {
+      const res = await fetch(`${API_BASE}/admin/users`);
+      const users = await res.json();
+      document.getElementById('users-body').innerHTML = users.map(u => `
+        <div style="background:rgba(255,255,255,0.02);padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-radius:8px">
+          <div><strong>${u.nom}</strong><br><small style="opacity:0.5">${u.email} (${u.role})</small></div>
+          <button onclick="deleteUser(${u.id_user})" style="color:var(--rust);background:none;border:none;cursor:pointer"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+      openModal('usersModal');
+    }
+
+    async function deleteUser(id) {
+      if(confirm('Supprimer cet utilisateur ?')) {
+        const res = await fetch(`${API_BASE}/admin/users/${id}`, { method: 'DELETE' });
+        if(res.ok) { showToast('Utilisateur supprimé'); loadUsers(); loadData(); }
+      }
+    }
+
+    async function loadOrders() {
+      const res = await fetch(`${API_BASE}/admin/orders`);
+      const orders = await res.json();
+      document.getElementById('orders-body').innerHTML = orders.map(o => `
+        <div style="background:rgba(255,255,255,0.02);padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;border-radius:8px">
+          <div><strong>Commande #${o.id_commande}</strong><br><small>${o.client_nom} · ${new Date(o.date_commande).toLocaleDateString()}</small></div>
+          <div style="color:var(--gold);font-weight:700">${o.total_ttc} €</div>
+        </div>
+      `).join('');
+      openModal('ordersModal');
+    }
+
+    async function loadNotifs() {
+      const res = await fetch(`${API_BASE}/admin/notifications`);
+      const notifs = await res.json();
+      const p = document.getElementById('notifPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('notif-body').innerHTML = notifs.map(n => `
+        <div style="padding:10px;border-bottom:1px solid rgba(229,166,87,0.1)"><strong style="color:var(--gold)">${n.titre}</strong><br><small>${n.contenu}</small></div>
+      `).join('');
+    }
+
+    document.getElementById('nav-users-link').onclick = (e) => { e.preventDefault(); loadUsers(); };
+    document.getElementById('nav-orders-link').onclick = (e) => { e.preventDefault(); loadOrders(); };
+    document.getElementById('nav-products-link').onclick = (e) => { e.preventDefault(); loadData(); };
+    document.getElementById('notifBtn').onclick = (e) => { e.stopPropagation(); loadNotifs(); };
+    document.addEventListener('click', () => document.getElementById('notifPanel').style.display = 'none');
+    document.getElementById('dash-date').textContent = new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+    
+    loadData();
+  </script>
+</body>
+</html>

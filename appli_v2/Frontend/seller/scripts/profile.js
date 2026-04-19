@@ -11,12 +11,8 @@ const ProfileController = {
 
     this.userId = this.user.id_vendeur || this.user.vendeur?.id || this.user.id;
     
-    // Add "Partager" icon to header
-    SellerHeader.addAction(`
-      <button class="btn-ghost-studio" onclick="ProfileController.shareProfile()" style="padding: 8px 14px; font-size:0.8rem">
-        <i class="fas fa-share-alt"></i> Partager
-      </button>
-    `);
+    // Header CTA
+    SellerHeader.addAction(``);
 
     this.renderStoreInfo();
     this.initTabs();
@@ -29,8 +25,8 @@ const ProfileController = {
     
     document.getElementById('p-name').textContent = name;
     document.getElementById('p-handle').textContent = `@${cleanHandle}`;
-    document.getElementById('p-bio').textContent = this.user.description || 'Bienvenue dans ma boutique Gold. Découvrez mes trésors vintage !';
-    document.getElementById('p-full-bio').textContent = this.user.description || 'Bienvenue dans ma boutique sur Gold ! Ici, la musique vit et transmet des émotions. Explorez ma collection soigneusement sélectionnée.';
+    document.getElementById('p-bio').textContent = this.user.description || '';
+    document.getElementById('p-full-bio').textContent = this.user.description || 'Aucune description disponible.';
 
     if (this.user.localisation) {
         document.querySelector('#p-location .txt').textContent = this.user.localisation;
@@ -74,9 +70,6 @@ const ProfileController = {
     try {
         const products = await ProductService.getProducts(this.userId);
         
-        // Update stats
-        document.getElementById('stat-sales').textContent = products.length; // placeholder metric
-
         if (products && products.length > 0) {
             feed.innerHTML = products.map((p, i) => {
                 const isAvailable = p.est_disponible == 1 && p.quantite > 0;

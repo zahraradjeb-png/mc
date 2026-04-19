@@ -3,106 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gold — Musique Vintage</title>
+  <title>Retro Market — Musique Vintage</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    /* ── Promo Banner ── */
-    .promo-banner { background:#1c0f07; overflow:hidden; border-bottom:1px solid rgba(229,166,87,0.2); }
-    .promo-track { display:flex; width:max-content; animation:promoScroll 36s linear infinite; }
-    .promo-track:hover { animation-play-state:paused; }
-    @keyframes promoScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-    .promo-item {
-      display:inline-flex;align-items:center;gap:10px;
-      padding:12px 28px;white-space:nowrap;flex-shrink:0;
-      cursor:pointer;transition:background .2s;text-decoration:none;
+    /* ── OVERRIDES POUR LE STYLE SIGN-IN (Pas très sombre) ── */
+    :root {
+      --crumpet: #1c1719; /* Fond principal, pas trop sombre */
+      --ink: #f5e2ce;     /* Texte principal */
+      --ink2: #272124;    /* Fond des cartes */
+      --paprika: #b53324; /* Accent rouge (Rust) */
+      --paprika-dk: #8f261a;
+      --honey: #e5a657;   /* Accent or (Amber Gold) */
+      --biscuit: #383033; /* Bordures */
+      --muted: rgba(245, 226, 206, 0.6);
+      --faint: rgba(245, 226, 206, 0.3);
     }
-    .promo-item:hover { background:rgba(255,255,255,.04); }
-    .promo-emoji {
-      width:38px;height:38px;border-radius:6px;
-      background:linear-gradient(135deg,#B53324,#E5A657);
-      display:flex;align-items:center;justify-content:center;
-      font-size:1.2rem;flex-shrink:0;
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--crumpet);
+      color: var(--ink);
     }
-    .promo-info { display:flex;flex-direction:column;gap:1px; }
-    .promo-name { font-size:.79rem;color:rgba(245,226,206,.85); }
-    .promo-price { font-size:.73rem;color:#E5A657;font-weight:500; }
-    .promo-badge { background:#B53324;color:white;font-size:.58rem;padding:2px 7px;border-radius:100px;font-weight:700;letter-spacing:.05em;text-transform:uppercase; }
-    .promo-sep { color:rgba(229,166,87,.25);padding:0 6px;font-size:1.1rem; }
+    h1, h2, h3, h4, .logo {
+      font-family: 'Cormorant Garamond', serif !important;
+    }
+    .logo { color: var(--ink) !important; }
+    .logo span { color: var(--honey) !important; }
 
-    /* ── Mon Compte Dropdown ── */
-    .account-menu-wrap { position:relative; }
-    .account-btn {
-      display:flex;align-items:center;gap:8px;
-      padding:8px 16px;border-radius:6px;
-      background:rgba(229,166,87,0.12);border:1px solid rgba(229,166,87,0.3);
-      color:#E5A657;font-size:.82rem;font-family:'Jost',sans-serif;font-weight:500;
-      cursor:pointer;transition:all .2s;white-space:nowrap;
+    /* ── HERO ── */
+    .hslide-overlay {
+      background: linear-gradient(135deg, rgba(28, 23, 25, 0.85) 0%, rgba(28, 23, 25, 0.6) 50%, rgba(28, 23, 25, 0.9) 100%) !important;
     }
-    .account-btn:hover { background:rgba(229,166,87,0.22); }
-    .account-btn i.fa-chevron-down { font-size:.65rem;transition:transform .2s; }
-    .account-menu-wrap.open .account-btn i.fa-chevron-down { transform:rotate(180deg); }
-    .account-dropdown {
-      position:absolute;top:calc(100% + 10px);right:0;
-      min-width:200px;background:#1c0f07;
-      border:1px solid rgba(229,166,87,0.2);border-radius:10px;
-      box-shadow:0 12px 40px rgba(0,0,0,.5);
-      overflow:hidden;opacity:0;pointer-events:none;
-      transform:translateY(-8px);transition:all .2s;z-index:999;
+    .hero-title { color: #fff !important; font-weight: 600 !important; }
+    .hero-sub { color: var(--muted) !important; font-size: 1.1rem !important; }
+    .hero-eyebrow { color: var(--honey) !important; }
+    .heline { background: var(--honey) !important; }
+    .slide-counter { color: var(--muted) !important; }
+    
+    /* ── HEADER NAVBAR ── */
+    .navbar { background: rgba(28, 23, 25, 0.95) !important; backdrop-filter: blur(15px); border-bottom: 1px solid var(--biscuit) !important; transition: none; }
+    .navbar.scrolled .nav-wrap { background: transparent !important; box-shadow: none !important; border-bottom: none !important; }
+    .nav-wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; padding: 0 40px; }
+    
+    .header-search {
+      flex: 1; max-width: 450px; margin: 0 30px; position: relative;
     }
-    .account-menu-wrap.open .account-dropdown { opacity:1;pointer-events:all;transform:translateY(0); }
-    .account-dropdown a {
-      display:flex;align-items:center;gap:10px;
-      padding:12px 18px;color:rgba(245,226,206,.85);
-      font-size:.82rem;font-family:'Jost',sans-serif;
-      text-decoration:none;transition:background .15s;
+    .header-search input {
+      width: 100%; padding: 10px 20px 10px 45px;
+      border-radius: 50px; border: 1px solid var(--biscuit);
+      background: rgba(245, 226, 206, 0.05);
+      color: var(--ink); font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+      outline: none; transition: all 0.3s;
     }
-    .account-dropdown a:hover { background:rgba(229,166,87,0.1);color:#E5A657; }
-    .account-dropdown a i { width:16px;text-align:center;color:#E5A657;opacity:.8; }
-    .account-dropdown-sep { height:1px;background:rgba(229,166,87,0.15);margin:4px 0; }
-    .account-dropdown-logout { color:rgba(181,51,36,.9) !important; }
-    .account-dropdown-logout i { color:rgba(181,51,36,.9) !important; }
+    .header-search input:focus { border-color: var(--honey); background: rgba(245, 226, 206, 0.08); }
+    .header-search input::placeholder { color: var(--faint); }
+    .header-search i {
+      position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 0.9rem;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 15px; }
+    .btn-login {
+      background: linear-gradient(135deg, var(--honey), #c07d30);
+      color: #111 !important; font-weight: 600; font-size: 0.9rem;
+      padding: 9px 24px; border-radius: 50px; text-decoration: none;
+      box-shadow: 0 4px 15px rgba(229, 166, 87, 0.25); transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(229, 166, 87, 0.4); }
+
+    /* ── SECTIONS ── */
+    .sec { background: transparent; padding: 80px 0; }
+    .sec-light, .sec-dark { background: transparent; }
+    .sec-lbl { color: var(--honey) !important; font-family: 'Outfit', sans-serif !important; }
+    .sec-ttl { color: var(--ink) !important; font-family: 'Cormorant Garamond', serif !important; font-weight: 600 !important; }
+    .sec-ttl em { color: var(--honey) !important; font-style: italic; }
+    
+    /* ── CARDS OVERRIDE ── */
+    .pcard { background: var(--ink2) !important; border: 1px solid var(--biscuit) !important; border-radius: 12px; overflow: hidden; }
+    .pname { color: var(--ink) !important; font-family: 'Cormorant Garamond', serif !important; font-weight: 600 !important; font-size: 1.2rem !important; }
+    .pprice { color: var(--honey) !important; font-weight: 600 !important; font-family: 'Outfit', sans-serif !important; }
+    .pmeta { color: var(--muted) !important; font-family: 'Outfit', sans-serif !important; }
+    
+    .ccard-body .cname { color: var(--ink) !important; font-family: 'Cormorant Garamond', serif !important; }
+    .ccard:hover .cname { color: var(--honey) !important; }
+    
+    /* ── FOOTER ── */
+    .footer { background: #130f11; padding: 60px 0 30px; border-top: 1px solid var(--biscuit); color: var(--muted); }
+    .flogo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--ink); margin-bottom: 15px; }
+    .flogo span { color: var(--honey); }
   </style>
 </head>
 <body>
 
-<!-- SEARCH OVERLAY -->
+<!-- SEARCH OVERLAY (Fallback for mobile) -->
 <div class="search-overlay" id="searchOverlay">
   <button class="search-close">&times;</button>
   <div class="search-box">
     <i class="fas fa-search"></i>
     <input type="text" placeholder="Rechercher vinyles, artistes, instruments…" />
   </div>
-  <div class="search-hints">
-    <span>Pink Floyd</span><span>Fender 1965</span><span>Jazz Vinyl</span><span>Beatles</span><span>Cassettes 80s</span>
-  </div>
 </div>
 
-<!-- NAVBAR -->
-<header class="navbar" id="navbar">
+<!-- NAVBAR CUSTOM (Overrides initGoldNavbar) -->
+<header class="navbar" id="navbar" style="position:fixed; width:100%; z-index:1000;">
   <div class="nav-wrap">
-    <a href="index.html" class="logo">G<span>old</span></a>
-    <!-- nav-mid and nav-r inserted here by initGoldNavbar() -->
-
-    <!-- Mon Compte dropdown (vendeur) — injecté si connecté comme vendeur by auth-system or here -->
-    <div class="account-menu-wrap" id="accountMenuWrap" style="display:none">
-      <button class="account-btn" id="accountBtn">
-        <i class="fas fa-user-circle"></i>
-        Mon compte
-        <i class="fas fa-chevron-down"></i>
-      </button>
-      <div class="account-dropdown" id="accountDropdown">
-        <a href="seller/orders.html"><i class="fas fa-shopping-bag"></i> Mes commandes</a>
-        <a href="seller/dashboard.html"><i class="fas fa-store"></i> Ma boutique</a>
-        <a href="seller/create-product.html"><i class="fas fa-plus-circle"></i> Ajouter un produit</a>
-        <a href="seller/reviews.html"><i class="fas fa-star"></i> Avis clients</a>
-        <div class="account-dropdown-sep"></div>
-        <a href="#" onclick="GoldAuth.logout(); window.location.reload(); return false;" class="account-dropdown-logout"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
-      </div>
+    <a href="index.html" class="logo">Retro<span>Market</span></a>
+    
+    <div class="header-search" id="headerSearch">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInputMain" placeholder="Rechercher vinyles, instruments, artistes..." />
     </div>
 
+    <div class="header-actions" id="headerActions">
+      <a href="authentification/sign-in.html" class="btn-login">Se connecter</a>
+    </div>
   </div>
 </header>
 
@@ -112,10 +128,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-slides" id="heroSlides">
-    <div class="hslide active" style="background:url('assets/images/hero/first.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hero/second.jpg') center/cover no-repeat;background-color:#2d1508"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hero/third.jpg') center/cover no-repeat;background-color:#3d1f0a"><div class="hslide-overlay"></div></div>
-    <div class="hslide" style="background:url('assets/images/hero/forth.jpg') center/cover no-repeat;background-color:#1a0e05"><div class="hslide-overlay"></div></div>
+    <div class="hslide active" style="background:url('assets/images/hero/first.jpg') center/cover no-repeat;"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/second.jpg') center/cover no-repeat;"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/third.jpg') center/cover no-repeat;"><div class="hslide-overlay"></div></div>
+    <div class="hslide" style="background:url('assets/images/hero/forth.jpg') center/cover no-repeat;"><div class="hslide-overlay"></div></div>
     <div class="slide-progress"><div class="slide-prog-bar" id="progBar"></div></div>
     <div class="slide-dots" id="slideDots">
       <span class="sdot active"></span><span class="sdot"></span><span class="sdot"></span><span class="sdot"></span>
@@ -128,251 +144,176 @@
     <p class="hero-sub">Des milliers de vinyles, cassettes &amp; instruments<br/>sélectionnés par des passionnés.</p>
     <div class="hero-btns">
       <a href="#categories" class="hb-primary js-scroll-cats">Explorer <span class="hb-arr">→</span></a>
-      <a href="auth-entry.html?role=buyer" class="hb-sec">Acheter</a>
-      <a href="auth-entry.html?role=seller" class="hb-ter">Vendre</a>
-    </div>
-    <div class="hero-trust">
-      <i class="fas fa-shield-alt"></i> Paiement sécurisé
-      <span class="htdot"></span>
-      <i class="fas fa-certificate"></i> Certifié authentique
-      <span class="htdot"></span>
-      <i class="fas fa-undo"></i> Retours 30j
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.isLoggedIn()?'catalogue.html':'catalogue-visiteur.html'" class="hb-sec">Catalogue</a>
     </div>
   </div>
-  <div class="hero-scroll-hint"><div class="hsh-line"></div><span>Scroll</span></div>
 </section>
 
-<!-- TICKER -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-inner" id="tickerInner">
-    <span>Livraison offerte dès 60€</span><span class="ts">·</span>
-    <span>Vendez en 2 min</span><span class="ts">·</span>
-    <span>+1 247 vendeurs actifs</span><span class="ts">·</span>
-    <span>Paiement 100% sécurisé</span><span class="ts">·</span>
-    <span>Retours gratuits 30 jours</span><span class="ts">·</span>
-    <span>Commission 8% seulement</span><span class="ts">·</span>
-    <span>Authenticité certifiée</span><span class="ts">·</span>
-  </div>
-</div>
-
-<!-- PROMO BANNER AUTO-SCROLL -->
-<div class="promo-banner"><div class="promo-track" id="promoTrack"></div></div>
-
-<!-- CATEGORIES -->
+<!-- CATEGORIES (Vinyle, Cassette, CDs, Posters, Instruments) -->
 <section class="sec" id="categories">
   <div class="wrap">
     <div class="sec-hd">
       <div><div class="sec-lbl">Collections</div><h2 class="sec-ttl">Explorer par <em>catégorie</em></h2></div>
-      <a href="catalogue.html" class="sec-more">Tout voir →</a>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.isLoggedIn()?'catalogue.html':'catalogue-visiteur.html'" class="sec-more">Tout voir →</a>
     </div>
     <div class="cat-grid">
-      <a href="catalogue.html?cat=vinyles" class="ccard big">
-        <div class="ccard-bg"><img src="assets/images/categories/vinyle.jpg" alt="Vinyles" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><span class="cpill">Le plus populaire</span><div class="cname">Vinyles</div><div class="ccount">218 références</div><div class="cgo">Explorer →</div></div>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?cat=vinyles'" class="ccard big">
+        <div class="ccard-bg"><img src="assets/images/categories/vinyle.jpg" alt="Vinyle" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill" style="background:var(--honey); color:#111;">Populaire</span><div class="cname">Vinyle</div><div class="cgo">Explorer →</div></div>
       </a>
-      <a href="catalogue.html?cat=cassettes" class="ccard">
-        <div class="ccard-bg"><img src="assets/images/categories/cassetes.jpg" alt="Cassettes" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><span class="cpill">Rétro</span><div class="cname">Cassettes</div><div class="ccount">94 références</div><div class="cgo">Explorer →</div></div>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?cat=cassettes'" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/cassetes.jpg" alt="Cassette" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill" style="background:var(--paprika);">Rétro</span><div class="cname">Cassette</div><div class="cgo">Explorer →</div></div>
       </a>
-      <a href="catalogue.html?cat=instruments" class="ccard">
-        <div class="ccard-bg"><img src="assets/images/categories/instruments.jpg" alt="Instruments" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><div class="cname">Instruments</div><div class="ccount">132 références</div><div class="cgo">Explorer →</div></div>
-      </a>
-      <a href="catalogue.html?cat=posters" class="ccard">
-        <div class="ccard-bg"><img src="assets/images/categories/posters.jpg" alt="Posters" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><span class="cpill">Art</span><div class="cname">Posters</div><div class="ccount">76 références</div><div class="cgo">Explorer →</div></div>
-      </a>
-      <a href="catalogue.html?cat=electronique" class="ccard">
-        <div class="ccard-bg"><img src="assets/images/categories/electro.jpg" alt="Électronique" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><div class="cname">Électronique</div><div class="ccount">58 références</div><div class="cgo">Explorer →</div></div>
-      </a>
-      <a href="catalogue.html?cat=cd" class="ccard">
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?cat=cd'" class="ccard">
         <div class="ccard-bg"><img src="assets/images/categories/cd.jpg" alt="CDs" onerror="this.style.display='none'"></div>
-        <div class="ccard-body"><span class="cpill">Numérique</span><div class="cname">CDs</div><div class="ccount">47 références</div><div class="cgo">Explorer →</div></div>
+        <div class="ccard-body"><span class="cpill" style="background:var(--honey); color:#111;">Classique</span><div class="cname">CDs</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?cat=posters'" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/posters.jpg" alt="Posters" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><span class="cpill" style="background:var(--paprika);">Art</span><div class="cname">Posters</div><div class="cgo">Explorer →</div></div>
+      </a>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?cat=instruments'" class="ccard">
+        <div class="ccard-bg"><img src="assets/images/categories/instruments.jpg" alt="Instruments" onerror="this.style.display='none'"></div>
+        <div class="ccard-body"><div class="cname">Instruments</div><div class="cgo">Explorer →</div></div>
       </a>
     </div>
   </div>
 </section>
 
-<!-- PRODUITS POPULAIRES -->
-<section class="sec sec-light">
-  <div class="wrap">
-    <div class="frow-decade">
-      <span class="fdec-lbl"><i class="fas fa-clock-rotate-left"></i> Décennie</span>
-      <button class="fdec active" data-decade="all">Toutes</button>
-      <button class="fdec" data-decade="60">Années 60</button>
-      <button class="fdec" data-decade="70">Années 70</button>
-      <button class="fdec" data-decade="80">Années 80</button>
-      <button class="fdec" data-decade="90">Années 90</button>
-      <button class="fdec" data-decade="2000">Années 2000</button>
-    </div>
-    <div class="sec-hd">
-      <div><div class="sec-lbl">Tendances</div><h2 class="sec-ttl">Produits <em>populaires</em></h2></div>
-      <a href="catalogue.html" class="sec-more">Voir tout →</a>
-    </div>
-    <div class="pgrid" id="popularGrid">
-      <!-- Dynamically loaded -->
-    </div>
-  </div>
-</section>
-
-<!-- NOUVEAUTÉS -->
+<!-- PRODUITS POPULAIRES (Vraies données API) -->
 <section class="sec">
   <div class="wrap">
     <div class="sec-hd">
-      <div><div class="sec-lbl">Nouveautés</div><h2 class="sec-ttl">Derniers <em>arrivages</em></h2></div>
-      <a href="catalogue.html?new=1" class="sec-more">Voir tout →</a>
+      <div><div class="sec-lbl">Tendances</div><h2 class="sec-ttl">Produits <em>populaires</em></h2></div>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()" class="sec-more">Voir tout →</a>
     </div>
-    <div class="pgrid" id="latestGrid">
+    <div class="pgrid" id="popularGrid">
       <div style="grid-column:1/-1;text-align:center;padding:40px;opacity:.5">
-         <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--gold);margin-bottom:15px;display:block"></i>
-         Récupération des derniers arrivages...
+         <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--honey);margin-bottom:15px;display:block"></i>
+         Chargement des produits...
       </div>
     </div>
   </div>
 </section>
 
-<!-- VENDEURS -->
-<section class="sec sec-light">
+<!-- NOUVEAUTÉS (Vraies données API) -->
+<section class="sec">
   <div class="wrap">
     <div class="sec-hd">
-      <div><div class="sec-lbl">Communauté</div><h2 class="sec-ttl">Vendeurs <em>populaires</em></h2></div>
-      <a href="#" class="sec-more">Tous les vendeurs →</a>
+      <div><div class="sec-lbl">Nouveautés</div><h2 class="sec-ttl">Derniers <em>arrivages</em></h2></div>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?new=1'" class="sec-more">Voir tout →</a>
     </div>
-    <div class="sgrid">
-      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#B53324,#7a2015)">JP</div><div class="sname">Jean-Pierre V.</div><div class="sspec">Vinyles Rock classique</div><div class="srow"><div class="ss"><b>4.9</b><small>Note</small></div><div class="ss"><b>248</b><small>Ventes</small></div><div class="ss"><b>134</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=jean-pierre" class="sbtn">Voir boutique</a></div>
-      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#E5A657,#c07d30)">ML</div><div class="sname">Marie-Louise R.</div><div class="sspec">Cassettes & Soul</div><div class="srow"><div class="ss"><b>5.0</b><small>Note</small></div><div class="ss"><b>192</b><small>Ventes</small></div><div class="ss"><b>87</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=marie-louise" class="sbtn">Voir boutique</a></div>
-      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#DFBC94,#a07040)">RA</div><div class="sname">RétroArt Studio</div><div class="sspec">Instruments & Posters</div><div class="srow"><div class="ss"><b>4.8</b><small>Note</small></div><div class="ss"><b>315</b><small>Ventes</small></div><div class="ss"><b>210</b><small>Produits</small></div></div><div class="sstars">★★★★★</div><a href="seller-profile.html?id=retroart" class="sbtn">Voir boutique</a></div>
-      <div class="scard"><div class="sav" style="background:linear-gradient(135deg,#B53324,#E5A657)">TK</div><div class="sname">TomKaz Records</div><div class="sspec">Jazz & Éditions rares</div><div class="srow"><div class="ss"><b>4.7</b><small>Note</small></div><div class="ss"><b>156</b><small>Ventes</small></div><div class="ss"><b>98</b><small>Produits</small></div></div><div class="sstars">★★★★☆</div><a href="seller-profile.html?id=tomkaz" class="sbtn">Voir boutique</a></div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="sec sec-dark" id="how">
-  <div class="wrap">
-    <div class="sec-hd centered"><div><div class="sec-lbl light">Simple & rapide</div><h2 class="sec-ttl light">Comment <em>ça marche ?</em></h2></div></div>
-    <div class="hiw-tabs"><button class="ht active" data-m="buy">J'achète</button><button class="ht" data-m="sell">Je vends</button></div>
-    <div class="hiw-steps" id="hiwSteps"></div>
-  </div>
-</section>
-
-<!-- STATS -->
-<section class="stats-band">
-  <div class="wrap">
-    <div class="stats-row" id="statsRow">
-      <div class="st-cell"><div class="st-num" data-to="520" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Produits</div></div>
-      <div class="st-sep"></div>
-      <div class="st-cell"><div class="st-num" data-to="1247" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Vendeurs actifs</div></div>
-      <div class="st-sep"></div>
-      <div class="st-cell"><div class="st-num" data-to="8500" data-sfx="+"><span class="cv">0</span>+</div><div class="st-lbl">Clients satisfaits</div></div>
-      <div class="st-sep"></div>
-      <div class="st-cell"><div class="st-num" data-to="98" data-sfx="%"><span class="cv">0</span>%</div><div class="st-lbl">Satisfaction</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="sec sec-light">
-  <div class="wrap">
-    <div class="sec-hd centered"><div><div class="sec-lbl">Avis clients</div><h2 class="sec-ttl">Ce qu'ils <em>disent</em></h2></div></div>
-    <div class="tgrid">
-      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« J'ai trouvé un vinyle de Miles Davis que je cherchais depuis 3 ans, en parfait état. Incroyable. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Sophie M.</div><div class="trole">Collectionneuse, Paris</div></div><span class="tbadge">Acheteur</span></div></div>
-      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« En 6 mois, j'ai vendu 200 vinyles pour plus de 8 000€. La meilleure plateforme pour vendeurs sérieux. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Jacques D.</div><div class="trole">Vendeur Pro — 200+ ventes</div></div><span class="tbadge" style="color:#B53324;border-color:rgba(181,51,36,.25)">Vendeur</span></div></div>
-      <div class="tcard"><div class="tstars">★★★★★</div><p class="tquote">« Interface superbe et intuitive. J'adore pouvoir gérer ma boutique et mes achats depuis le même profil. »</p><div class="tauthor"><div class="tav"></div><div><div class="tname">Marc L.</div><div class="trole">Acheteur & Vendeur, Lyon</div></div><span class="tbadge">Les deux</span></div></div>
+    <div class="pgrid" id="latestGrid">
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-  <div class="wrap">
-    <div class="ftop">
-      <div class="fbrand">
-        <div class="flogo">G<span>old</span></div>
-        <p>La marketplace de référence pour la musique vintage. Achetez et vendez avec confiance.</p>
-        <div class="fsocials">
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
-          <a href="#"><i class="fab fa-x-twitter"></i></a>
-          <a href="#"><i class="fab fa-tiktok"></i></a>
-        </div>
-      </div>
-      <div class="fcol"><div class="fctitle">Marketplace</div><a href="catalogue.html">Catalogue</a><a href="catalogue.html?new=1">Nouveautés</a><a href="catalogue.html?rare=1">Éditions rares</a><a href="catalogue.html?sale=1">Ventes flash</a></div>
-      <div class="fcol"><div class="fctitle">Vendeurs</div><a href="auth-entry.html?role=seller">Créer ma boutique</a><a href="../vendeur/dashboard.html">Dashboard</a><a href="../vendeur/products/create.html">Ajouter un produit</a></div>
-      <div class="fcol"><div class="fctitle">Contact</div><a href="mailto:contact@gold.fr">contact@gold.fr</a><a href="tel:+33123456789">+33 1 23 45 67 89</a><a href="#">Lun–Ven 9h–18h</a></div>
+  <div class="wrap" style="max-width:1280px; margin:0 auto; padding:0 40px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:40px;">
+    <div class="fbrand" style="max-width:300px;">
+      <div class="flogo">Retro<span>Market</span></div>
+      <p style="font-size:0.85rem; line-height:1.6;">La marketplace de référence pour la musique vintage. Achetez et vendez avec confiance.</p>
     </div>
-    <div class="fbot">
-      <span>© 2026 Gold Marketplace · <a href="cgv.html">CGV</a> · <a href="confidentialite.html">Confidentialité</a></span>
-      <div class="fpay"><span>VISA</span><span>MC</span><span>PAYPAL</span><span>APPLE PAY</span></div>
+    <div class="fcol" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="font-family:'Outfit',sans-serif; font-weight:600; color:var(--ink); margin-bottom:10px;">Marketplace</div>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()" style="font-size:0.85rem; transition:color 0.3s;">Catalogue</a>
+      <a href="javascript:void(0)" onclick="location.href=GoldAuth.getCatalogueUrl()+'?new=1'" style="font-size:0.85rem; transition:color 0.3s;">Nouveautés</a>
     </div>
+    <div class="fcol" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="font-family:'Outfit',sans-serif; font-weight:600; color:var(--ink); margin-bottom:10px;">Vendeurs</div>
+      <a href="authentification/sign-up.html?role=seller" style="font-size:0.85rem; transition:color 0.3s;">Créer ma boutique</a>
+      <a href="seller/dashboard.html" style="font-size:0.85rem; transition:color 0.3s;">Espace vendeur</a>
+    </div>
+  </div>
+  <div class="wrap" style="max-width:1280px; margin:40px auto 0; padding:20px 40px 0; border-top:1px solid var(--biscuit); display:flex; justify-content:space-between; font-size:0.8rem;">
+    <span>© 2026 Retro Market Studio. Tous droits réservés.</span>
   </div>
 </footer>
 
-<button class="up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
-<div class="toast" id="toast"><i class="fas fa-check"></i> <span id="tmsg"></span></div>
+<button class="up-btn" id="upBtn" style="position:fixed; bottom:30px; right:30px; background:var(--honey); color:#111; width:45px; height:45px; border-radius:50%; border:none; cursor:pointer; opacity:0; visibility:hidden; transition:all 0.3s; z-index:100; box-shadow:0 4px 15px rgba(229,166,87,0.3); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+  <i class="fas fa-arrow-up"></i>
+</button>
 
 <script src="js/api-config.js"></script>
 <script src="js/auth-system.js"></script>
+<script>
+  window.initGoldNavbar = function() {};
+</script>
 <script src="js/main.js"></script>
 <script>
-/* ── Mon Compte dropdown : visible uniquement si vendeur connecté ── */
-document.addEventListener('DOMContentLoaded', () => {
-  const wrap = document.getElementById('accountMenuWrap');
-  const btn  = document.getElementById('accountBtn');
-  const drop = document.getElementById('accountDropdown');
-
-  // Afficher le menu seulement si vendeur connecté via GoldAuth
-  if (typeof GoldAuth !== 'undefined') {
-    const user = GoldAuth.getUser();
-    if (user && user.role === 'seller') {
-      wrap.style.display = 'block';
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Always inject cart icon
+    document.getElementById('headerActions').insertAdjacentHTML('afterbegin', `
+      <a href="cart.html" style="position:relative; color:var(--ink); font-size:1.1rem; text-decoration:none; margin-right:15px;" title="Panier">
+        <i class="fas fa-shopping-bag"></i>
+        <span class="cbadge" id="cBadge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--paprika); color:#fff; font-size:0.6rem; font-weight:700; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center;">0</span>
+      </a>
+    `);
+    
+    // 2. Handle User Auth State
+    if (typeof GoldAuth !== 'undefined' && GoldAuth.isLoggedIn()) {
+      const user = GoldAuth.getUser();
+      const initials = (user.firstName||user.prenom||'U')[0].toUpperCase() + ((user.lastName||user.nom||'')[0]||'').toUpperCase();
+      const isSeller = GoldAuth.isSeller();
+      const dashUrl = isSeller ? 'seller/dashboard.html' : 'acheteur/profile.html';
+      
+      // Inject user actions after the cart icon
+      document.getElementById('headerActions').insertAdjacentHTML('beforeend', `
+        <a href="${dashUrl}" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:'Outfit',sans-serif; font-weight:500; font-size:0.9rem;">
+          <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--honey), #c07d30); color:#111; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem;">${initials}</div>
+          <span style="white-space:nowrap;">Mon Espace</span>
+        </a>
+        <button onclick="GoldAuth.logout(); window.location.reload();" style="background:none; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; padding:5px; transition:color 0.3s; margin-left:10px;" title="Se déconnecter" onmouseover="this.style.color='var(--paprika)'" onmouseout="this.style.color='var(--muted)'">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      `);
+      // Hide the default "Se connecter" btn if it exists in the HTML
+      const loginBtn = document.querySelector('.btn-login');
+      if (loginBtn) loginBtn.style.display = 'none';
+      const actBtn = document.getElementById('visitorActBtn');
+      if (actBtn) actBtn.style.display = 'none';
+    } else {
+      // Show Se connecter and Activity
+      let loginBtn = document.querySelector('.btn-login');
+      if (!loginBtn) {
+        document.getElementById('headerActions').insertAdjacentHTML('beforeend', '<a href="authentification/sign-in.html" class="btn-login">Se connecter</a>');
+      } else {
+        loginBtn.style.display = 'inline-flex';
+      }
+      
+      // Add activity button if not present
+      if (!document.getElementById('visitorActBtn')) {
+        document.getElementById('headerActions').insertAdjacentHTML('afterbegin', `
+          <a href="visitor-activity.html" id="visitorActBtn" style="color:var(--muted); font-size:0.9rem; text-decoration:none; margin-right:15px; display:flex; align-items:center; gap:6px; transition:color 0.3s;" onmouseover="this.style.color='var(--honey)'" onmouseout="this.style.color='var(--muted)'">
+            <i class="fas fa-history"></i> Activité
+          </a>
+        `);
+      }
     }
-  }
+    
+    if (typeof updateCartBadges === 'function') updateCartBadges();
 
-  // Toggle dropdown
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    wrap.classList.toggle('open');
-  });
+    const searchInput = document.getElementById('searchInputMain');
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && searchInput.value.trim().length > 0) {
+          window.location.href = GoldAuth.getCatalogueUrl() + '?search=' + encodeURIComponent(searchInput.value.trim());
+        }
+      });
+    }
 
-  // Fermer si clic ailleurs
-  document.addEventListener('click', () => {
-    wrap.classList.remove('open');
-  });
-});
-
-/* ── Promo banner ── */
-document.addEventListener('DOMContentLoaded', () => {
-  const promos = [
-    {e:'', n:'Led Zeppelin IV',      p:'89,99 €', b:'Rare',     h:'product.html?id=led-zeppelin-iv'},
-    {e:'', n:'The Wall',             p:'74,00 €', b:'Populaire',h:'product.html?id=the-wall'},
-    {e:'', n:'Thriller',             p:'21,00 €', b:'-30%',     h:'product.html?id=thriller'},
-    {e:'', n:"Fender '65",           p:'1 240 €', b:'Rare',     h:'product.html?id=fender-65'},
-    {e:'', n:'Kind of Blue',         p:'55,00 €', b:'Jazz',     h:'product.html?id=kind-of-blue'},
-    {e:'', n:'Dark Side',            p:'95,00 €', b:'-15%',     h:'product.html?id=dark-side'},
-    {e:'', n:'Abbey Road',           p:'64,00 €', b:'Nouveau',  h:'product.html?id=abbey-road'},
-    {e:'', n:'Rumours',              p:'48,00 €', b:'Top vente',h:'product.html?id=rumours'},
-  ];
-  const track = document.getElementById('promoTrack');
-  if (!track) return;
-  let html = '';
-  for (let r = 0; r < 2; r++) {
-    promos.forEach(p => {
-      html += `<a href="${p.h}" class="promo-item">
-        <div class="promo-emoji"></div>
-        <div class="promo-info">
-          <span class="promo-name">${p.n}</span>
-          <span class="promo-price">${p.p}</span>
-        </div>
-        <span class="promo-badge">${p.b}</span>
-      </a><span class="promo-sep">·</span>`;
+    const upBtn = document.getElementById('upBtn');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        upBtn.style.opacity = '1'; upBtn.style.visibility = 'visible';
+      } else {
+        upBtn.style.opacity = '0'; upBtn.style.visibility = 'hidden';
+      }
     });
-  }
-  track.innerHTML = html;
-});
+    upBtn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+  });
 </script>
 </body>
 </html>
-
-

@@ -13,7 +13,7 @@ const ProductCard = {
     
     return `
       <article class="pcard" data-id="${p.id_produit || p.id}">
-        <a href="${root}src/pages/visiteur/product.html?id=${p.id_produit || p.id}" class="pcard-link" aria-label="Voir ${p.titre}"></a>
+        <a href="${root}product.html?id=${p.id_produit || p.id}" class="pcard-link" aria-label="Voir ${p.titre}"></a>
         <div class="pthumb">
           <img src="${root}${photo}" alt="${p.titre}" onerror="this.src='${root}assets/images/placeholder.jpg'">
           ${p.badge ? `<span class="pbadge ${p.badge.toLowerCase()}">${p.badge}</span>` : ''}

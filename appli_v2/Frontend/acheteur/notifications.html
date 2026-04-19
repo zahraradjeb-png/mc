@@ -70,7 +70,7 @@ let allNotifs = [];
 document.addEventListener('DOMContentLoaded', () => {
   initGoldNavbar('notifications');
   const user = GoldAuth.getUser();
-  if (!user) { window.location.href = '../auth/sign-in.html'; return; }
+  if (!user) { window.location.href = '../authentification/sign-in.html'; return; }
   loadNotifications(user);
   setupFilters();
   document.getElementById('markAllRead').addEventListener('click', markAllRead);

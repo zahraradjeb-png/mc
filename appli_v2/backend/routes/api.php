@@ -39,6 +39,7 @@ Route::get('/panier/{id_acheteur}', [PanierController::class, 'index']);
 Route::post('/panier', [PanierController::class, 'store']);
 Route::put('/panier/ligne/{id_panier}/{id_produit}', [PanierController::class, 'update']);
 Route::delete('/panier/ligne/{id_panier}/{id_produit}', [PanierController::class, 'destroy']);
+Route::delete('/panier/ligne/user/{id_acheteur}/{id_produit}', [PanierController::class, 'destroyByAcheteur']);
 Route::delete('/panier/clear/{id_acheteur}', [PanierController::class, 'clear']);
 
 // ── Commandes (acheteur) ──
@@ -64,10 +65,13 @@ Route::get('/admin/users', [AdminController::class, 'getUsers']);
 Route::get('/admin/notifications', [AdminController::class, 'getNotifications']);
 Route::get('/admin/catalogue-recent', [AdminController::class, 'getRecentCatalogue']);
 Route::post('/admin/produits/{id}/moderer', [AdminController::class, 'moderateProduct']);
+Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
+Route::get('/admin/orders', [AdminController::class, 'getAllOrders']);
+Route::get('/admin/notifications', [AdminController::class, 'getNotifications']);
 
 use App\Http\Controllers\AuthController;
 
 Route::post('/inscription', [AuthController::class, 'inscription']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::put('/user/{id}/profile', [AuthController::class, 'updateProfile']);
 

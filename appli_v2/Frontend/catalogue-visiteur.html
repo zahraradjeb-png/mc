@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalogue Visiteur — Retro Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/catalogue.css" />
+  <style>
+    /* ── OVERRIDES POUR LE STYLE SIGN-IN (Pas très sombre) ── */
+    :root {
+      --crumpet: #1c1719;
+      --ink: #f5e2ce;
+      --ink2: #272124;
+      --paprika: #b53324;
+      --paprika-dk: #8f261a;
+      --honey: #e5a657;
+      --biscuit: #383033;
+      --muted: rgba(245, 226, 206, 0.6);
+      --faint: rgba(245, 226, 206, 0.3);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--crumpet);
+      color: var(--ink);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    .logo {
+      font-family: 'Cormorant Garamond', serif !important;
+    }
+
+    .logo {
+      color: var(--ink) !important;
+    }
+
+    .logo span {
+      color: var(--honey) !important;
+    }
+
+    /* ── HEADER NAVBAR ── */
+    .navbar {
+      background: rgba(28, 23, 25, 0.95) !important;
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--biscuit) !important;
+    }
+
+    /* ── CATALOGUE SPECIFICS ── */
+    .cat-page-header {
+      background: linear-gradient(135deg, rgba(28, 23, 25, 0.9) 0%, rgba(28, 23, 25, 0.7) 100%), url('assets/images/hero/third.jpg') center/cover;
+      border-bottom: 1px solid var(--biscuit);
+      padding-bottom: 40px;
+      padding-top: 100px;
+    }
+
+    .header-title {
+      color: #fff !important;
+      font-size: 3.5rem !important;
+      font-weight: 600 !important;
+    }
+
+    .header-title em {
+      color: var(--honey) !important;
+      font-style: italic;
+    }
+
+    .v-badge {
+      background: var(--paprika);
+      color: white;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      vertical-align: middle;
+      margin-left: 15px;
+      box-shadow: 0 4px 12px rgba(181, 51, 36, 0.3);
+    }
+
+    .cat-quick-tabs {
+      background: transparent !important;
+      border-bottom: 1px solid var(--biscuit) !important;
+    }
+
+    .cat-tabs-inner {
+      background: var(--ink2) !important;
+      border: 1px solid var(--biscuit) !important;
+      border-radius: 12px;
+    }
+
+    .cat-tab {
+      color: var(--muted);
+    }
+
+    .cat-tab.active {
+      color: var(--honey) !important;
+      border-bottom-color: var(--honey) !important;
+      background: rgba(229, 166, 87, 0.1) !important;
+    }
+
+    .cat-tab-count {
+      background: var(--biscuit) !important;
+      color: var(--muted) !important;
+    }
+
+    .cat-tab.active .cat-tab-count {
+      background: var(--honey) !important;
+      color: #111 !important;
+    }
+
+    .sidebar-card {
+      background: var(--ink2) !important;
+      border: 1px solid var(--biscuit) !important;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .sidebar-title {
+      color: var(--ink) !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Custom Checkboxes */
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+
+    .filter-option input {
+      display: none;
+    }
+
+    .filter-option-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .custom-check {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--biscuit);
+      border-radius: 4px;
+      background: transparent;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .filter-option input:checked+.filter-option-left .custom-check {
+      background: var(--honey);
+      border-color: var(--honey);
+    }
+
+    .filter-option input:checked+.filter-option-left .custom-check::after {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: #111;
+      font-size: 0.7rem;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .filter-option input:checked~.filter-option-left {
+      color: var(--honey);
+    }
+
+    .condition-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--biscuit);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.85rem;
+    }
+
+    .condition-btn:hover,
+    .condition-btn.active {
+      border-color: var(--honey);
+      color: var(--honey);
+      background: rgba(229, 166, 87, 0.1);
+    }
+
+    .prod-card-catalogue,
+    .prod-card-list {
+      background: var(--ink2) !important;
+      border: 1px solid var(--biscuit) !important;
+    }
+
+    .pcc-price,
+    .pcl-price {
+      color: var(--honey) !important;
+    }
+
+    .footer {
+      background: #130f11;
+      padding: 60px 0 30px;
+      border-top: 1px solid var(--biscuit);
+      color: var(--muted);
+      margin-top: 80px;
+    }
+
+    /* Header align */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px !important;
+    }
+  </style>
+</head>
+
+<body data-page="catalogue">
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay" role="dialog">
+    <button class="search-close">&times;</button>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Vinyles, artistes, instruments…" />
+    </div>
+  </div>
+
+  <!-- NAVBAR CUSTOM -->
+  <header class="navbar" id="navbar" style="position:fixed; width:100%; z-index:1000;">
+    <div class="nav-wrap">
+      <a href="index.html" class="logo">Retro<span>Market</span></a>
+      <div class="header-search" id="headerSearch"
+        style="flex: 1; max-width: 450px; margin: 0 30px; position: relative;">
+        <i class="fas fa-search"
+          style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.9rem;"></i>
+        <input type="text" id="searchInputMain" placeholder="Rechercher..."
+          style="width: 100%; padding: 10px 20px 10px 45px; border-radius: 50px; border: 1px solid var(--biscuit); background: rgba(245, 226, 206, 0.05); color: var(--ink); font-family: 'Outfit', sans-serif; font-size: 0.9rem; outline: none;" />
+      </div>
+      <div class="header-actions" id="headerActions">
+        <a href="authentification/sign-in.html" class="btn-login"
+          style="background: var(--honey); color: #111 !important; font-weight: 600; padding: 9px 24px; border-radius: 50px; text-decoration: none;">Se
+          connecter</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="cat-page-header">
+      <div class="wrap">
+        <div class="header-inner">
+          <div class="header-left">
+            <h1 class="header-title">Notre <em>Catalogue</em> <span class="v-badge">Visiteur</span></h1>
+            <p class="header-desc">Explorez des centaines de produits musicaux vintage authentiques.</p>
+          </div>
+          <div class="header-right">
+            <div class="result-count" id="result-count">Chargement...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY QUICK TABS -->
+    <div class="cat-quick-tabs">
+      <div class="cat-tabs-inner">
+        <button class="cat-tab active" data-cat="all">Tout<span class="cat-tab-count" id="count-all">0</span></button>
+        <button class="cat-tab" data-cat="vinyles">Vinyles<span class="cat-tab-count"
+            id="count-vinyles">0</span></button>
+        <button class="cat-tab" data-cat="cassettes">Cassettes<span class="cat-tab-count"
+            id="count-cassettes">0</span></button>
+        <button class="cat-tab" data-cat="instruments">Instruments<span class="cat-tab-count"
+            id="count-instruments">0</span></button>
+        <button class="cat-tab" data-cat="posters">Posters<span class="cat-tab-count"
+            id="count-posters">0</span></button>
+        <button class="cat-tab" data-cat="cd">CDs<span class="cat-tab-count" id="count-cd">0</span></button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="catalogue-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" aria-label="Filtres">
+
+          <div class="sidebar-card" id="active-filters-card" style="display:none">
+            <div id="active-filters-row" class="active-filters" style="border-color: var(--biscuit);"></div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-body" style="padding:14px 18px">
+              <label class="filter-search" for="filter-search"
+                style="border-color: var(--biscuit); background: var(--ink2);">
+                <i class="fas fa-search" style="color: var(--muted);"></i>
+                <input type="text" id="filter-search" placeholder="Rechercher un produit…"
+                  style="background: transparent; border: none; color: var(--ink); outline: none; width: 100%; margin-left: 8px;" />
+              </label>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <div class="sidebar-title"><i class="fas fa-th-large" style="color: var(--honey);"></i> Catégories</div>
+              <button class="sidebar-toggle open" style="background: var(--biscuit); color: var(--ink);"><i
+                  class="fas fa-minus"></i></button>
+            </div>
+            <div class="sidebar-body">
+              <div class="filter-options">
+                <label class="filter-option"><input type="checkbox" class="cat-checkbox" value="vinyles" />
+                  <div class="filter-option-left">
+                    <div class="custom-check"></div><span>Vinyles</span>
+                  </div>
+                </label>
+                <label class="filter-option"><input type="checkbox" class="cat-checkbox" value="cassettes" />
+                  <div class="filter-option-left">
+                    <div class="custom-check"></div><span>Cassettes</span>
+                  </div>
+                </label>
+                <label class="filter-option"><input type="checkbox" class="cat-checkbox" value="instruments" />
+                  <div class="filter-option-left">
+                    <div class="custom-check"></div><span>Instruments</span>
+                  </div>
+                </label>
+                <label class="filter-option"><input type="checkbox" class="cat-checkbox" value="posters" />
+                  <div class="filter-option-left">
+                    <div class="custom-check"></div><span>Posters</span>
+                  </div>
+                </label>
+                <label class="filter-option"><input type="checkbox" class="cat-checkbox" value="cd" />
+                  <div class="filter-option-left">
+                    <div class="custom-check"></div><span>CDs</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <div class="sidebar-title"><i class="fas fa-award" style="color: var(--honey);"></i> État</div>
+              <button class="sidebar-toggle open" style="background: var(--biscuit); color: var(--ink);"><i
+                  class="fas fa-minus"></i></button>
+            </div>
+            <div class="sidebar-body">
+              <div class="condition-grid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button class="condition-btn" data-val="neuf">Neuf</button>
+                <button class="condition-btn" data-val="bon">Bon état</button>
+                <button class="condition-btn" data-val="acceptable">Acceptable</button>
+                <button class="condition-btn" data-val="abime">Abîmé</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <div class="sidebar-title"><i class="fas fa-gem" style="color: var(--honey);"></i> Rareté</div>
+              <button class="sidebar-toggle open" style="background: var(--biscuit); color: var(--ink);"><i
+                  class="fas fa-minus"></i></button>
+            </div>
+            <div class="sidebar-body">
+              <div class="rarete-grid" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <button class="rarete-btn condition-btn" data-val="commun">Commun</button>
+                <button class="rarete-btn condition-btn" data-val="rare">Rare</button>
+                <button class="rarete-btn condition-btn" data-val="tres_rare">Très Rare</button>
+                <button class="rarete-btn condition-btn" data-val="collector">Collector</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-header">
+              <div class="sidebar-title"><i class="fas fa-tag" style="color: var(--honey);"></i> Prix</div>
+              <button class="sidebar-toggle open" style="background: var(--biscuit); color: var(--ink);"><i
+                  class="fas fa-minus"></i></button>
+            </div>
+            <div class="sidebar-body">
+              <div class="price-range-display"
+                style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <div><span class="price-label" style="font-size: 0.7rem; color: var(--muted);">Maximum</span>
+                  <div class="price-val" id="price-max-display" style="color: var(--honey); font-weight: 600;">5 000 €
+                  </div>
+                </div>
+              </div>
+              <div class="range-slider">
+                <div class="range-fill" id="range-fill" style="background: var(--honey);"></div>
+                <input type="range" id="price-max" min="0" max="5000" value="5000" step="10" />
+              </div>
+            </div>
+          </div>
+
+          <button id="clear-filters" class="btn-clear-filters"
+            style="width: 100%; padding: 12px; background: transparent; border: 1px solid var(--biscuit); border-radius: 8px; color: var(--muted); cursor: pointer; transition: all 0.3s; margin-top: 10px;"><i
+              class="fas fa-times"></i> Effacer tous les filtres</button>
+
+        </aside>
+
+        <!-- PRODUCTS -->
+        <div class="products-area">
+          <div class="products-grid-view" id="products-grid"></div>
+          <div class="no-results" id="no-results" style="display:none; text-align:center; padding:50px;">
+            <h3>Aucun produit trouvé</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:40px;">
+      <div class="fbrand">
+        <div class="flogo">Retro<span>Market</span></div>
+        <p>La marketplace de référence pour la musique vintage.</p>
+      </div>
+      <div class="fcol">
+        <a href="catalogue-visiteur.html">Catalogue</a>
+        <a href="index.html">Accueil</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api-config.js"></script>
+  <script src="js/auth-system.js"></script>
+  <script>
+    // Force Visitor Mode & UI
+    document.addEventListener('DOMContentLoaded', () => {
+      localStorage.removeItem('gold_user');
+
+      const actions = document.getElementById('headerActions');
+      actions.innerHTML = `
+        <a href="visitor-activity.html" id="visitorActBtn" style="color:var(--muted); font-size:0.9rem; text-decoration:none; margin-right:15px; display:flex; align-items:center; gap:6px; transition:color 0.3s;" onmouseover="this.style.color='var(--honey)'" onmouseout="this.style.color='var(--muted)'">
+          <i class="fas fa-history"></i> Activité
+        </a>
+        <a href="cart.html" style="position:relative; color:var(--ink); font-size:1.1rem; text-decoration:none; margin-right:15px;" title="Panier">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cbadge" id="cBadge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--paprika); color:#fff; font-size:0.6rem; font-weight:700; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center;">0</span>
+        </a>
+        <a href="authentification/sign-in.html" class="btn-login" style="background: var(--honey); color: #111 !important; font-weight: 600; padding: 9px 24px; border-radius: 50px; text-decoration: none;">Se connecter</a>
+      `;
+
+      updateCartBadges();
+    });
+  </script>
+  <script src="js/catalogue.js"></script>
+</body>
+
+</html>
