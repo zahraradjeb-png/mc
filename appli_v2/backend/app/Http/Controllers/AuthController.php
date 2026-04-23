@@ -74,9 +74,10 @@ class AuthController extends Controller
             ], 401);
         }
 
+        $idValue = $user->id_user ?? $user->id ?? 0;
         $userData = [
-            'id'      => $user->id_user,
-            'id_user' => $user->id_user,
+            'id'      => $idValue,
+            'id_user' => $idValue,
             'nom'     => $user->nom,
             'prenom'  => $user->prenom,
             'email'   => $user->email,
@@ -145,8 +146,8 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Profil mis à jour avec succès',
             'user' => [
-                'id' => $user->id_user,
-                'id_user' => $user->id_user,
+                'id' => $user->id_user ?? $user->id ?? 0,
+                'id_user' => $user->id_user ?? $user->id ?? 0,
                 'nom' => $user->nom,
                 'prenom' => $user->prenom,
                 'email' => $user->email,

@@ -377,7 +377,7 @@ CREATE TABLE `vw_commandes` (
 CREATE TABLE `vw_produits` (
 `id_produit` int(11)
 ,`titre` varchar(200)
-,`prix` decimal(10,2)
+,`prix` decimal(10,2)'rfdsg'
 ,`decennie` varchar(10)
 ,`artiste` varchar(200)
 ,`rarete` enum('COMMUN','RARE','TRES_RARE','COLLECTOR')
