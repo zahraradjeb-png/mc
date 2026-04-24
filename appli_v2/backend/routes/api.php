@@ -59,6 +59,7 @@ Route::get('/vendeurs-overview', [\App\Http\Controllers\SellerController::class,
 use App\Http\Controllers\AdminController;
 Route::get('/admin/stats', [AdminController::class, 'getStats']);
 Route::get('/admin/produits/en-attente', [AdminController::class, 'getPendingProducts']);
+Route::get('/admin/produits/statut/{statut}', [AdminController::class, 'getProductsByStatus']);
 Route::get('/admin/ventes', [AdminController::class, 'getRecentSales']);
 Route::get('/admin/commandes', [AdminController::class, 'getAllSales']);
 Route::get('/admin/users', [AdminController::class, 'getUsers']);

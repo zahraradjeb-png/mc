@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePricing() {
     const price    = parseFloat(document.getElementById('prod-price')?.value) || 0;
     const oldPrice = parseFloat(document.getElementById('prod-old-price')?.value) || 0;
-    const commission = price * 0.08;
+    const commission = price * 0.10;
     const net = price - commission;
 
     document.getElementById('pp-price').textContent      = price ? price.toLocaleString('fr-FR',{style:'currency',currency:'EUR'}) : '–';
