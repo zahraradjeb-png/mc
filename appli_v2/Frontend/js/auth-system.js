@@ -3,26 +3,27 @@ if (typeof window.API_BASE === 'undefined') { window.API_BASE = 'http://127.0.0.
 const API_BASE = window.API_BASE;
 
 const GoldAuth = {
-  getUser()  { try { return JSON.parse(localStorage.getItem('gold_user')); } catch { return null; } },
+  getUser() { try { return JSON.parse(localStorage.getItem('gold_user')); } catch { return null; } },
   setUser(u) { localStorage.setItem('gold_user', JSON.stringify(u)); },
-  logout()   { 
-    localStorage.removeItem('gold_user'); 
+  logout() {
+    localStorage.removeItem('gold_user');
     localStorage.removeItem('gold_cart'); // On vide aussi le panier au logout pour la sécurité
-    window.location.href = _root() + 'index.html'; 
+    window.location.href = _root() + 'index.html';
   },
-  isLoggedIn(){ return !!this.getUser(); },
-  isBuyer()  { const u=this.getUser(); return u?.role==='ACHETEUR'; },
-  isSeller() { const u=this.getUser(); return u?.role==='VENDEUR' || u?.role==='ADMIN'; },
-  isAdmin()  { const u=this.getUser(); return u?.role==='ADMIN'; },
-  
+  isLoggedIn() { return !!this.getUser(); },
+  isBuyer() { const u = this.getUser(); return u?.role === 'ACHETEUR'; },
+  isSeller() { const u = this.getUser(); return u?.role === 'VENDEUR' || u?.role === 'ADMIN'; },
+  isAdmin() { const u = this.getUser(); return u?.role === 'ADMIN'; },
+
   getCatalogueUrl() {
     return this.isLoggedIn() ? 'catalogue.html' : 'catalogue-visiteur.html';
   },
-  
+
   /* CART LOGIC */
-  getCart()  { try { return JSON.parse(localStorage.getItem('gold_cart'))||[]; } catch { return []; } },
-  saveCart(c){ localStorage.setItem('gold_cart', JSON.stringify(c)); updateCartBadges(); },
-  
+  getCart() { try { return JSON.parse(localStorage.getItem('gold_cart')) || []; } catch { return []; } },
+  saveCart(c) { localStorage.setItem('gold_cart', JSON.stringify(c)); updateCartBadges(); },
+  isProductInCart(id) { return this.getCart().some(i => String(i.id) === String(id)); },
+
   getCartCount() {
     const cart = this.getCart();
     // On compte simplement le nombre de lignes pour éviter les "2" bizarres
@@ -64,7 +65,7 @@ const GoldAuth = {
         name: item.titre,
         price: parseFloat(item.prix_unitaire),
         qty: item.quantite,
-        image: item.photo ? (API_BASE.replace('/api','') + '/' + item.photo) : null
+        image: item.photo ? (API_BASE.replace('/api', '') + '/' + item.photo) : null
       }));
       this.saveCart(simplified);
     } catch (e) { console.warn("Sync error", e); }
@@ -73,11 +74,15 @@ const GoldAuth = {
   async addToCart(prod) {
     const id = String(prod.id);
     const cart = this.getCart();
-    
+
     // Si déjà là, on ne fait rien (simulation simple)
     if (cart.find(i => String(i.id) === id)) {
-       showToast('Déjà dans le panier', 'info');
-       return true;
+      if (typeof showToast !== 'undefined') {
+        showToast('Déjà dans le panier', 'info');
+      } else {
+        alert('Déjà dans le panier !');
+      }
+      return true;
     }
 
     const newItem = { id, name: prod.name, price: prod.price, qty: 1, image: prod.image, meta: prod.meta };
@@ -106,8 +111,8 @@ const GoldAuth = {
           } else {
             console.log("Panier synchronisé avec succès pour l'ID:", bId);
           }
-        } catch (e) { 
-          console.error("Erreur réseau Panier:", e); 
+        } catch (e) {
+          console.error("Erreur réseau Panier:", e);
         }
       }
     }
@@ -138,13 +143,41 @@ const GoldAuth = {
   },
 
   /* FAVORITES */
-  getFavs() { try { return JSON.parse(localStorage.getItem('gold_favs'))||[]; } catch { return []; } },
+  async syncFavsFromServer() {
+    const user = this.getUser();
+    if (!user) return;
+    const bId = user.id_user || user.id;
+    try {
+      const res = await fetch(`${API_BASE}/acheteurs/${bId}/favoris?_t=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const favIds = data.map(f => String(f.id_produit || f.id));
+      localStorage.setItem('gold_favs', JSON.stringify(favIds));
+      if (typeof window.updateFavBadges === 'function') window.updateFavBadges();
+    } catch (e) {
+      console.warn("Sync favoris error", e);
+    }
+  },
+
+  getFavs() { try { return JSON.parse(localStorage.getItem('gold_favs')) || []; } catch { return []; } },
   isFav(id) { return this.getFavs().includes(String(id)); },
   toggleFav(id) {
     let f = this.getFavs();
     const idx = f.indexOf(String(id));
     if (idx > -1) f.splice(idx, 1); else f.push(String(id));
     localStorage.setItem('gold_favs', JSON.stringify(f));
+    if (typeof window.updateFavBadges === 'function') window.updateFavBadges();
+    
+    const user = this.getUser();
+    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN' || user.role === 'VENDEUR')) {
+      const bId = user.id_user || user.id;
+      fetch(`${API_BASE}/acheteurs/${bId}/favoris`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id_produit: id })
+      }).catch(e => console.warn("Toggle fav sync error:", e));
+    }
+    
     return idx === -1;
   },
 
@@ -159,13 +192,30 @@ function updateCartBadges() {
   });
 }
 
+window.updateFavBadges = function() {
+  const count = GoldAuth.getFavs().length;
+  const favLinks = document.querySelectorAll('a[href*="favoris.html"]');
+  favLinks.forEach(link => {
+    if (!link.querySelector('.fbadge')) {
+       link.style.position = 'relative';
+       link.insertAdjacentHTML('beforeend', '<span class="fbadge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--paprika); color:#fff; font-size:0.6rem; font-weight:700; border-radius:50%; width:16px; height:16px; align-items:center; justify-content:center;">0</span>');
+    }
+  });
+  document.querySelectorAll('.fbadge').forEach(b => {
+    b.textContent = count;
+    b.style.display = count > 0 ? 'flex' : 'none';
+  });
+};
+
+document.addEventListener('DOMContentLoaded', () => { setTimeout(window.updateFavBadges, 100); });
+
 function _root() {
   const p = window.location.pathname;
   if (p.includes('/seller/') || p.includes('/acheteur/') || p.includes('/admin/')) return '../';
   return '';
 }
 
-function showToast(msg, type='ok') {
+function showToast(msg, type = 'ok') {
   const t = document.getElementById('toast') || document.getElementById('gold-toast');
   if (t) {
     const msgEl = document.getElementById('tmsg') || t.querySelector('span') || t;
@@ -173,7 +223,7 @@ function showToast(msg, type='ok') {
     t.classList.add('show');
     t.style.opacity = '1';
     t.style.transform = 'translateX(-50%) translateY(0)';
-    
+
     setTimeout(() => {
       t.classList.remove('show');
       t.style.opacity = '0';
@@ -181,5 +231,35 @@ function showToast(msg, type='ok') {
     }, 3000);
   } else {
     console.log("Toast:", msg);
+  }
+}
+
+async function switchUserRole() {
+  const user = GoldAuth.getUser();
+  if (!user) return;
+  const btn = document.querySelector('button[onclick="switchUserRole()"]');
+  if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bascule...';
+
+  try {
+    const res = await fetch(`${API_BASE}/user/${user.id_user || user.id}/switch-role`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erreur bascule');
+
+    // Mettre à jour l'utilisateur
+    GoldAuth.setUser(data.user);
+
+    // Rediriger vers l'espace approprié
+    if (data.user.role === 'VENDEUR') {
+      window.location.href = _root() + 'seller/dashboard.html';
+    } else {
+      window.location.href = _root() + 'catalogue.html';
+    }
+  } catch (e) {
+    console.error(e);
+    if (typeof showToast !== 'undefined') showToast('Erreur lors de la bascule', 'error');
+    else alert('Erreur lors de la bascule de profil');
+    if (btn) btn.innerHTML = '<i class="fas fa-exchange-alt"></i> Basculer';
   }
 }

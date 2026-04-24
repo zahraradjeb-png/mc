@@ -44,10 +44,14 @@ const SellerSidebar = {
         </nav>
 
         <div class="sidebar-footer">
-          <a href="../index.html" class="nav-item back-site">
+          <a href="../index.html" class="nav-item back-site" style="margin-bottom: 5px;">
             <i class="fas fa-arrow-left"></i>
             <span>Retour au site</span>
           </a>
+          <button class="nav-item" onclick="switchUserRole()" style="margin-bottom: 5px; color: var(--studio-honey); border: 1px solid rgba(229,166,87,0.2); background: rgba(229,166,87,0.05); text-align: left;">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Passer Acheteur</span>
+          </button>
           <button class="nav-item logout-btn" onclick="SellerAuth.logout()">
             <i class="fas fa-sign-out-alt"></i>
             <span>Déconnexion</span>

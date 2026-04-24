@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Get product info from page
     const pname = document.querySelector('.product-title, .prod-name, h1')?.textContent?.trim() || 'Produit';
-    const priceTxt = document.querySelector('.price-main, .prod-price, .price')?.textContent?.replace(/[^0-9.,]/g,'').replace(',','.') || '0';
+    const priceTxt = document.querySelector('.price-main, .prod-price, .price')?.textContent?.replace(/[^0-9.,]/g, '').replace(',', '.') || '0';
     const pid = new URLSearchParams(window.location.search).get('id') || 'product';
     const btn = document.querySelector('.btn-add-to-cart');
     const flashOk = () => {
