@@ -16,7 +16,7 @@ class BuyerController extends Controller
             ->join('produit', 'produit.id_produit', '=', 'favoris.id_produit')
             ->leftJoin('categorie', 'categorie.id_categorie', '=', 'produit.id_categorie')
             ->where('favoris.id_user', $id)
-            ->select('produit.*', 'categorie.nom_categorie as categorie_nom')
+            ->select('produit.*', 'categorie.nom as categorie_nom')
             ->get();
 
         return response()->json($favorites);
@@ -107,29 +107,29 @@ class BuyerController extends Controller
         $grouped = [];
         foreach ($rows as $row) {
             $cid = (int) $row->id_commande;
-            if (! isset($grouped[$cid])) {
+            if (!isset($grouped[$cid])) {
                 $grouped[$cid] = [
-                    'id'              => $cid,
-                    'id_commande'     => $cid,
-                    'numero'          => 'GLD-' . $cid,
-                    'date_commande'   => $row->date_commande,
-                    'created_at'      => $row->date_commande,
-                    'statut'          => strtolower((string) $row->statut),
-                    'montant_total'   => (float) $row->montant_total,
-                    'total'           => (float) $row->montant_total,
-                    'produits'        => [],
-                    '_boutiques'      => [],
+                    'id' => $cid,
+                    'id_commande' => $cid,
+                    'numero' => 'GLD-' . $cid,
+                    'date_commande' => $row->date_commande,
+                    'created_at' => $row->date_commande,
+                    'statut' => strtolower((string) $row->statut),
+                    'montant_total' => (float) $row->montant_total,
+                    'total' => (float) $row->montant_total,
+                    'produits' => [],
+                    '_boutiques' => [],
                 ];
             }
             $grouped[$cid]['_boutiques'][$row->nom_boutique] = true;
             $grouped[$cid]['produits'][] = [
                 'id_produit' => (int) $row->id_produit,
-                'nom'        => $row->titre,
-                'name'       => $row->titre,
-                'quantite'   => (int) $row->quantite,
-                'prix'       => (float) $row->prix_unitaire,
+                'nom' => $row->titre,
+                'name' => $row->titre,
+                'quantite' => (int) $row->quantite,
+                'prix' => (float) $row->prix_unitaire,
                 'statut_ligne' => $row->statut_ligne,
-                'photo'      => $row->photo
+                'photo' => $row->photo
             ];
         }
 

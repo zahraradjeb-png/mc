@@ -74,4 +74,4 @@ use App\Http\Controllers\AuthController;
 Route::post('/inscription', [AuthController::class, 'inscription']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::put('/user/{id}/profile', [AuthController::class, 'updateProfile']);
-
+Route::post('/user/{id}/switch-role', [AuthController::class, 'switchRole']);
