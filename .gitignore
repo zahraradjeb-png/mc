@@ -1,0 +1,20 @@
+# Ignorer les dossiers de config IDE
+.vscode/
+.idea/
+
+# Ignorer les uploads de produits (images de test)
+appli_v2/backend/public/uploads/products/*
+!appli_v2/backend/public/uploads/products/.gitkeep
+
+# Laravel / Backend basics
+appli_v2/backend/.env
+appli_v2/backend/storage/*.key
+appli_v2/backend/storage/framework/cache/*
+appli_v2/backend/storage/framework/sessions/*
+appli_v2/backend/storage/framework/views/*
+appli_v2/backend/vendor/
+
+# Node / Frontend basics
+node_modules/
+dist/
+.env.local

@@ -29,6 +29,15 @@ class CommandeController extends Controller
 
         try {
             $result = DB::transaction(function () use ($idAcheteur, $livraison, $request) {
+                // S'assurer que l'acheteur existe dans la table 'acheteur'
+                if (! DB::table('acheteur')->where('id_user', $idAcheteur)->exists()) {
+                    DB::table('acheteur')->insert([
+                        'id_user'   => $idAcheteur,
+                        'adresse'   => '',
+                        'telephone' => '',
+                    ]);
+                }
+
                 $panier = DB::table('panier')->where('id_acheteur', $idAcheteur)->first();
                 if (!$panier) {
                     throw new \RuntimeException('Panier introuvable pour cet utilisateur.');
@@ -40,14 +49,6 @@ class CommandeController extends Controller
 
                 if ($lignes->isEmpty()) {
                     throw new \RuntimeException('Le panier en base de données est vide.');
-                }
-
-                if (! DB::table('acheteur')->where('id_user', $idAcheteur)->exists()) {
-                    DB::table('acheteur')->insert([
-                        'id_user'   => $idAcheteur,
-                        'adresse'   => '',
-                        'telephone' => '',
-                    ]);
                 }
 
                 $sousTotal = 0;
