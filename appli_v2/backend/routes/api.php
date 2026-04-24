@@ -59,6 +59,7 @@ Route::get('/vendeurs-overview', [\App\Http\Controllers\SellerController::class,
 use App\Http\Controllers\AdminController;
 Route::get('/admin/stats', [AdminController::class, 'getStats']);
 Route::get('/admin/produits/en-attente', [AdminController::class, 'getPendingProducts']);
+Route::get('/admin/produits/statut/{statut}', [AdminController::class, 'getProductsByStatus']);
 Route::get('/admin/ventes', [AdminController::class, 'getRecentSales']);
 Route::get('/admin/commandes', [AdminController::class, 'getAllSales']);
 Route::get('/admin/users', [AdminController::class, 'getUsers']);
@@ -74,4 +75,4 @@ use App\Http\Controllers\AuthController;
 Route::post('/inscription', [AuthController::class, 'inscription']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::put('/user/{id}/profile', [AuthController::class, 'updateProfile']);
-
+Route::post('/user/{id}/switch-role', [AuthController::class, 'switchRole']);

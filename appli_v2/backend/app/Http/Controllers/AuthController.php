@@ -25,9 +25,7 @@ class AuthController extends Controller
             'prenom' => $request->prenom,
             'email'  => $request->email,
             'mdp'    => Hash::make($request->mdp),
-            'role'   => $request->role,
-            'created_at' => now(),
-            'updated_at' => now()
+            'role'   => $request->role
         ]);
 
         // Si vendeur → créer entrée dans table vendeur
@@ -81,8 +79,7 @@ class AuthController extends Controller
             'nom'     => $user->nom,
             'prenom'  => $user->prenom,
             'email'   => $user->email,
-            'role'    => $user->role,
-            'created_at' => $user->created_at ?? now()
+            'role'    => $user->role
         ];
 
         // Si vendeur, récupérer ses infos spécifiques
@@ -117,8 +114,7 @@ class AuthController extends Controller
         }
 
         DB::table('users')->where('email', $request->email)->update([
-            'mdp' => Hash::make($request->nouveau_mdp),
-            'updated_at' => now()
+            'mdp' => Hash::make($request->nouveau_mdp)
         ]);
 
         return response()->json(['message' => 'Mot de passe modifié avec succès.'], 200);
@@ -136,8 +132,7 @@ class AuthController extends Controller
             'nom'    => $request->nom,
             'prenom' => $request->prenom,
             'email'  => $request->email,
-            'bio'    => $request->bio ?? '',
-            'updated_at' => now()
+            'bio'    => $request->bio ?? ''
         ]);
 
         // On renvoie les nouvelles infos pour mettre à jour le localStorage
@@ -152,9 +147,73 @@ class AuthController extends Controller
                 'prenom' => $user->prenom,
                 'email' => $user->email,
                 'role' => $user->role,
-                'bio' => $user->bio,
-                'created_at' => $user->created_at
+                'bio' => $user->bio
             ]
         ]);
+    }
+
+    public function switchRole($id)
+    {
+        $user = DB::table('users')->where('id_user', $id)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+        }
+
+        $newRole = $user->role === 'VENDEUR' ? 'ACHETEUR' : 'VENDEUR';
+
+        // S'il bascule vers Vendeur, on lui crée un profil Vendeur par défaut s'il n'existe pas
+        if ($newRole === 'VENDEUR') {
+            $exists = DB::table('vendeur')->where('id_user', $id)->exists();
+            if (!$exists) {
+                DB::table('vendeur')->insert([
+                    'id_user'              => $id,
+                    'nom_boutique'         => $user->prenom . ' ' . $user->nom . ' Boutique',
+                    'description'          => '',
+                    'categorie_principale' => 'Vinyles',
+                    'localisation'         => ''
+                ]);
+            }
+        }
+
+        // S'il bascule vers Acheteur, on lui crée un profil Acheteur par défaut s'il n'existe pas
+        if ($newRole === 'ACHETEUR') {
+            $exists = DB::table('acheteur')->where('id_user', $id)->exists();
+            if (!$exists) {
+                DB::table('acheteur')->insert([
+                    'id_user'   => $id,
+                    'adresse'   => '',
+                    'telephone' => ''
+                ]);
+            }
+        }
+
+        DB::table('users')->where('id_user', $id)->update(['role' => $newRole]);
+
+        // On renvoie l'utilisateur mis à jour pour le localStorage
+        $userData = [
+            'id'      => $id,
+            'id_user' => $id,
+            'nom'     => $user->nom,
+            'prenom'  => $user->prenom,
+            'email'   => $user->email,
+            'role'    => $newRole
+        ];
+
+        // Ajouter infos spécifiques au mode Vendeur
+        if ($newRole === 'VENDEUR') {
+            $vendeur = DB::table('vendeur')->where('id_user', $id)->first();
+            if ($vendeur) {
+                $userData['nom_boutique'] = $vendeur->nom_boutique;
+                $userData['description']  = $vendeur->description;
+                $userData['categorie_principale'] = $vendeur->categorie_principale;
+                $userData['localisation'] = $vendeur->localisation;
+                $userData['photo_profil'] = $vendeur->photo_profil ?? null;
+            }
+        }
+
+        return response()->json([
+            'message' => 'Rôle mis à jour',
+            'user'    => $userData
+        ], 200);
     }
 }

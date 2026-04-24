@@ -12,10 +12,11 @@ class AdminController extends Controller
      */
     public function getStats()
     {
-        $commissionRate  = 0.08;
+        $commissionRate  = 0.10;
         $totalVolume     = DB::table('commande')->where('statut', 'LIVREE')->sum('montant_total');
         $totalFees       = $totalVolume * $commissionRate;
         $activeProducts  = DB::table('produit')->where('statut', 'VALIDEE')->count();
+        $refusedProducts = DB::table('produit')->where('statut', 'REFUSEE')->count();
         $pendingProducts = DB::table('produit')->where('statut', 'EN_ATTENTE')->count();
         $totalOrders     = DB::table('commande')->count();
         $totalUsers      = DB::table('users')->count();
@@ -23,10 +24,48 @@ class AdminController extends Controller
         return response()->json([
             'platform_fees'    => (float)$totalFees,
             'active_products'  => (int)$activeProducts,
+            'refused_products' => (int)$refusedProducts,
             'pending_products' => (int)$pendingProducts,
             'total_users'      => (int)$totalUsers,
             'total_orders'     => (int)$totalOrders
         ]);
+    }
+
+    /**
+     * Produits filtrés par statut.
+     */
+    public function getProductsByStatus($statut)
+    {
+        $allowed = ['VALIDEE', 'REFUSEE', 'EN_ATTENTE'];
+        if (!in_array($statut, $allowed)) {
+            return response()->json(['message' => 'Statut invalide.'], 422);
+        }
+
+        $photoSub = '(SELECT pp.chemin FROM produit_photo pp WHERE pp.id_produit = produit.id_produit ORDER BY pp.id_photo ASC LIMIT 1)';
+
+        $products = DB::table('produit')
+            ->join('vendeur', 'produit.id_vendeur', '=', 'vendeur.id_user')
+            ->join('users',   'vendeur.id_user',    '=', 'users.id_user')
+            ->leftJoin('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
+            ->where('produit.statut', $statut)
+            ->select(
+                'produit.id_produit',
+                'produit.titre',
+                'produit.description',
+                'produit.prix',
+                'produit.etat',
+                'produit.statut',
+                'produit.date_ajout',
+                'categorie.nom as categorie',
+                'users.nom   as vendeur_nom',
+                'users.prenom as vendeur_prenom',
+                'vendeur.nom_boutique',
+                DB::raw($photoSub . ' as photo')
+            )
+            ->orderBy('produit.date_ajout', 'desc')
+            ->get();
+
+        return response()->json($products);
     }
 
     /**
@@ -35,20 +74,26 @@ class AdminController extends Controller
      */
     public function getPendingProducts()
     {
+        $photoSub = '(SELECT pp.chemin FROM produit_photo pp WHERE pp.id_produit = produit.id_produit ORDER BY pp.id_photo ASC LIMIT 1)';
+
         $products = DB::table('produit')
-            ->join('vendeur', 'produit.id_vendeur', '=', 'vendeur.id_user')
-            ->join('users',   'vendeur.id_user',    '=', 'users.id_user')
+            ->join('vendeur',   'produit.id_vendeur', '=', 'vendeur.id_user')
+            ->join('users',     'vendeur.id_user',    '=', 'users.id_user')
+            ->leftJoin('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
             ->where('produit.statut', 'EN_ATTENTE')
             ->select(
                 'produit.id_produit',
                 'produit.titre',
+                'produit.description',
                 'produit.prix',
                 'produit.etat',
                 'produit.statut',
                 'produit.date_ajout',
-                'users.nom  as vendeur_nom',
+                'categorie.nom as categorie',
+                'users.nom   as vendeur_nom',
                 'users.prenom as vendeur_prenom',
-                'vendeur.nom_boutique'
+                'vendeur.nom_boutique',
+                DB::raw($photoSub . ' as photo')
             )
             ->orderBy('produit.date_ajout', 'desc')
             ->get();
@@ -83,6 +128,8 @@ class AdminController extends Controller
      */
     public function getAllOrders()
     {
+        $vendeursSub = '(SELECT GROUP_CONCAT(DISTINCT v.nom_boutique SEPARATOR ", ") FROM commande_produit cp JOIN produit p ON cp.id_produit = p.id_produit JOIN vendeur v ON p.id_vendeur = v.id_user WHERE cp.id_commande = commande.id_commande)';
+
         $orders = DB::table('commande')
             ->join('users', 'commande.id_acheteur', '=', 'users.id_user')
             ->select(
@@ -93,7 +140,8 @@ class AdminController extends Controller
                 'commande.montant_total',
                 'users.nom    as client_nom',
                 'users.prenom as client_prenom',
-                'users.email  as client_email'
+                'users.email  as client_email',
+                DB::raw($vendeursSub . ' as vendeurs')
             )
             ->orderBy('commande.date_commande', 'desc')
             ->get();
@@ -109,9 +157,19 @@ class AdminController extends Controller
         $photoSub = '(SELECT pp.chemin FROM produit_photo pp WHERE pp.id_produit = produit.id_produit ORDER BY pp.id_photo ASC LIMIT 1)';
 
         $products = DB::table('produit')
-            ->where('statut', 'VALIDEE')
-            ->select('produit.*', DB::raw($photoSub . ' as photo'))
-            ->orderBy('id_produit', 'desc')
+            ->join('vendeur', 'produit.id_vendeur', '=', 'vendeur.id_user')
+            ->join('users',   'vendeur.id_user',    '=', 'users.id_user')
+            ->leftJoin('categorie', 'produit.id_categorie', '=', 'categorie.id_categorie')
+            ->where('produit.statut', 'VALIDEE')
+            ->select(
+                'produit.*',
+                'categorie.nom as categorie',
+                'users.nom    as vendeur_nom',
+                'users.prenom as vendeur_prenom',
+                'vendeur.nom_boutique',
+                DB::raw($photoSub . ' as photo')
+            )
+            ->orderBy('produit.id_produit', 'desc')
             ->limit(12)
             ->get();
 

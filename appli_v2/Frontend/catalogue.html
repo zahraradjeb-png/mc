@@ -554,10 +554,17 @@
 
         // Inject user actions after the cart icon
         document.getElementById('headerActions').insertAdjacentHTML('beforeend', `
+        <a href="favoris.html" style="position:relative; color:var(--ink); font-size:1.1rem; text-decoration:none; margin-right:15px; transition:color 0.3s;" title="Mes Favoris" onmouseover="this.style.color='var(--paprika)'" onmouseout="this.style.color='var(--ink)'">
+          <i class="fas fa-heart"></i>
+          <span class="fbadge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--paprika); color:#fff; font-size:0.6rem; font-weight:700; border-radius:50%; width:16px; height:16px; align-items:center; justify-content:center;">0</span>
+        </a>
         <a href="${dashUrl}" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:'Outfit',sans-serif; font-weight:500; font-size:0.9rem;">
           <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, var(--honey), #c07d30); color:#111; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem;">${initials}</div>
           <span style="white-space:nowrap;">Mon Espace</span>
         </a>
+        <button onclick="switchUserRole()" style="background:none; border:1px solid rgba(245, 226, 206, 0.2); color:var(--ink); padding:6px 12px; border-radius:50px; font-size:0.85rem; cursor:pointer; margin-left:15px; display:flex; align-items:center; gap:6px; transition:all 0.3s;" onmouseover="this.style.borderColor='var(--honey)'" onmouseout="this.style.borderColor='rgba(245, 226, 206, 0.2)'">
+          <i class="fas fa-exchange-alt"></i> Passer ${isSeller ? 'Acheteur' : 'Vendeur'}
+        </button>
         <button onclick="GoldAuth.logout(); window.location.reload();" style="background:none; border:none; color:var(--muted); font-size:1.1rem; cursor:pointer; padding:5px; transition:color 0.3s; margin-left:10px;" title="Se déconnecter" onmouseover="this.style.color='var(--paprika)'" onmouseout="this.style.color='var(--muted)'">
           <i class="fas fa-sign-out-alt"></i>
         </button>

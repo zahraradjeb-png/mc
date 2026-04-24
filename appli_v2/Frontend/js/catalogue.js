@@ -7,12 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ─── CAT ICON MAP (FontAwesome — no emoji) ─── */
   const catIcon = c => ({
-    vinyles:     '<i class="fas fa-record-vinyl"></i>',
-    cassettes:   '<i class="fas fa-tape"></i>',
+    vinyles: '<i class="fas fa-record-vinyl"></i>',
+    cassettes: '<i class="fas fa-tape"></i>',
     instruments: '<i class="fas fa-guitar"></i>',
-    posters:     '<i class="fas fa-image"></i>',
-    electronique:'<i class="fas fa-plug"></i>',
-    cd:          '<i class="fas fa-compact-disc"></i>',
+    posters: '<i class="fas fa-image"></i>',
+    electronique: '<i class="fas fa-plug"></i>',
+    cd: '<i class="fas fa-compact-disc"></i>',
   }[c] || '<i class="fas fa-music"></i>');
 
   /* ─── PRODUCTS ─── */
@@ -23,31 +23,39 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await fetch(`${API_BASE}/produits`);
       const data = await response.json();
-      
-      products = data.map(p => ({
-        id: p.id_produit,
-        name: p.titre,
-        artist: p.artiste || 'Artiste inconnu',
-        cat: p.categorie_nom?.toLowerCase() || 'autres',
-        price: parseFloat(p.prix),
-        oldPrice: null,
-        year: p.annee || p.decennie || 'N/A',
-        badge: p.rarete?.toLowerCase() === 'rare' ? 'rare' : null,
-        rarete: p.rarete?.toLowerCase() || 'commun',
-        condition: p.etat?.toLowerCase() || 'bon',
-        rating: 5,
-        seller: {
-          init: (p.vendeur_nom || 'V')[0],
-          name: p.vendeur_nom || 'Vendeur Indépendant',
-          rating: 4.8
-        },
-        desc: p.description || 'Aucune description disponible pour ce produit.',
-        photo: p.photo_principale || null
-      }));
 
-      filtered = [...products];
-      renderProducts();
+      products = data.map(p => {
+        let cName = p.categorie_nom?.toLowerCase() || 'autres';
+        // Le dashboard frontend utilise des identifiants au pluriel pour les filtres
+        if (cName === 'vinyle') cName = 'vinyles';
+        if (cName === 'cassette') cName = 'cassettes';
+        if (cName === 'instrument') cName = 'instruments';
+        if (cName === 'poster') cName = 'posters';
+
+        return {
+          id: p.id_produit,
+          name: p.titre,
+          artist: p.artiste || 'Artiste inconnu',
+          cat: cName,
+          price: parseFloat(p.prix),
+          oldPrice: null,
+          year: p.annee || p.decennie || 'N/A',
+          badge: p.rarete?.toLowerCase() === 'rare' ? 'rare' : null,
+          rarete: p.rarete?.toLowerCase() || 'commun',
+          condition: p.etat?.toLowerCase() || 'bon',
+          rating: 5,
+          seller: {
+            init: (p.vendeur_nom || 'V')[0],
+            name: p.vendeur_nom || 'Vendeur Indépendant',
+            rating: 4.8
+          },
+          desc: p.description || 'Aucune description disponible pour ce produit.',
+          photo: p.photo_principale || null
+        };
+      });
+
       updateCategoryCounts();
+      applyFilters();
     } catch (err) {
       console.error('Erreur fetch produits:', err);
       showToast('Impossible de charger les produits', 'error');
@@ -58,29 +66,55 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentView = 'grid';
   let currentPage = 1;
   const perPage = 9;
-  let activeFilters = { cats:[], conditions:[], raretes:[], minPrice:0, maxPrice:5000, minRating:0, search:'' };
+  const urlParams = new URLSearchParams(window.location.search);
+  let activeFilters = {
+    cats: urlParams.has('cat') ? [urlParams.get('cat')] : [],
+    conditions: [],
+    raretes: [],
+    minPrice: 0,
+    maxPrice: 5000,
+    minRating: 0,
+    search: urlParams.has('search') ? urlParams.get('search').toLowerCase() : ''
+  };
+
+  // Set UI input text to match URL search param if present
+  if (activeFilters.search) {
+    setTimeout(() => {
+      const sf = document.getElementById('filter-search');
+      if (sf) sf.value = activeFilters.search;
+    }, 100);
+  }
+
+  // Set category active state
+  if (activeFilters.cats.length > 0) {
+    setTimeout(() => {
+      document.querySelectorAll('.cat-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.cat === activeFilters.cats[0]);
+      });
+    }, 100);
+  }
 
   /* ─── AUTH ─── */
   const isLoggedIn = () => typeof GoldAuth !== 'undefined' && GoldAuth.isLoggedIn();
-  const askLogin   = a => typeof requireLogin !== 'undefined' ? requireLogin(a) : (window.location.href='login.html?redirect=catalogue.html');
+  const askLogin = a => typeof requireLogin !== 'undefined' ? requireLogin(a) : (window.location.href = 'login.html?redirect=catalogue.html');
   const updateCartBadges = () => {
     if (typeof GoldAuth === 'undefined') return;
     const c = GoldAuth.getCartCount();
-    document.querySelectorAll('.cbadge,#cartBadge,.cart-badge,#cBadge').forEach(b => { 
-      if(b) { b.textContent=c; b.style.display=c>0?'flex':'none'; }
+    document.querySelectorAll('.cbadge,#cartBadge,.cart-badge,#cBadge').forEach(b => {
+      if (b) { b.textContent = c; b.style.display = c > 0 ? 'flex' : 'none'; }
     });
   };
 
   /* ─── TOAST ─── */
   const showToast = msg => {
-    const t=document.getElementById('toast'), tm=document.getElementById('tmsg');
-    if (!t||!tm) return;
-    tm.textContent=msg; t.classList.add('show');
+    const t = document.getElementById('toast'), tm = document.getElementById('tmsg');
+    if (!t || !tm) return;
+    tm.textContent = msg; t.classList.add('show');
     t.style.opacity = '1';
-    clearTimeout(t._t); t._t=setTimeout(()=>t.style.opacity='0',3000);
+    clearTimeout(t._t); t._t = setTimeout(() => t.style.opacity = '0', 3000);
   };
 
-  const catLabel = c => ({vinyles:'Vinyle',cassettes:'Cassette',instruments:'Instrument',electronique:'Électronique',cd:'CD',posters:'Poster'}[c]||c);
+  const catLabel = c => ({ vinyles: 'Vinyle', cassettes: 'Cassette', instruments: 'Instrument', electronique: 'Électronique', cd: 'CD', posters: 'Poster' }[c] || c);
 
   /* ═══════════════════════════════
      MODAL PRODUIT
@@ -184,13 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!p) return;
     const modal = document.getElementById('rwModal');
     if (!modal) return;
-    const cl    = catLabel(p.cat);
+    const cl = catLabel(p.cat);
     const favOn = isLoggedIn() && GoldAuth.isFav(String(id));
 
     modal.innerHTML = `
       <button class="rw-modal-close" id="rwClose"><i class="fas fa-times"></i></button>
       <div class="rw-modal-left">
-        <div class="rw-modal-cat-icon">${p.photo ? `<img src="${API_BASE.replace('/api','')}/${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />` : catIcon(p.cat)}</div>
+        <div class="rw-modal-cat-icon">${p.photo ? `<img src="${API_BASE.replace('/api', '')}/${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />` : catIcon(p.cat)}</div>
         <div class="rw-modal-seller">
           <div class="rw-modal-seller-av">${p.seller.init}</div>
           <div><span class="rw-modal-seller-nm">${p.seller.name}</span></div>
@@ -198,12 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="rw-modal-right">
         <div>
-          <div class="rw-modal-cat">${cl} · ${p.year} · ${p.condition.toUpperCase()} · ${p.rarete.toUpperCase().replace('_',' ')}</div>
+          <div class="rw-modal-cat">${cl} · ${p.year} · ${p.condition.toUpperCase()} · ${p.rarete.toUpperCase().replace('_', ' ')}</div>
           <h2 class="rw-modal-title">${p.name}</h2>
           <div class="rw-modal-artist">${p.artist}</div>
         </div>
         <div class="rw-modal-price-row">
-          <span class="rw-modal-price">${p.price.toFixed(2).replace('.',',')} €</span>
+          <span class="rw-modal-price">${p.price.toFixed(2).replace('.', ',')} €</span>
         </div>
         <div class="rw-modal-div"></div>
         <div>
@@ -218,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="rw-modal-actions">
           <button class="rw-modal-btn-cart" id="rwCart"><i class="fas fa-shopping-bag"></i> Ajouter au panier</button>
-          <button class="rw-modal-btn-fav ${favOn?'liked':''}" id="rwFav"><i class="${favOn?'fas':'far'} fa-heart"></i></button>
+          <button class="rw-modal-btn-fav ${favOn ? 'liked' : ''}" id="rwFav"><i class="${favOn ? 'fas' : 'far'} fa-heart"></i></button>
         </div>
         <div class="rw-modal-secondary-actions">
           <button class="rw-modal-btn-outline" id="rwBtnComment" onclick="rwToggleArea('comment')"><i class="far fa-comment"></i> Commenter</button>
@@ -270,11 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isLoggedIn()) { askLogin('ajouter aux favoris'); return; }
       const added = GoldAuth.toggleFav(String(p.id));
       favBtn.classList.toggle('liked', added);
-      favBtn.innerHTML = `<i class="${added?'fas':'far'} fa-heart"></i>`;
+      favBtn.innerHTML = `<i class="${added ? 'fas' : 'far'} fa-heart"></i>`;
       showToast(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
       document.querySelectorAll(`.heart-btn[data-id="${p.id}"]`).forEach(b => {
         b.classList.toggle('liked', added);
-        b.innerHTML = `<i class="${added?'fas':'far'} fa-heart"></i>`;
+        b.innerHTML = `<i class="${added ? 'fas' : 'far'} fa-heart"></i>`;
       });
     });
 
@@ -283,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cArea = document.getElementById('rwCommentsArea');
       const rArea = document.getElementById('rwReportArea');
       if (!cArea || !rArea) return;
-      
+
       if (type === 'comment') {
         rArea.style.setProperty('display', 'none', 'important');
         const isHidden = cArea.style.display === 'none' || cArea.style.display === '';
@@ -307,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('Veuillez indiquer une raison pour le signalement.', 'error');
         return;
       }
-      
+
       const guestReports = JSON.parse(localStorage.getItem('guest_reports') || '[]');
       guestReports.push({
         productId: String(p.id),
@@ -316,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         date: new Date().toLocaleDateString('fr-FR')
       });
       localStorage.setItem('guest_reports', JSON.stringify(guestReports));
-      
+
       document.getElementById('rwReportArea').style.display = 'none';
       document.getElementById('rwReportText').value = '';
       showToast('⚠️ Produit signalé à nos équipes de modération.');
@@ -326,10 +360,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = document.getElementById('rwCommentText').value.trim();
       if (!text) return;
       document.getElementById('rwCommentText').value = '';
-      
+
       const userName = (typeof GoldAuth !== 'undefined' && GoldAuth.isLoggedIn()) ? (GoldAuth.getUser().prenom || GoldAuth.getUser().firstName) : 'Visiteur';
       const dateStr = new Date().toLocaleDateString('fr-FR');
-      
+
       const commentHtml = `
         <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; margin-bottom:8px;">
           <div style="font-weight:600; color:var(--honey); margin-bottom:4px;">${userName} <span style="font-size:0.65rem;color:var(--muted);font-weight:normal;margin-left:5px;">${dateStr}</span></div>
@@ -337,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       document.getElementById('rwCommentsList').insertAdjacentHTML('afterbegin', commentHtml);
-      
+
       // Save to localStorage
       const guestComments = JSON.parse(localStorage.getItem('guest_comments') || '[]');
       guestComments.push({
@@ -348,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         date: dateStr
       });
       localStorage.setItem('guest_comments', JSON.stringify(guestComments));
-      
+
       showToast('Commentaire publié avec succès');
     });
 
@@ -363,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     products.forEach(p => {
       if (counts[p.cat] !== undefined) counts[p.cat]++;
     });
-    
+
     document.getElementById('count-all') && (document.getElementById('count-all').textContent = counts.all);
     document.getElementById('count-vinyles') && (document.getElementById('count-vinyles').textContent = counts.vinyles);
     document.getElementById('count-cassettes') && (document.getElementById('count-cassettes').textContent = counts.cassettes);
@@ -376,28 +410,28 @@ document.addEventListener('DOMContentLoaded', () => {
      RENDER PRODUCTS
   ═══════════════════════════════ */
   function renderProducts() {
-    const grid    = document.getElementById('products-grid');
-    const list    = document.getElementById('products-list');
-    const noRes   = document.getElementById('no-results');
+    const grid = document.getElementById('products-grid');
+    const list = document.getElementById('products-list');
+    const noRes = document.getElementById('no-results');
     const countEl = document.getElementById('result-count');
     if (!grid) return;
 
-    const items = filtered.slice((currentPage-1)*perPage, currentPage*perPage);
+    const items = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
     if (countEl) countEl.innerHTML = `<strong>${filtered.length}</strong> produits trouvés`;
 
     if (filtered.length === 0) {
-      grid.innerHTML = ''; if(list) list.innerHTML = '';
-      noRes?.classList.add('show'); 
+      grid.innerHTML = ''; if (list) list.innerHTML = '';
+      noRes?.classList.add('show');
       noRes.style.display = 'block';
       return;
     }
     noRes?.classList.remove('show');
     if (noRes) noRes.style.display = 'none';
 
-    grid.innerHTML = items.map((p,i) => `
-      <article class="prod-card-catalogue" data-id="${p.id}" style="animation-delay:${i*0.06}s;cursor:pointer">
+    grid.innerHTML = items.map((p, i) => `
+      <article class="prod-card-catalogue" data-id="${p.id}" style="animation-delay:${i * 0.06}s;cursor:pointer">
           <div class="pcc-thumb">
-            ${p.photo ? `<img src="${API_BASE.replace('/api','')}/${p.photo}" class="prod-thumb-img" style="object-fit:cover" />` : `<div class="prod-thumb-img">${catIcon(p.cat)}</div>`}
+            ${p.photo ? `<img src="${API_BASE.replace('/api', '')}/${p.photo}" class="prod-thumb-img" style="object-fit:cover" />` : `<div class="prod-thumb-img">${catIcon(p.cat)}</div>`}
           <button class="pcc-heart heart-btn" data-id="${p.id}" aria-label="Favoris"><i class="far fa-heart"></i></button>
           <button class="quick-add-cat add-cart-btn" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" style="background:var(--paprika);color:#fff;">
             <i class="fas fa-plus"></i> Ajouter au panier
@@ -412,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="pcc-artist">${p.artist}</div>
           <div class="pcc-footer">
             <div>
-              <span class="pcc-price">${p.price.toFixed(2).replace('.',',')} €</span>
+              <span class="pcc-price">${p.price.toFixed(2).replace('.', ',')} €</span>
             </div>
             <div style="font-size:0.7rem; color:var(--muted);">${p.rarete.toUpperCase().replace('_', ' ')}</div>
           </div>
@@ -422,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (list) {
       list.innerHTML = items.map(p => `
         <article class="prod-card-list" data-id="${p.id}" style="cursor:pointer">
-          <div class="pcl-thumb">${p.photo ? `<img src="${API_BASE.replace('/api','')}/${p.photo}" style="width:100%;height:100%;object-fit:cover;" />` : catIcon(p.cat)}</div>
+          <div class="pcl-thumb">${p.photo ? `<img src="${API_BASE.replace('/api', '')}/${p.photo}" style="width:100%;height:100%;object-fit:cover;" />` : catIcon(p.cat)}</div>
           <div class="pcl-body">
             <div class="pcl-meta">${p.cat} · ${p.year} · ${p.condition.toUpperCase()} · ${p.rarete.toUpperCase().replace('_', ' ')}</div>
             <div class="pcl-name">${p.name}</div>
@@ -434,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="pcl-action">
             <div>
-              <div class="pcl-price">${p.price.toFixed(2).replace('.',',')} €</div>
+              <div class="pcl-price">${p.price.toFixed(2).replace('.', ',')} €</div>
             </div>
             <div style="display:flex;gap:8px;align-items:center">
               <button class="pcl-heart heart-btn" data-id="${p.id}"><i class="far fa-heart"></i></button>
@@ -468,17 +502,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.heart-btn').forEach(btn => {
-      const pid = String(btn.dataset.id||'');
+      const pid = String(btn.dataset.id || '');
       if (isLoggedIn() && pid && GoldAuth.isFav(pid)) {
         btn.classList.add('liked');
-        btn.innerHTML='<i class="fas fa-heart"></i>';
+        btn.innerHTML = '<i class="fas fa-heart"></i>';
       }
       btn.addEventListener('click', e => {
         e.stopPropagation();
         if (!isLoggedIn()) { askLogin('ajouter aux favoris'); return; }
         const added = GoldAuth.toggleFav(pid);
         btn.classList.toggle('liked', added);
-        btn.innerHTML = `<i class="${added?'fas':'far'} fa-heart"></i>`;
+        btn.innerHTML = `<i class="${added ? 'fas' : 'far'} fa-heart"></i>`;
         showToast(added ? 'Ajouté aux favoris' : 'Retiré des favoris');
       });
     });
@@ -503,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { searchOverlay?.classList.remove('open'); closeModal(); }
   });
-  searchOverlay?.addEventListener('click', e => { if(e.target===searchOverlay) searchOverlay.classList.remove('open'); });
+  searchOverlay?.addEventListener('click', e => { if (e.target === searchOverlay) searchOverlay.classList.remove('open'); });
 
   const overlayInput = searchOverlay?.querySelector('input');
   overlayInput?.addEventListener('input', () => {
@@ -517,38 +551,38 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ─── APPLY FILTERS ─── */
   function applyFilters() {
     filtered = products.filter(p => {
-      const catOk    = activeFilters.cats.length===0 || activeFilters.cats.includes(p.cat);
-      const condOk   = activeFilters.conditions.length===0 || activeFilters.conditions.includes(p.condition);
-      const rareOk   = activeFilters.raretes.length===0 || activeFilters.raretes.includes(p.rarete);
-      const priceOk  = p.price>=activeFilters.minPrice && p.price<=activeFilters.maxPrice;
-      const searchOk = activeFilters.search==='' ||
+      const catOk = activeFilters.cats.length === 0 || activeFilters.cats.includes(p.cat);
+      const condOk = activeFilters.conditions.length === 0 || activeFilters.conditions.includes(p.condition);
+      const rareOk = activeFilters.raretes.length === 0 || activeFilters.raretes.includes(p.rarete);
+      const priceOk = p.price >= activeFilters.minPrice && p.price <= activeFilters.maxPrice;
+      const searchOk = activeFilters.search === '' ||
         p.name.toLowerCase().includes(activeFilters.search) ||
         p.artist.toLowerCase().includes(activeFilters.search);
       return catOk && condOk && rareOk && priceOk && searchOk;
     });
-    currentPage=1; renderProducts(); renderActiveFilterTags();
+    currentPage = 1; renderProducts(); renderActiveFilterTags();
   }
 
   /* ─── SORT ─── */
   document.getElementById('sort-select')?.addEventListener('change', e => {
-    const v=e.target.value;
-    if(v==='price-asc')       filtered.sort((a,b)=>a.price-b.price);
-    else if(v==='price-desc') filtered.sort((a,b)=>b.price-a.price);
-    else if(v==='newest')     filtered.sort((a,b)=>b.year-a.year);
-    else filtered=[...products].filter(p=>filtered.some(f=>f.id===p.id));
-    currentPage=1; renderProducts();
+    const v = e.target.value;
+    if (v === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (v === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else if (v === 'newest') filtered.sort((a, b) => b.year - a.year);
+    else filtered = [...products].filter(p => filtered.some(f => f.id === p.id));
+    currentPage = 1; renderProducts();
   });
 
   /* ─── CATEGORY TABS ─── */
   document.querySelectorAll('.cat-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const cat=tab.dataset.cat;
-      activeFilters.cats = cat==='all' ? [] : [cat];
+      const cat = tab.dataset.cat;
+      activeFilters.cats = cat === 'all' ? [] : [cat];
       document.querySelectorAll('.cat-checkbox').forEach(cb => {
-        cb.checked=cb.value===cat;
-        const c=cb.closest('.filter-option')?.querySelector('.custom-check'); if(c) c.textContent=cb.checked?'✓':'';
+        cb.checked = cb.value === cat;
+        const c = cb.closest('.filter-option')?.querySelector('.custom-check'); if (c) c.textContent = cb.checked ? '✓' : '';
       });
       applyFilters();
     });
@@ -557,8 +591,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ─── SIDEBAR CHECKBOXES ─── */
   document.querySelectorAll('.cat-checkbox').forEach(cb => {
     cb.addEventListener('change', () => {
-      const c=cb.closest('.filter-option')?.querySelector('.custom-check'); if(c) c.textContent=cb.checked?'✓':'';
-      activeFilters.cats=[...document.querySelectorAll('.cat-checkbox:checked')].map(x=>x.value);
+      const c = cb.closest('.filter-option')?.querySelector('.custom-check'); if (c) c.textContent = cb.checked ? '✓' : '';
+      activeFilters.cats = [...document.querySelectorAll('.cat-checkbox:checked')].map(x => x.value);
       applyFilters();
     });
   });
@@ -570,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.style.color = btn.classList.contains('active') ? '#111' : 'var(--muted)';
       btn.style.background = btn.classList.contains('active') ? 'var(--honey)' : 'transparent';
       btn.style.borderColor = btn.classList.contains('active') ? 'var(--honey)' : 'var(--biscuit)';
-      activeFilters.conditions=[...document.querySelectorAll('.condition-btn.active:not(.rarete-btn)')].map(b=>b.dataset.val);
+      activeFilters.conditions = [...document.querySelectorAll('.condition-btn.active:not(.rarete-btn)')].map(b => b.dataset.val);
       applyFilters();
     });
   });
@@ -582,133 +616,133 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.style.color = btn.classList.contains('active') ? '#111' : 'var(--muted)';
       btn.style.background = btn.classList.contains('active') ? 'var(--honey)' : 'transparent';
       btn.style.borderColor = btn.classList.contains('active') ? 'var(--honey)' : 'var(--biscuit)';
-      activeFilters.raretes=[...document.querySelectorAll('.rarete-btn.active')].map(b=>b.dataset.val);
+      activeFilters.raretes = [...document.querySelectorAll('.rarete-btn.active')].map(b => b.dataset.val);
       applyFilters();
     });
   });
 
   document.getElementById('filter-search')?.addEventListener('input', e => {
-    activeFilters.search=e.target.value.toLowerCase().trim(); applyFilters();
+    activeFilters.search = e.target.value.toLowerCase().trim(); applyFilters();
   });
 
-  const priceSlider=document.getElementById('price-max'), priceDisplay=document.getElementById('price-max-display');
+  const priceSlider = document.getElementById('price-max'), priceDisplay = document.getElementById('price-max-display');
   priceSlider?.addEventListener('input', () => {
-    const v=parseInt(priceSlider.value); activeFilters.maxPrice=v;
-    if(priceDisplay) priceDisplay.textContent=v.toLocaleString('fr-FR')+' €';
-    const fill=document.querySelector('.range-fill'); if(fill) fill.style.right=(100-(v/5000)*100)+'%';
+    const v = parseInt(priceSlider.value); activeFilters.maxPrice = v;
+    if (priceDisplay) priceDisplay.textContent = v.toLocaleString('fr-FR') + ' €';
+    const fill = document.querySelector('.range-fill'); if (fill) fill.style.right = (100 - (v / 5000) * 100) + '%';
     applyFilters();
   });
 
   document.getElementById('clear-filters')?.addEventListener('click', () => {
-    activeFilters={cats:[],conditions:[],raretes:[],minPrice:0,maxPrice:5000,minRating:0,search:''};
-    document.querySelectorAll('.cat-checkbox').forEach(cb=>{cb.checked=false;const c=cb.closest('.filter-option')?.querySelector('.custom-check');if(c)c.textContent='';});
+    activeFilters = { cats: [], conditions: [], raretes: [], minPrice: 0, maxPrice: 5000, minRating: 0, search: '' };
+    document.querySelectorAll('.cat-checkbox').forEach(cb => { cb.checked = false; const c = cb.closest('.filter-option')?.querySelector('.custom-check'); if (c) c.textContent = ''; });
     document.querySelectorAll('.condition-btn').forEach(btn => {
       btn.classList.remove('active');
       btn.style.color = 'var(--muted)';
       btn.style.background = 'transparent';
       btn.style.borderColor = 'var(--biscuit)';
     });
-    document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
     document.querySelector('.cat-tab[data-cat="all"]')?.classList.add('active');
-    if(priceSlider) priceSlider.value=5000;
-    if(priceDisplay) priceDisplay.textContent='5 000 €';
-    const fill=document.querySelector('.range-fill'); if(fill) fill.style.right='0%';
-    const searchEl=document.getElementById('filter-search'); if(searchEl) searchEl.value='';
-    filtered=[...products]; currentPage=1; renderProducts(); renderActiveFilterTags();
+    if (priceSlider) priceSlider.value = 5000;
+    if (priceDisplay) priceDisplay.textContent = '5 000 €';
+    const fill = document.querySelector('.range-fill'); if (fill) fill.style.right = '0%';
+    const searchEl = document.getElementById('filter-search'); if (searchEl) searchEl.value = '';
+    filtered = [...products]; currentPage = 1; renderProducts(); renderActiveFilterTags();
   });
 
   /* ─── ACTIVE FILTER TAGS ─── */
   function renderActiveFilterTags() {
-    const container=document.getElementById('active-filters-row'), card=document.getElementById('active-filters-card');
-    if(!container) return;
-    const tags=[];
-    activeFilters.cats.forEach(c=>tags.push({label:c,key:'cat',val:c}));
-    activeFilters.conditions.forEach(c=>tags.push({label:'État: '+c,key:'cond',val:c}));
-    activeFilters.raretes.forEach(c=>tags.push({label:'Rareté: '+c.replace('_',' '),key:'rare',val:c}));
-    if(activeFilters.maxPrice<5000) tags.push({label:'max '+activeFilters.maxPrice+' €',key:'price',val:activeFilters.maxPrice});
-    if(activeFilters.search) tags.push({label:'"'+activeFilters.search+'"',key:'search',val:''});
-    if(card) card.style.display=tags.length?'block':'none';
-    container.innerHTML=tags.length>0
-      ? tags.map(t=>`<span class="active-filter-tag" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--honey);border-radius:20px;padding:4px 12px;font-size:0.8rem;display:inline-flex;align-items:center;gap:6px;">${t.label} <button style="background:none;border:none;color:var(--honey);cursor:pointer;font-size:1rem;line-height:1;" onclick="removeFilter('${t.key}','${t.val}')">×</button></span>`).join('')
-        +'<button class="clear-all-btn" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem;margin-left:auto;" onclick="clearAllFilters()">Tout effacer</button>'
+    const container = document.getElementById('active-filters-row'), card = document.getElementById('active-filters-card');
+    if (!container) return;
+    const tags = [];
+    activeFilters.cats.forEach(c => tags.push({ label: c, key: 'cat', val: c }));
+    activeFilters.conditions.forEach(c => tags.push({ label: 'État: ' + c, key: 'cond', val: c }));
+    activeFilters.raretes.forEach(c => tags.push({ label: 'Rareté: ' + c.replace('_', ' '), key: 'rare', val: c }));
+    if (activeFilters.maxPrice < 5000) tags.push({ label: 'max ' + activeFilters.maxPrice + ' €', key: 'price', val: activeFilters.maxPrice });
+    if (activeFilters.search) tags.push({ label: '"' + activeFilters.search + '"', key: 'search', val: '' });
+    if (card) card.style.display = tags.length ? 'block' : 'none';
+    container.innerHTML = tags.length > 0
+      ? tags.map(t => `<span class="active-filter-tag" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--honey);border-radius:20px;padding:4px 12px;font-size:0.8rem;display:inline-flex;align-items:center;gap:6px;">${t.label} <button style="background:none;border:none;color:var(--honey);cursor:pointer;font-size:1rem;line-height:1;" onclick="removeFilter('${t.key}','${t.val}')">×</button></span>`).join('')
+      + '<button class="clear-all-btn" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.8rem;margin-left:auto;" onclick="clearAllFilters()">Tout effacer</button>'
       : '';
   }
-  window.removeFilter=(key,val)=>{
-    if(key==='cat') activeFilters.cats=activeFilters.cats.filter(c=>c!==val);
-    if(key==='cond') activeFilters.conditions=activeFilters.conditions.filter(c=>c!==val);
-    if(key==='rare') activeFilters.raretes=activeFilters.raretes.filter(c=>c!==val);
-    if(key==='price') activeFilters.maxPrice=5000;
-    if(key==='search'){activeFilters.search='';const s=document.getElementById('filter-search');if(s)s.value='';}
+  window.removeFilter = (key, val) => {
+    if (key === 'cat') activeFilters.cats = activeFilters.cats.filter(c => c !== val);
+    if (key === 'cond') activeFilters.conditions = activeFilters.conditions.filter(c => c !== val);
+    if (key === 'rare') activeFilters.raretes = activeFilters.raretes.filter(c => c !== val);
+    if (key === 'price') activeFilters.maxPrice = 5000;
+    if (key === 'search') { activeFilters.search = ''; const s = document.getElementById('filter-search'); if (s) s.value = ''; }
     applyFilters();
     // Also visual updates
     document.querySelectorAll('.condition-btn').forEach(btn => {
-      if ((btn.dataset.val === val && key==='cond') || (btn.dataset.val === val && key==='rare')) {
-         btn.classList.remove('active');
-         btn.style.color = 'var(--muted)';
-         btn.style.background = 'transparent';
-         btn.style.borderColor = 'var(--biscuit)';
+      if ((btn.dataset.val === val && key === 'cond') || (btn.dataset.val === val && key === 'rare')) {
+        btn.classList.remove('active');
+        btn.style.color = 'var(--muted)';
+        btn.style.background = 'transparent';
+        btn.style.borderColor = 'var(--biscuit)';
       }
     });
-    if(key==='cat') {
+    if (key === 'cat') {
       document.querySelectorAll('.cat-checkbox').forEach(cb => {
-        if(cb.value===val) { cb.checked=false; const c=cb.closest('.filter-option')?.querySelector('.custom-check'); if(c) c.textContent=''; }
+        if (cb.value === val) { cb.checked = false; const c = cb.closest('.filter-option')?.querySelector('.custom-check'); if (c) c.textContent = ''; }
       });
     }
   };
-  window.clearAllFilters=()=>document.getElementById('clear-filters')?.click();
+  window.clearAllFilters = () => document.getElementById('clear-filters')?.click();
 
   /* ─── VIEW TOGGLE ─── */
-  const gridView=document.getElementById('products-grid'), listView=document.getElementById('products-list');
-  document.getElementById('btn-grid')?.addEventListener('click',()=>{
-    currentView='grid';
-    document.getElementById('btn-grid').style.color='var(--ink)';
-    document.getElementById('btn-list').style.color='var(--muted)';
-    if(listView)listView.style.display='none';
+  const gridView = document.getElementById('products-grid'), listView = document.getElementById('products-list');
+  document.getElementById('btn-grid')?.addEventListener('click', () => {
+    currentView = 'grid';
+    document.getElementById('btn-grid').style.color = 'var(--ink)';
+    document.getElementById('btn-list').style.color = 'var(--muted)';
+    if (listView) listView.style.display = 'none';
     gridView?.style.removeProperty('display');
   });
-  document.getElementById('btn-list')?.addEventListener('click',()=>{
-    currentView='list';
-    document.getElementById('btn-list').style.color='var(--ink)';
-    document.getElementById('btn-grid').style.color='var(--muted)';
-    if(gridView)gridView.style.display='none';
-    if(listView)listView.style.display='flex';
+  document.getElementById('btn-list')?.addEventListener('click', () => {
+    currentView = 'list';
+    document.getElementById('btn-list').style.color = 'var(--ink)';
+    document.getElementById('btn-grid').style.color = 'var(--muted)';
+    if (gridView) gridView.style.display = 'none';
+    if (listView) listView.style.display = 'flex';
   });
 
   /* ─── PAGINATION ─── */
   function renderPagination() {
-    const c=document.getElementById('pagination'); if(!c) return;
-    const tp=Math.ceil(filtered.length/perPage); if(tp<=1){c.innerHTML='';return;}
-    let h=`<button class="page-btn nav-page" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--muted);width:35px;height:35px;border-radius:8px;cursor:pointer;" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
-    for(let i=1;i<=tp;i++){
-      if(i===1||i===tp||Math.abs(i-currentPage)<=1) h+=`<button class="page-btn" style="background:${i===currentPage?'var(--honey)':'var(--ink2)'};border:1px solid ${i===currentPage?'var(--honey)':'var(--biscuit)'};color:${i===currentPage?'#111':'var(--muted)'};width:35px;height:35px;border-radius:8px;cursor:pointer;" onclick="goPage(${i})">${i}</button>`;
-      else if(i===currentPage-2||i===currentPage+2) h+=`<span class="page-dots" style="color:var(--muted);margin:0 5px;">…</span>`;
+    const c = document.getElementById('pagination'); if (!c) return;
+    const tp = Math.ceil(filtered.length / perPage); if (tp <= 1) { c.innerHTML = ''; return; }
+    let h = `<button class="page-btn nav-page" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--muted);width:35px;height:35px;border-radius:8px;cursor:pointer;" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
+    for (let i = 1; i <= tp; i++) {
+      if (i === 1 || i === tp || Math.abs(i - currentPage) <= 1) h += `<button class="page-btn" style="background:${i === currentPage ? 'var(--honey)' : 'var(--ink2)'};border:1px solid ${i === currentPage ? 'var(--honey)' : 'var(--biscuit)'};color:${i === currentPage ? '#111' : 'var(--muted)'};width:35px;height:35px;border-radius:8px;cursor:pointer;" onclick="goPage(${i})">${i}</button>`;
+      else if (i === currentPage - 2 || i === currentPage + 2) h += `<span class="page-dots" style="color:var(--muted);margin:0 5px;">…</span>`;
     }
-    h+=`<button class="page-btn nav-page" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--muted);width:35px;height:35px;border-radius:8px;cursor:pointer;" ${currentPage===tp?'disabled':''} onclick="goPage(${currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
-    c.innerHTML=h;
+    h += `<button class="page-btn nav-page" style="background:var(--ink2);border:1px solid var(--biscuit);color:var(--muted);width:35px;height:35px;border-radius:8px;cursor:pointer;" ${currentPage === tp ? 'disabled' : ''} onclick="goPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
+    c.innerHTML = h;
   }
-  window.goPage=p=>{currentPage=p;renderProducts();window.scrollTo({top:200,behavior:'smooth'});};
+  window.goPage = p => { currentPage = p; renderProducts(); window.scrollTo({ top: 200, behavior: 'smooth' }); };
 
   /* ─── SIDEBAR COLLAPSE ─── */
-  document.querySelectorAll('.sidebar-header').forEach(h=>{
-    const t=h.querySelector('.sidebar-toggle'),b=h.nextElementSibling;
-    t?.addEventListener('click',e=>{
+  document.querySelectorAll('.sidebar-header').forEach(h => {
+    const t = h.querySelector('.sidebar-toggle'), b = h.nextElementSibling;
+    t?.addEventListener('click', e => {
       e.stopPropagation();
       b?.classList.toggle('collapsed');
       t.classList.toggle('open');
-      t.innerHTML=b?.classList.contains('collapsed')?'<i class="fas fa-plus"></i>':'<i class="fas fa-minus"></i>';
+      t.innerHTML = b?.classList.contains('collapsed') ? '<i class="fas fa-plus"></i>' : '<i class="fas fa-minus"></i>';
     });
   });
 
   /* ─── REVEAL ─── */
   function revealCards() {
-    document.querySelectorAll('.prod-card-catalogue').forEach((card,i)=>{
-      card.style.opacity='0'; card.style.transform='translateY(18px)';
-      card.style.transition=`opacity .38s ease ${i*.055}s,transform .38s ease ${i*.055}s`;
-      setTimeout(()=>{card.style.opacity='1';card.style.transform='translateY(0)';},50);
+    document.querySelectorAll('.prod-card-catalogue').forEach((card, i) => {
+      card.style.opacity = '0'; card.style.transform = 'translateY(18px)';
+      card.style.transition = `opacity .38s ease ${i * .055}s,transform .38s ease ${i * .055}s`;
+      setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; }, 50);
     });
   }
 
-  const navbar=document.querySelector('.navbar');
-  window.addEventListener('scroll',()=>navbar?.classList.toggle('scrolled',window.scrollY>40),{passive:true});
+  const navbar = document.querySelector('.navbar');
+  window.addEventListener('scroll', () => navbar?.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
 
 });

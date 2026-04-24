@@ -267,7 +267,7 @@ class SellerController extends Controller
     public function getFinance($id)
     {
         // 1. Calculations
-        $commissionRate = 0.08;
+        $commissionRate = 0.10;
 
         // Current Balance (Non-cancelled items * (1 - 0.08))
         $totalEarned = DB::table('commande_produit')

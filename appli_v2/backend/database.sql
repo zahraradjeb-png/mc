@@ -284,7 +284,10 @@ CREATE TABLE `users` (
   `prenom` varchar(100) NOT NULL,
   `email` varchar(200) NOT NULL,
   `mdp` varchar(255) NOT NULL,
-  `role` enum('ACHETEUR','VENDEUR','ADMIN') NOT NULL
+  `role` enum('ACHETEUR','VENDEUR','ADMIN') NOT NULL,
+  `bio` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
