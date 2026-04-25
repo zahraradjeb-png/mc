@@ -27,7 +27,7 @@ class ProductController extends Controller
                 'produit.*', 
                 'categorie.nom as categorie_nom', 
                 'produit_photo.chemin as photo_principale',
-                DB::raw('COALESCE(annonce.statut, produit.statut, "EN_ATTENTE") as real_statut')
+                DB::raw('CASE WHEN annonce.statut = "VALIDEE" OR produit.statut = "VALIDEE" THEN "VALIDEE" WHEN annonce.statut = "REFUSEE" OR produit.statut = "REFUSEE" THEN "REFUSEE" ELSE "EN_ATTENTE" END as real_statut')
             );
 
         if ($id_vendeur) {

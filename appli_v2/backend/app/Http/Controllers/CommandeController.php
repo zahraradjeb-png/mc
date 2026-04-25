@@ -13,6 +13,7 @@ class CommandeController extends Controller
      */
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Tentative de création de commande', ['payload' => $request->all()]);
         $validator = Validator::make($request->all(), [
             'id_acheteur'       => 'required|integer',
             'montant_livraison' => 'nullable|numeric|min:0',
@@ -40,7 +41,8 @@ class CommandeController extends Controller
 
                 $panier = DB::table('panier')->where('id_acheteur', $idAcheteur)->first();
                 if (!$panier) {
-                    throw new \RuntimeException('Panier introuvable pour cet utilisateur.');
+                    \Illuminate\Support\Facades\Log::error("Panier introuvable pour acheteur: $idAcheteur");
+                    throw new \RuntimeException("Votre panier est vide (session expirée ou non synchronisée).");
                 }
 
                 $lignes = DB::table('panier_produit')
@@ -48,7 +50,8 @@ class CommandeController extends Controller
                     ->get();
 
                 if ($lignes->isEmpty()) {
-                    throw new \RuntimeException('Le panier en base de données est vide.');
+                    \Illuminate\Support\Facades\Log::error("Panier BDD vide pour id_panier: {$panier->id_panier}");
+                    throw new \RuntimeException("Votre panier est vide en base de données.");
                 }
 
                 $sousTotal = 0;

@@ -150,10 +150,27 @@ class SellerController extends Controller
             return response()->json(['message' => 'Produit non trouvé pour ce vendeur.'], 403);
         }
 
-        DB::table('commande_produit')
-            ->where('id_commande', $orderId)
-            ->where('id_produit', $productId)
-            ->update(['statut' => $request->statut]);
+        DB::transaction(function () use ($orderId, $productId, $request) {
+            // 1. Mettre à jour l'article
+            DB::table('commande_produit')
+                ->where('id_commande', $orderId)
+                ->where('id_produit', $productId)
+                ->update(['statut' => $request->statut]);
+
+            // 2. Vérifier si TOUTE la commande est maintenant livrée
+            // On compte les articles qui ne sont pas encore LIVRE ou ANNULE
+            $remaining = DB::table('commande_produit')
+                ->where('id_commande', $orderId)
+                ->whereNotIn('statut', ['LIVRE', 'ANNULE'])
+                ->count();
+
+            if ($remaining === 0) {
+                // Tout est livré (ou annulé), on passe la commande globale à LIVREE
+                DB::table('commande')
+                    ->where('id_commande', $orderId)
+                    ->update(['statut' => 'LIVREE']);
+            }
+        });
 
         return response()->json(['message' => 'Statut de l\'article mis à jour !']);
     }

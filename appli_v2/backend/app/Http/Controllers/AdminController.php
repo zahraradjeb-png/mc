@@ -181,11 +181,26 @@ class AdminController extends Controller
      */
     public function moderateProduct(Request $request, $id)
     {
-        $status = $request->action;
+        $status = $request->action; // VALIDEE ou REFUSEE
 
-        DB::table('produit')->where('id_produit', $id)->update([
-            'statut' => $status
-        ]);
+        DB::transaction(function () use ($id, $status) {
+            // 1. Mettre à jour le produit
+            DB::table('produit')->where('id_produit', $id)->update([
+                'statut' => $status
+            ]);
+
+            // 2. Mettre à jour l'annonce liée (si elle existe)
+            $annonceId = DB::table('annonce_produit')
+                ->where('id_produit', $id)
+                ->value('id_annonce');
+
+            if ($annonceId) {
+                DB::table('annonce')->where('id_annonce', $annonceId)->update([
+                    'statut' => $status,
+                    'date_traitement' => now()
+                ]);
+            }
+        });
 
         return response()->json(['message' => "Statut mis à jour : {$status}"]);
     }
