@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+
+
+    
+    //Ajout , modification et affichage des produits 
+
+
+
     /**
      * Get all products for a specific seller or all products.
      */

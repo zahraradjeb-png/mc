@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\ProductController;
 
+//la liste de touts les adresses (urls)
+//  que le front peut appeler 
+
 // ── Produits ──
 Route::get('/produits', [ProductController::class, 'index']);
 Route::get('/produits-populaires', [ProductController::class, 'getPopular']);
