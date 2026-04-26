@@ -17,10 +17,15 @@
     }
     .v-hero-bg {
       position: absolute; inset: 0;
-      background: url('../assets/images/hero/first.jpg') center/cover no-repeat;
     }
+    .v-hero-bg-img {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: 0; transition: opacity 1.2s ease-in-out;
+    }
+    .v-hero-bg-img.active { opacity: 1; }
     .v-hero-bg::after {
-      content: ''; position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0; z-index: 1;
       background: linear-gradient(135deg, rgba(28,23,25,0.88) 0%, rgba(28,23,25,0.6) 50%, rgba(28,23,25,0.92) 100%);
     }
     .v-hero-content {
@@ -100,11 +105,30 @@
     .v-cat-item:hover .v-cat-disc {
       box-shadow: 0 0 0 4px var(--paprika), 0 18px 50px rgba(181,51,36,0.3);
     }
+    /* Vinyl hole in center */
+    .v-cat-disc::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18%; height: 18%; border-radius: 50%;
+      background: var(--ink2); border: 2px solid rgba(229,166,87,0.2);
+      z-index: 2; pointer-events: none;
+    }
     .v-cat-disc img {
       width: 100%; height: 100%; object-fit: cover;
       filter: brightness(0.7) saturate(0.85); transition: filter 0.4s;
     }
     .v-cat-item:hover .v-cat-disc img { filter: brightness(0.9) saturate(1.1); }
+    /* Vinyl spinning animation */
+    @keyframes vinylSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .v-cat-disc.spinning {
+      animation: vinylSpin 4s linear infinite;
+    }
+    .v-cat-item:hover .v-cat-disc.spinning {
+      animation-duration: 2s;
+    }
     .v-cat-name {
       font-family: 'Cormorant Garamond', serif !important;
       font-size: 1rem; font-weight: 600; color: var(--ink);
@@ -177,7 +201,12 @@
 
   <!-- HERO -->
   <section class="v-hero">
-    <div class="v-hero-bg"></div>
+    <div class="v-hero-bg">
+      <div class="v-hero-bg-img active" style="background-image:url('../assets/images/hero/first.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/second.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/third.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/forth.jpg')"></div>
+    </div>
     <div class="v-hero-content">
       <div class="v-hero-eyebrow"><span></span><span>Marketplace · Son Vintage</span></div>
       <h1 class="v-hero-title">Le Son<br>du Passé,<br><em>Revit.</em></h1>
@@ -314,6 +343,32 @@
       }
     }
     loadProducts();
+
+    // ── Hero image slideshow ──
+    (function() {
+      const slides = document.querySelectorAll('.v-hero-bg-img');
+      let current = 0;
+      setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 4000);
+    })();
+
+    // ── Vinyl spin on scroll into view ──
+    (function() {
+      const discs = document.querySelectorAll('.v-cat-disc');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('spinning');
+          } else {
+            entry.target.classList.remove('spinning');
+          }
+        });
+      }, { threshold: 0.3 });
+      discs.forEach(d => observer.observe(d));
+    })();
   </script>
 </body>
 </html>
