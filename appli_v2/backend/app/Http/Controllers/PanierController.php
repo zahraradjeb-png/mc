@@ -112,6 +112,22 @@ class PanierController extends Controller
 
         $action = $request->input('action', 'add'); // 'add' (incrément) ou 'set' (fixe)
 
+        // Vérification du stock disponible
+        $produit = DB::table('produit')->where('id_produit', $id_produit)->first();
+        if ($produit) {
+            $newQty = $exists
+                ? (($action === 'set') ? $qtyAdd : ($exists->quantite + $qtyAdd))
+                : $qtyAdd;
+
+            if ($newQty > $produit->quantite) {
+                return response()->json([
+                    'message' => "Stock insuffisant. Disponible : {$produit->quantite}",
+                    'status'  => 'stock_exceeded',
+                    'stock'   => $produit->quantite
+                ], 422);
+            }
+        }
+
         if ($exists) {
             $newQty = ($action === 'set') ? $qtyAdd : ($exists->quantite + $qtyAdd);
             
