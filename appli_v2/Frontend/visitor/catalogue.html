@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue — RetroMarket</title>
+  <meta name="description" content="Parcourez notre catalogue de musique vintage.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/visitor.css">
+  <style>
+    .v-cat-tabs {
+      background: rgba(39,33,36,0.6); border-bottom: 1px solid var(--biscuit);
+      position: sticky; top: 68px; z-index: 50; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .v-cat-tabs::-webkit-scrollbar { display: none; }
+    .v-cat-tabs-inner {
+      display: flex; gap: 4px; padding: 10px 48px;
+      max-width: 1280px; margin: 0 auto; white-space: nowrap;
+    }
+    .v-cat-tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 20px; border-radius: 50px;
+      font-size: 0.78rem; font-weight: 400; letter-spacing: 0.04em;
+      color: var(--muted); background: transparent;
+      border: 1px solid transparent; cursor: pointer;
+      transition: all 0.25s;
+    }
+    .v-cat-tab:hover { color: var(--ink); background: rgba(245,226,206,0.06); border-color: rgba(245,226,206,0.1); }
+    .v-cat-tab.active { background: rgba(229,166,87,0.12); border-color: rgba(229,166,87,0.3); color: var(--honey); }
+    .v-cat-tab-count {
+      background: var(--biscuit); color: var(--muted);
+      font-size: 0.6rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 50px;
+    }
+    .v-cat-tab.active .v-cat-tab-count { background: var(--honey); color: #111; }
+
+    .v-catalogue-layout {
+      display: grid; grid-template-columns: 260px 1fr;
+      gap: 32px; padding: 40px 0 80px; align-items: start;
+    }
+    .v-sidebar { position: sticky; top: 130px; }
+    .v-sidebar-card {
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 16px; overflow: hidden;
+    }
+    .v-sidebar-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--biscuit);
+      cursor: pointer;
+    }
+    .v-sidebar-title {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .v-sidebar-title i { color: var(--honey); font-size: 0.78rem; }
+    .v-sidebar-body { padding: 14px 18px; }
+    .v-filter-opt {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; cursor: pointer; color: var(--muted);
+      font-size: 0.85rem; transition: color 0.2s;
+    }
+    .v-filter-opt:hover { color: var(--ink); }
+    .v-filter-opt input { display: none; }
+    .v-filter-check {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 1.5px solid var(--biscuit); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .v-filter-opt input:checked ~ .v-filter-check {
+      background: var(--honey); border-color: var(--honey);
+    }
+    .v-filter-opt input:checked ~ .v-filter-check::after {
+      content: '✓'; color: #111; font-size: 0.65rem; font-weight: 700;
+    }
+    .v-filter-opt input:checked ~ span { color: var(--honey); font-weight: 500; }
+
+    .v-cond-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .v-cond-btn {
+      padding: 8px 16px; border-radius: 20px;
+      border: 1px solid var(--biscuit); background: transparent;
+      color: var(--muted); cursor: pointer; font-size: 0.82rem;
+      transition: all 0.3s;
+    }
+    .v-cond-btn:hover, .v-cond-btn.active {
+      border-color: var(--honey); color: var(--honey);
+      background: rgba(229,166,87,0.08);
+    }
+
+    .v-price-slider { position: relative; height: 3px; background: var(--biscuit); border-radius: 2px; margin: 16px 0 8px; }
+    .v-price-fill { position: absolute; height: 100%; background: linear-gradient(to right, var(--paprika), var(--honey)); border-radius: 2px; left: 0; }
+    .v-price-slider input[type="range"] {
+      position: absolute; width: 100%; top: 50%; transform: translateY(-50%);
+      -webkit-appearance: none; background: transparent; cursor: pointer;
+    }
+    .v-price-slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--ink); border: 2px solid var(--honey);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .v-clear-btn {
+      width: 100%; padding: 11px; border: 1px dashed var(--biscuit);
+      border-radius: 8px; color: var(--muted); background: transparent;
+      font-size: 0.8rem; cursor: pointer; transition: all 0.3s; margin-top: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .v-clear-btn:hover { border-color: var(--honey); color: var(--honey); }
+
+    .v-no-results {
+      display: none; text-align: center; padding: 60px;
+      border: 1px dashed var(--biscuit); border-radius: 14px;
+    }
+    .v-no-results.show { display: block; }
+
+    @media (max-width: 1100px) {
+      .v-catalogue-layout { grid-template-columns: 1fr; }
+      .v-sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <!-- PAGE HEADER -->
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Notre <em>Catalogue</em> <span class="v-page-badge">Visiteur</span></h1>
+      <p class="v-page-subtitle">Explorez des centaines de produits musicaux vintage authentiques.</p>
+    </div>
+  </div>
+
+  <!-- CATEGORY TABS -->
+  <div class="v-cat-tabs">
+    <div class="v-cat-tabs-inner" id="catTabs">
+      <button class="v-cat-tab active" data-cat="all">Tout <span class="v-cat-tab-count" id="cnt-all">0</span></button>
+      <button class="v-cat-tab" data-cat="vinyles">Vinyles <span class="v-cat-tab-count" id="cnt-vinyles">0</span></button>
+      <button class="v-cat-tab" data-cat="cassettes">Cassettes <span class="v-cat-tab-count" id="cnt-cassettes">0</span></button>
+      <button class="v-cat-tab" data-cat="instruments">Instruments <span class="v-cat-tab-count" id="cnt-instruments">0</span></button>
+      <button class="v-cat-tab" data-cat="posters">Posters <span class="v-cat-tab-count" id="cnt-posters">0</span></button>
+      <button class="v-cat-tab" data-cat="cd">CDs <span class="v-cat-tab-count" id="cnt-cd">0</span></button>
+    </div>
+  </div>
+
+  <main>
+    <div class="wrap">
+      <div class="v-catalogue-layout">
+        <!-- SIDEBAR -->
+        <aside class="v-sidebar">
+          <div class="v-sidebar-card">
+            <div class="v-sidebar-body">
+              <div style="display:flex; align-items:center; gap:8px; border:1px solid var(--biscuit); border-radius:8px; padding:10px 14px;">
+                <i class="fas fa-search" style="color:var(--muted);"></i>
+                <input type="text" id="filterSearch" placeholder="Rechercher un produit…"
+                  style="flex:1; background:transparent; border:none; color:var(--ink); outline:none; font-size:0.85rem;">
+              </div>
+            </div>
+          </div>
+
+          <div class="v-sidebar-card">
+            <div class="v-sidebar-header">
+              <div class="v-sidebar-title"><i class="fas fa-award"></i> État</div>
+            </div>
+            <div class="v-sidebar-body">
+              <div class="v-cond-grid" id="conditionFilters">
+                <button class="v-cond-btn" data-val="NEUF">Neuf</button>
+                <button class="v-cond-btn" data-val="BON">Bon état</button>
+                <button class="v-cond-btn" data-val="ACCEPTABLE">Acceptable</button>
+                <button class="v-cond-btn" data-val="ABIME">Abîmé</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="v-sidebar-card">
+            <div class="v-sidebar-header">
+              <div class="v-sidebar-title"><i class="fas fa-gem"></i> Rareté</div>
+            </div>
+            <div class="v-sidebar-body">
+              <div class="v-cond-grid" id="rareteFilters">
+                <button class="v-cond-btn" data-val="COMMUN">Commun</button>
+                <button class="v-cond-btn" data-val="RARE">Rare</button>
+                <button class="v-cond-btn" data-val="TRES_RARE">Très Rare</button>
+                <button class="v-cond-btn" data-val="COLLECTOR">Collector</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="v-sidebar-card">
+            <div class="v-sidebar-header">
+              <div class="v-sidebar-title"><i class="fas fa-tag"></i> Prix max</div>
+            </div>
+            <div class="v-sidebar-body">
+              <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+                <span id="priceDisplay" style="color:var(--honey); font-weight:600;">5 000 €</span>
+              </div>
+              <div class="v-price-slider">
+                <div class="v-price-fill" id="priceFill" style="right:0;"></div>
+                <input type="range" id="priceRange" min="0" max="5000" value="5000" step="10">
+              </div>
+            </div>
+          </div>
+
+          <button class="v-clear-btn" id="clearFilters"><i class="fas fa-times"></i> Effacer les filtres</button>
+        </aside>
+
+        <!-- PRODUCTS -->
+        <div>
+          <div class="v-products-grid" id="productsGrid"></div>
+          <div class="v-no-results" id="noResults">
+            <i class="fas fa-search" style="font-size:2rem; color:var(--biscuit); margin-bottom:12px; display:block;"></i>
+            <h3 style="font-size:1.3rem; color:var(--ink); margin-bottom:8px;">Aucun produit trouvé</h3>
+            <p style="color:var(--muted);">Essayez de modifier vos filtres.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script>
+    // Redirect if logged in
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (u) {
+      if (u.role === 'ACHETEUR' || u.role === 'BOTH') {
+        window.location.href = '../acheteur/catalogue.html';
+      } else if (u.role === 'VENDEUR') {
+        window.location.href = '../seller/index.html';
+      }
+    }
+  </script>
+  <script src="js/visitor.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderVisitorNavbar('catalogue');
+    document.getElementById('footer-container').innerHTML = renderVisitorFooter();
+
+    let allProducts = [];
+    let activeCategory = 'all';
+    let activeConditions = new Set();
+    let activeRaretes = new Set();
+    let maxPrice = 5000;
+    let searchQuery = '';
+
+    // URL params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cat')) {
+      activeCategory = params.get('cat');
+      document.querySelectorAll('.v-cat-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.cat === activeCategory);
+      });
+    }
+
+    async function loadProducts() {
+      const grid = document.getElementById('productsGrid');
+      try {
+        const res = await fetch(`${window.API_BASE}/produits`);
+        allProducts = await res.json();
+        updateCounts();
+        filterAndRender();
+      } catch (e) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--paprika)">Erreur de chargement.</div>';
+      }
+    }
+
+    function getCatKey(catName) {
+      if (!catName) return '';
+      const map = {
+        'Vinyle': 'vinyles', 'VINYLE': 'vinyles',
+        'Cassette Audio': 'cassettes', 'CASSETTE': 'cassettes', 'Cassette': 'cassettes',
+        'Instrument': 'instruments', 'INSTRUMENT': 'instruments',
+        'Poster': 'posters', 'POSTER': 'posters',
+        'CD': 'cd'
+      };
+      return map[catName] || catName.toLowerCase();
+    }
+
+    function updateCounts() {
+      const counts = { all: allProducts.length, vinyles: 0, cassettes: 0, instruments: 0, posters: 0, cd: 0 };
+      allProducts.forEach(p => {
+        const k = getCatKey(p.categorie_nom);
+        if (counts[k] !== undefined) counts[k]++;
+      });
+      Object.entries(counts).forEach(([k, v]) => {
+        const el = document.getElementById(`cnt-${k}`);
+        if (el) el.textContent = v;
+      });
+    }
+
+    function filterAndRender() {
+      let filtered = [...allProducts];
+
+      if (activeCategory !== 'all') {
+        filtered = filtered.filter(p => getCatKey(p.categorie_nom) === activeCategory);
+      }
+      if (activeConditions.size > 0) {
+        filtered = filtered.filter(p => activeConditions.has(p.etat));
+      }
+      if (activeRaretes.size > 0) {
+        filtered = filtered.filter(p => activeRaretes.has(p.rarete));
+      }
+      if (maxPrice < 5000) {
+        filtered = filtered.filter(p => parseFloat(p.prix) <= maxPrice);
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(p =>
+          (p.titre || '').toLowerCase().includes(q) ||
+          (p.artiste || '').toLowerCase().includes(q) ||
+          (p.categorie_nom || '').toLowerCase().includes(q)
+        );
+      }
+
+      const grid = document.getElementById('productsGrid');
+      const noRes = document.getElementById('noResults');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noRes.classList.add('show');
+      } else {
+        noRes.classList.remove('show');
+        grid.innerHTML = filtered.map(p => buildVisitorProductCard(p)).join('');
+      }
+    }
+
+    // Category tabs
+    document.querySelectorAll('.v-cat-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.v-cat-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeCategory = tab.dataset.cat;
+        filterAndRender();
+      });
+    });
+
+    // Condition filters
+    document.querySelectorAll('#conditionFilters .v-cond-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        if (btn.classList.contains('active')) activeConditions.add(btn.dataset.val);
+        else activeConditions.delete(btn.dataset.val);
+        filterAndRender();
+      });
+    });
+
+    // Rarete filters
+    document.querySelectorAll('#rareteFilters .v-cond-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        if (btn.classList.contains('active')) activeRaretes.add(btn.dataset.val);
+        else activeRaretes.delete(btn.dataset.val);
+        filterAndRender();
+      });
+    });
+
+    // Price filter
+    const priceRange = document.getElementById('priceRange');
+    const priceDisplay = document.getElementById('priceDisplay');
+    const priceFill = document.getElementById('priceFill');
+    priceRange.addEventListener('input', () => {
+      maxPrice = parseInt(priceRange.value);
+      priceDisplay.textContent = maxPrice.toLocaleString('fr-FR') + ' €';
+      priceFill.style.right = ((1 - maxPrice / 5000) * 100) + '%';
+      filterAndRender();
+    });
+
+    // Search
+    document.getElementById('filterSearch').addEventListener('input', e => {
+      searchQuery = e.target.value.trim();
+      filterAndRender();
+    });
+
+    // Clear
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      activeCategory = 'all'; activeConditions.clear(); activeRaretes.clear();
+      maxPrice = 5000; searchQuery = '';
+      priceRange.value = 5000; priceDisplay.textContent = '5 000 €'; priceFill.style.right = '0';
+      document.getElementById('filterSearch').value = '';
+      document.querySelectorAll('.v-cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === 'all'));
+      document.querySelectorAll('.v-cond-btn').forEach(b => b.classList.remove('active'));
+      filterAndRender();
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>

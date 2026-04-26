@@ -526,6 +526,14 @@
 
         const data = await response.json();
         if (response.ok && data.user) {
+          // PROTECTION: Clear all previous session/visitor data to prevent leakage
+          localStorage.removeItem('gold_user');
+          localStorage.removeItem('gold_cart');
+          localStorage.removeItem('gold_favs');
+          localStorage.removeItem('visitor_uuid');
+          localStorage.removeItem('visitor_cart');
+          localStorage.removeItem('visitor_favs');
+
           const user = {
             id: data.user.id,
             id_user: data.user.id_user != null ? data.user.id_user : data.user.id,
@@ -549,10 +557,14 @@
           showToast('Connexion réussie ! Bienvenue ' + data.user.prenom, 'ok');
 
           setTimeout(() => {
-            const user = data.user;
-            if (user.role === 'ADMIN') window.location.href = '../admin/dashboard.html';
-            else if (user.role === 'VENDEUR') window.location.href = '../seller/dashboard.html';
-            else window.location.href = '../catalogue.html';
+            const uData = data.user;
+            if (uData.role === 'ADMIN') window.location.href = '../admin/dashboard.html';
+            else if (uData.role === 'VENDEUR') window.location.href = '../seller/dashboard.html';
+            else if (uData.role === 'BOTH') {
+                // Par défaut on envoie vers acheteur, ou on peut décider
+                window.location.href = '../acheteur/index.html';
+            }
+            else window.location.href = '../acheteur/index.html';
           }, 1500);
         } else {
           showToast(data.message || 'Identifiants incorrects');

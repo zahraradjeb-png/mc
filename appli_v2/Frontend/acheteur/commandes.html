@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Commandes — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    .order-card {
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .order-header {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--biscuit); padding-bottom: 15px; margin-bottom: 15px;
+    }
+    .order-id { font-weight: 600; color: var(--ink); font-size: 1.1rem; }
+    .order-status {
+      padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+    }
+    .status-en-attente { background: rgba(229,166,87,0.2); color: var(--honey); }
+    .status-en-preparation { background: rgba(100,149,237,0.2); color: cornflowerblue; }
+    .status-en-cours-de-livraison { background: rgba(255,165,0,0.2); color: orange; }
+    .status-livree { background: rgba(46,139,87,0.2); color: seagreen; }
+    
+    .order-info { color: var(--muted); font-size: 0.9rem; margin-bottom: 5px; }
+    .order-items { margin-top: 15px; }
+    .order-item { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px dashed rgba(245,226,206,0.1); }
+    .order-item:first-child { border-top: none; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Mes <em>Commandes</em></h1>
+      <p class="v-page-subtitle">Historique de vos achats sur RetroMarket.</p>
+    </div>
+  </div>
+  <main style="padding: 40px 0; min-height: 50vh;">
+    <div class="wrap" id="orders-container">
+      <div style="text-align:center; padding:40px; color:var(--muted);"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+    </div>
+  </main>
+  <div id="footer-container"></div>
+  
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('commandes');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    async function loadOrders() {
+      const user = JSON.parse(localStorage.getItem('gold_user'));
+      if (!user) {
+        showLoginRequired('voir vos commandes');
+        return;
+      }
+      
+      try {
+        const userId = user.id_user || user.id;
+        const res = await fetch(`${window.API_BASE}/orders/user?user_id=${userId}`);
+        const orders = await res.json();
+        
+        const container = document.getElementById('orders-container');
+        if (orders.length === 0) {
+          container.innerHTML = '<div class="v-empty"><i class="fas fa-box-open"></i><h3>Aucune commande</h3><p>Vous n\'avez pas encore passé de commande sur RetroMarket.</p></div>';
+          return;
+        }
+
+        container.innerHTML = orders.map(order => {
+          let statusClass = 'status-en-attente';
+          const statusText = order.status || 'EN ATTENTE';
+          const s = statusText.toLowerCase();
+          if(s.includes('validée') || s.includes('validee')) statusClass = 'status-en-preparation';
+          if(s.includes('livraison')) statusClass = 'status-en-cours-de-livraison';
+          if(s.includes('livrée') || s === 'livree') statusClass = 'status-livree';
+
+          const itemsHtml = (order.items || []).map(item => `
+            <div class="order-item">
+              <span>
+                ${item.quantity}x 
+                <a href="product-details.html?id=${item.product_id}" style="color:var(--ink); text-decoration:none; font-weight:500;">
+                  ${item.product_name || 'Produit #'+item.product_id}
+                </a>
+              </span>
+              <span style="color:var(--honey);">${item.price ? parseFloat(item.price).toFixed(2) + ' €' : ''}</span>
+            </div>
+          `).join('');
+
+          return `
+            <div class="order-card">
+              <div class="order-header">
+                <div class="order-id">Commande #${order.id}</div>
+                <div class="order-status ${statusClass}">${statusText.toUpperCase()}</div>
+              </div>
+              <div class="order-info"><i class="fas fa-calendar-alt"></i> ${new Date(order.created_at).toLocaleDateString('fr-FR')}</div>
+              <div class="order-info"><i class="fas fa-map-marker-alt"></i> Livraison : ${order.address || 'Non spécifiée'}</div>
+              <div class="order-info"><i class="fas fa-phone"></i> Tél : ${order.phone || 'Non spécifié'}</div>
+              <div class="order-info" style="margin-top:10px; font-weight:bold; color:var(--ink);">Total : ${parseFloat(order.total_price || 0).toFixed(2)} €</div>
+              <div class="order-items">
+                <strong style="color:var(--ink); font-size:0.9rem;">Articles :</strong>
+                ${itemsHtml || '<div style="color:var(--muted); font-size:0.85rem;">Détails indisponibles</div>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        document.getElementById('orders-container').innerHTML = '<div style="text-align:center; padding:40px; color:var(--paprika);">Erreur lors du chargement des commandes.</div>';
+      }
+    }
+    
+    loadOrders();
+  </script>
+</body>
+</html>

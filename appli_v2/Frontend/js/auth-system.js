@@ -7,16 +7,21 @@ const GoldAuth = {
   setUser(u) { localStorage.setItem('gold_user', JSON.stringify(u)); },
   logout() {
     localStorage.removeItem('gold_user');
-    localStorage.removeItem('gold_cart'); // On vide aussi le panier au logout pour la sécurité
+    localStorage.removeItem('gold_cart');
+    localStorage.removeItem('gold_favs');
+    localStorage.removeItem('visitor_uuid');
+    localStorage.removeItem('visitor_cart');
+    localStorage.removeItem('visitor_favs');
     window.location.href = _root() + 'index.html';
   },
   isLoggedIn() { return !!this.getUser(); },
-  isBuyer() { const u = this.getUser(); return u?.role === 'ACHETEUR'; },
-  isSeller() { const u = this.getUser(); return u?.role === 'VENDEUR' || u?.role === 'ADMIN'; },
+  isBuyer() { const u = this.getUser(); return u?.role === 'ACHETEUR' || u?.role === 'BOTH'; },
+  isSeller() { const u = this.getUser(); return u?.role === 'VENDEUR' || u?.role === 'ADMIN' || u?.role === 'BOTH'; },
   isAdmin() { const u = this.getUser(); return u?.role === 'ADMIN'; },
 
   getCatalogueUrl() {
-    return this.isLoggedIn() ? 'catalogue.html' : 'catalogue-visiteur.html';
+    if (!this.isLoggedIn()) return _root() + 'catalogue-visiteur.html';
+    return _root() + 'acheteur/catalogue.html';
   },
 
   /* CART LOGIC */
@@ -91,7 +96,7 @@ const GoldAuth = {
 
     // Si Acheteur, on envoie AU SERVEUR en plus
     const user = this.getUser();
-    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN')) {
+    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN' || user.role === 'BOTH')) {
       const bId = user.id_user || user.id;
       if (bId) {
         try {
@@ -169,7 +174,7 @@ const GoldAuth = {
     if (typeof window.updateFavBadges === 'function') window.updateFavBadges();
     
     const user = this.getUser();
-    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN' || user.role === 'VENDEUR')) {
+    if (user && (user.role === 'ACHETEUR' || user.role === 'ADMIN' || user.role === 'VENDEUR' || user.role === 'BOTH')) {
       const bId = user.id_user || user.id;
       fetch(`${API_BASE}/acheteurs/${bId}/favoris`, {
           method: 'POST',
@@ -238,8 +243,52 @@ async function switchUserRole() {
   const user = GoldAuth.getUser();
   if (!user) return;
   const btn = document.querySelector('button[onclick="switchUserRole()"]');
+  const originalHtml = btn ? btn.innerHTML : '';
   if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Bascule...';
 
+  // 1. If user is already BOTH, just redirect based on current path
+  if (user.role === 'BOTH') {
+    const isCurrentlyInSeller = window.location.pathname.includes('/seller/');
+    if (isCurrentlyInSeller) {
+      window.location.href = _root() + 'acheteur/index.html';
+    } else {
+      window.location.href = _root() + 'seller/dashboard.html';
+    }
+    return;
+  }
+
+  // 2. If user is VENDEUR only, they want to become BOTH
+  if (user.role === 'VENDEUR' || user.role === 'seller') {
+    try {
+      const res = await fetch(`${API_BASE}/become-acheteur`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id_user || user.id })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Erreur activation acheteur');
+
+      // Update local user (it will be BOTH now)
+      if (data.user) {
+          GoldAuth.setUser(data.user);
+      } else {
+          user.role = 'BOTH';
+          GoldAuth.setUser(user);
+      }
+      
+      if (typeof showToast !== 'undefined') showToast('Mode Acheteur activé !', 'ok');
+      setTimeout(() => { window.location.href = _root() + 'acheteur/index.html'; }, 1000);
+      return;
+    } catch (e) {
+      console.error(e);
+      if (typeof showToast !== 'undefined') showToast('Erreur activation acheteur', 'error');
+      if (btn) btn.innerHTML = originalHtml;
+      return;
+    }
+  }
+
+  // 3. If user is ACHETEUR only, call switchRole or let acheteur.js handle it
+  // For safety, let's handle it here if called from a generic button
   try {
     const res = await fetch(`${API_BASE}/user/${user.id_user || user.id}/switch-role`, {
       method: 'POST'
@@ -247,19 +296,16 @@ async function switchUserRole() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Erreur bascule');
 
-    // Mettre à jour l'utilisateur
     GoldAuth.setUser(data.user);
 
-    // Rediriger vers l'espace approprié
-    if (data.user.role === 'VENDEUR') {
+    if (data.user.role === 'VENDEUR' || data.user.role === 'BOTH') {
       window.location.href = _root() + 'seller/dashboard.html';
     } else {
-      window.location.href = _root() + 'catalogue.html';
+      window.location.href = _root() + 'acheteur/index.html';
     }
   } catch (e) {
     console.error(e);
     if (typeof showToast !== 'undefined') showToast('Erreur lors de la bascule', 'error');
-    else alert('Erreur lors de la bascule de profil');
-    if (btn) btn.innerHTML = '<i class="fas fa-exchange-alt"></i> Basculer';
+    if (btn) btn.innerHTML = originalHtml;
   }
 }

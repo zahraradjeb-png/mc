@@ -216,4 +216,53 @@ class AuthController extends Controller
             'user'    => $userData
         ], 200);
     }
+
+    public function becomeSeller(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required',
+            'shop_name' => 'required',
+            'description' => 'nullable',
+            'categories' => 'nullable',
+            'address' => 'nullable'
+        ]);
+
+        $id = $request->user_id;
+
+        // Ensure user exists
+        $user = DB::table('users')->where('id_user', $id)->orWhere('id', $id)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+        }
+
+        $userId = $user->id_user ?? $user->id;
+
+        // Update role to BOTH
+        // Since enum is ACHETEUR, VENDEUR, ADMIN, and we added 'BOTH' to users table role in our migration
+        // But if DB is using old schema, we might hit an error. We will try to update it, and if it fails, fallback to VENDEUR.
+        try {
+            DB::table('users')->where('id_user', $userId)->orWhere('id', $userId)->update(['role' => 'BOTH']);
+            $newRole = 'BOTH';
+        } catch (\Exception $e) {
+            // fallback if enum BOTH is not available
+            DB::table('users')->where('id_user', $userId)->orWhere('id', $userId)->update(['role' => 'VENDEUR']);
+            $newRole = 'VENDEUR';
+        }
+
+        $exists = DB::table('sellers')->where('user_id', $userId)->exists();
+        if (!$exists) {
+            DB::table('sellers')->insert([
+                'user_id'     => $userId,
+                'shop_name'   => $request->shop_name,
+                'description' => $request->description ?? '',
+                'categories'  => $request->categories ?? '',
+                'address'     => $request->address ?? ''
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Vous êtes maintenant vendeur !',
+            'role' => $newRole
+        ], 200);
+    }
 }

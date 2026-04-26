@@ -268,9 +268,17 @@
 
         const data = await response.json();
         if (response.ok) {
+          // PROTECTION: Clear all previous session/visitor data to prevent leakage
+          localStorage.removeItem('gold_user');
+          localStorage.removeItem('gold_cart');
+          localStorage.removeItem('gold_favs');
+          localStorage.removeItem('visitor_uuid');
+          localStorage.removeItem('visitor_cart');
+          localStorage.removeItem('visitor_favs');
+
           const userForLocal = {
             id: data.user_id,
-            id_vendeur: data.vendeur_id || data.user_id,
+            id_user: data.user_id,
             role: currentRole,
             nom: lastName,
             prenom: firstName,
@@ -280,7 +288,7 @@
           localStorage.setItem('gold_user', JSON.stringify(userForLocal));
           document.getElementById('successOverlay').classList.add('show');
           setTimeout(() => {
-            window.location.href = currentRole === 'VENDEUR' ? '../seller/dashboard.html' : '../index.html';
+            window.location.href = currentRole === 'VENDEUR' ? '../seller/dashboard.html' : '../acheteur/index.html';
           }, 2000);
         } else {
           showToast(data.message || "Erreur d'inscription");
