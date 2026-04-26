@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Profil — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/visitor.css">
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Mon <em>Profil</em></h1>
+      <p class="v-page-subtitle">Gérez votre compte RetroMarket.</p>
+    </div>
+  </div>
+  <main style="padding: 60px 0 80px;">
+    <div class="wrap">
+      <div class="v-login-prompt">
+        <i class="fas fa-user-lock"></i>
+        <h2>Vous n'êtes pas connecté</h2>
+        <p>Vous devez vous connecter ou vous inscrire pour accéder à votre profil, passer des commandes et gérer votre boutique.</p>
+        <div class="v-btn-row">
+          <a href="../authentification/sign-in.html" class="v-btn v-btn-primary"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
+          <a href="../authentification/sign-up.html" class="v-btn v-btn-secondary"><i class="fas fa-user-plus"></i> S'inscrire</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-container"></div>
+  <script>
+    // Redirect if logged in
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (u) {
+      if (u.role === 'ACHETEUR' || u.role === 'BOTH') {
+        window.location.href = '../acheteur/profile.html';
+      } else if (u.role === 'VENDEUR') {
+        window.location.href = '../seller/index.html';
+      }
+    }
+  </script>
+  <script src="js/visitor.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderVisitorNavbar('profile');
+    document.getElementById('footer-container').innerHTML = renderVisitorFooter();
+  </script>
+</body>
+</html>

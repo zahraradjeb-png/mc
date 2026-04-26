@@ -44,7 +44,7 @@ const SellerSidebar = {
         </nav>
 
         <div class="sidebar-footer">
-          <a href="../index.html" class="nav-item back-site" style="margin-bottom: 5px;">
+          <a href="../visitor/index.html" class="nav-item back-site" style="margin-bottom: 5px;">
             <i class="fas fa-arrow-left"></i>
             <span>Retour au site</span>
           </a>

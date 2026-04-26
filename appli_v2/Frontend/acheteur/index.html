@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetroMarket — Musique Vintage</title>
+  <meta name="description" content="Marketplace de musique vintage. Vinyles, cassettes, instruments et plus.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    /* ── HERO ── */
+    .v-hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; overflow: hidden;
+    }
+    .v-hero-bg {
+      position: absolute; inset: 0;
+    }
+    .v-hero-bg-img {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: 0; transition: opacity 1.2s ease-in-out;
+    }
+    .v-hero-bg-img.active { opacity: 1; }
+    .v-hero-bg::after {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(135deg, rgba(28,23,25,0.88) 0%, rgba(28,23,25,0.6) 50%, rgba(28,23,25,0.92) 100%);
+    }
+    .v-hero-content {
+      position: relative; z-index: 10;
+      max-width: 1280px; margin: 0 auto; padding: 100px 48px 60px;
+    }
+    .v-hero-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.7rem; font-weight: 400; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--honey);
+      margin-bottom: 28px; animation: vFadeUp 1s var(--ease-spring) both;
+    }
+    .v-hero-eyebrow span:first-child {
+      display: block; width: 36px; height: 1px; background: var(--honey);
+    }
+    .v-hero-title {
+      font-size: clamp(3.5rem, 7vw, 7rem);
+      font-weight: 600; color: #fff; line-height: 1.0;
+      margin-bottom: 24px; animation: vFadeUp 1s 0.1s var(--ease-spring) both;
+    }
+    .v-hero-title em {
+      font-style: italic; font-weight: 400;
+      background: linear-gradient(135deg, var(--honey), #c07d30);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .v-hero-sub {
+      font-size: 1.05rem; color: var(--muted);
+      line-height: 1.7; margin-bottom: 40px; max-width: 480px;
+      animation: vFadeUp 1s 0.2s var(--ease-spring) both;
+    }
+    .v-hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      animation: vFadeUp 1s 0.3s var(--ease-spring) both;
+    }
+    .v-hero-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 32px; border-radius: 6px;
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.06em;
+      transition: all 0.4s var(--ease-spring); border: none; cursor: pointer;
+    }
+    .v-hero-btn-buyer {
+      background: var(--honey); color: #111;
+      box-shadow: 0 6px 24px rgba(229,166,87,0.35);
+    }
+    .v-hero-btn-buyer:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(229,166,87,0.45); }
+    .v-hero-btn-seller {
+      background: transparent; border: 1px solid rgba(245,226,206,0.3);
+      color: rgba(245,226,206,0.8);
+    }
+    .v-hero-btn-seller:hover { border-color: var(--honey); color: var(--honey); transform: translateY(-3px); }
+
+    @keyframes vFadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CATEGORIES ── */
+    .v-cat-grid {
+      display: flex; justify-content: center; gap: clamp(20px, 3vw, 40px);
+      flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .v-cat-grid::-webkit-scrollbar { display: none; }
+    .v-cat-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 14px; cursor: pointer; transition: transform 0.4s var(--ease-spring);
+    }
+    .v-cat-item:hover { transform: translateY(-8px); }
+    .v-cat-disc {
+      width: clamp(90px, 11vw, 140px); height: clamp(90px, 11vw, 140px);
+      border-radius: 50%; overflow: hidden; position: relative;
+      background: var(--ink2);
+      box-shadow: 0 0 0 3px rgba(229,166,87,0.15), 0 10px 30px rgba(0,0,0,0.3);
+      transition: box-shadow 0.4s;
+    }
+    .v-cat-item:hover .v-cat-disc {
+      box-shadow: 0 0 0 4px var(--paprika), 0 18px 50px rgba(181,51,36,0.3);
+    }
+    /* Vinyl hole in center */
+    .v-cat-disc::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 18%; height: 18%; border-radius: 50%;
+      background: var(--ink2); border: 2px solid rgba(229,166,87,0.2);
+      z-index: 2; pointer-events: none;
+    }
+    .v-cat-disc img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: brightness(0.7) saturate(0.85); transition: filter 0.4s;
+    }
+    .v-cat-item:hover .v-cat-disc img { filter: brightness(0.9) saturate(1.1); }
+    /* Vinyl spinning animation */
+    @keyframes vinylSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .v-cat-disc.spinning {
+      animation: vinylSpin 4s linear infinite;
+    }
+    .v-cat-item:hover .v-cat-disc.spinning {
+      animation-duration: 2s;
+    }
+    .v-cat-name {
+      font-family: 'Cormorant Garamond', serif !important;
+      font-size: 1rem; font-weight: 600; color: var(--ink);
+      transition: color 0.3s;
+    }
+    .v-cat-item:hover .v-cat-name { color: var(--honey); }
+
+    /* ── SECTION ── */
+    .v-sec { padding: 80px 0; }
+    .v-sec-hd {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .v-sec-lbl {
+      font-size: 0.65rem; font-weight: 400; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--honey); margin-bottom: 10px;
+    }
+    .v-sec-ttl {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 600; color: var(--ink); line-height: 1.1;
+    }
+    .v-sec-ttl em { color: var(--honey); font-style: italic; }
+    .v-sec-more {
+      font-size: 0.78rem; color: var(--muted);
+      border-bottom: 1px solid var(--biscuit); padding-bottom: 2px;
+      transition: color 0.25s, border-color 0.25s; white-space: nowrap;
+    }
+    .v-sec-more:hover { color: var(--honey); border-color: var(--honey); }
+
+    /* ── HOW IT WORKS ── */
+    .v-hiw-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+    }
+    .v-hiw-card {
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 16px; padding: 36px 28px; text-align: center;
+      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s;
+    }
+    .v-hiw-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+    }
+    .v-hiw-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(229,166,87,0.1); border: 1px solid rgba(229,166,87,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 1.3rem; color: var(--honey);
+      transition: all 0.3s;
+    }
+    .v-hiw-card:hover .v-hiw-icon {
+      background: var(--honey); color: #111; transform: scale(1.1);
+    }
+    .v-hiw-num {
+      font-size: 0.65rem; letter-spacing: 0.15em; color: var(--honey);
+      margin-bottom: 8px; font-weight: 600;
+    }
+    .v-hiw-title {
+      font-size: 1.2rem; font-weight: 600; color: var(--ink); margin-bottom: 10px;
+    }
+    .v-hiw-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+    @media (max-width: 768px) {
+      .v-hiw-grid { grid-template-columns: 1fr; }
+      .v-hero-content { padding: 100px 24px 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <!-- HERO -->
+  <section class="v-hero">
+    <div class="v-hero-bg">
+      <div class="v-hero-bg-img active" style="background-image:url('../assets/images/hero/first.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/second.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/third.jpg')"></div>
+      <div class="v-hero-bg-img" style="background-image:url('../assets/images/hero/forth.jpg')"></div>
+    </div>
+    <div class="v-hero-content">
+      <div class="v-hero-eyebrow"><span></span><span>Marketplace · Son Vintage</span></div>
+      <h1 class="v-hero-title">Le Son<br>du Passé,<br><em>Revit.</em></h1>
+      <p class="v-hero-sub" id="welcome-message" style="font-size:1.5rem; font-weight:600; color:var(--honey);">Bienvenue !</p>
+      <p class="v-hero-sub">Des milliers de vinyles, cassettes & instruments<br>sélectionnés par des passionnés.</p>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="v-sec" id="categories">
+    <div class="wrap">
+      <div class="v-sec-hd">
+        <div>
+          <div class="v-sec-lbl">Collections</div>
+          <h2 class="v-sec-ttl">Explorer par <em>catégorie</em></h2>
+        </div>
+        <a href="catalogue.html" class="v-sec-more">Tout voir →</a>
+      </div>
+      <div class="v-cat-grid">
+        <a href="catalogue.html?cat=vinyles" class="v-cat-item">
+          <div class="v-cat-disc"><img src="../assets/images/categories/vinyle.jpg" alt="Vinyles" onerror="this.style.display='none'"></div>
+          <div class="v-cat-name">Vinyles</div>
+        </a>
+        <a href="catalogue.html?cat=cassettes" class="v-cat-item">
+          <div class="v-cat-disc"><img src="../assets/images/categories/cassetes.jpg" alt="Cassettes" onerror="this.style.display='none'"></div>
+          <div class="v-cat-name">Cassettes</div>
+        </a>
+        <a href="catalogue.html?cat=cd" class="v-cat-item">
+          <div class="v-cat-disc"><img src="../assets/images/categories/cd.jpg" alt="CDs" onerror="this.style.display='none'"></div>
+          <div class="v-cat-name">CDs</div>
+        </a>
+        <a href="catalogue.html?cat=posters" class="v-cat-item">
+          <div class="v-cat-disc"><img src="../assets/images/categories/posters.jpg" alt="Posters" onerror="this.style.display='none'"></div>
+          <div class="v-cat-name">Posters</div>
+        </a>
+        <a href="catalogue.html?cat=instruments" class="v-cat-item">
+          <div class="v-cat-disc"><img src="../assets/images/categories/instruments.jpg" alt="Instruments" onerror="this.style.display='none'"></div>
+          <div class="v-cat-name">Instruments</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR PRODUCTS -->
+  <section class="v-sec">
+    <div class="wrap">
+      <div class="v-sec-hd">
+        <div>
+          <div class="v-sec-lbl">Tendances</div>
+          <h2 class="v-sec-ttl">Produits <em>populaires</em></h2>
+        </div>
+        <a href="catalogue.html" class="v-sec-more">Voir tout →</a>
+      </div>
+      <div class="v-products-grid" id="popularGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;opacity:.5">
+          <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--honey);margin-bottom:15px;display:block"></i>
+          Chargement des produits...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="v-sec" id="how-it-works" style="background: rgba(39,33,36,0.5);">
+    <div class="wrap">
+      <div class="v-sec-hd" style="justify-content:center; text-align:center;">
+        <div>
+          <div class="v-sec-lbl">Guide</div>
+          <h2 class="v-sec-ttl">Comment ça <em>marche ?</em></h2>
+        </div>
+      </div>
+      <p style="text-align:center; color:var(--muted); max-width:600px; margin:0 auto 50px; font-size:0.95rem; line-height:1.7;">
+        RetroMarket est une plateforme qui connecte acheteurs et vendeurs de musique vintage.
+        Vous pouvez être <strong style="color:var(--ink)">acheteur</strong>, <strong style="color:var(--ink)">vendeur</strong>, ou même <strong style="color:var(--honey)">les deux</strong>.
+      </p>
+      <div class="v-hiw-grid">
+        <div class="v-hiw-card">
+          <div class="v-hiw-icon"><i class="fas fa-search"></i></div>
+          <div class="v-hiw-num">ÉTAPE 01</div>
+          <h3 class="v-hiw-title">Explorez le catalogue</h3>
+          <p class="v-hiw-desc">Parcourez des milliers de vinyles, cassettes, instruments et posters sélectionnés par nos vendeurs passionnés.</p>
+        </div>
+        <div class="v-hiw-card">
+          <div class="v-hiw-icon"><i class="fas fa-user-plus"></i></div>
+          <div class="v-hiw-num">ÉTAPE 02</div>
+          <h3 class="v-hiw-title">Créez votre compte</h3>
+          <p class="v-hiw-desc">Inscrivez-vous comme acheteur pour commander, ou comme vendeur pour ouvrir votre boutique. Vous pouvez basculer entre les deux !</p>
+        </div>
+        <div class="v-hiw-card">
+          <div class="v-hiw-icon"><i class="fas fa-handshake"></i></div>
+          <div class="v-hiw-num">ÉTAPE 03</div>
+          <h3 class="v-hiw-title">Achetez & Vendez</h3>
+          <p class="v-hiw-desc">Paiement sécurisé, livraison soigneuse. Vendeurs : commission de 8% seulement. Acheteurs : retours gratuits sous 30 jours.</p>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:50px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a href="../authentification/sign-up.html?role=acheteur" class="v-btn v-btn-primary"><i class="fas fa-shopping-bag"></i> Devenir acheteur</a>
+        <a href="../authentification/sign-up.html?role=seller" class="v-btn v-btn-secondary"><i class="fas fa-store"></i> Devenir vendeur</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('home');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    const wm = document.getElementById('welcome-message');
+    if (u && u.prenom) {
+      wm.textContent = `Ravi de vous revoir, ${u.prenom} ${u.nom}`;
+    }
+
+    // Load popular products
+    async function loadProducts() {
+      const grid = document.getElementById('popularGrid');
+      try {
+        const res = await fetch(`${window.API_BASE}/produits-populaires`);
+        const products = await res.json();
+        if (products.length) {
+          grid.innerHTML = products.map(p => buildacheteurProductCard(p)).join('');
+        } else {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">Aucun produit disponible pour le moment.</div>';
+        }
+      } catch (e) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--paprika)">Erreur de chargement.</div>';
+      }
+    }
+    loadProducts();
+
+    // ── Hero image slideshow ──
+    (function() {
+      const slides = document.querySelectorAll('.v-hero-bg-img');
+      let current = 0;
+      setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 4000);
+    })();
+
+    // ── Vinyl spin on scroll into view ──
+    (function() {
+      const discs = document.querySelectorAll('.v-cat-disc');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('spinning');
+          } else {
+            entry.target.classList.remove('spinning');
+          }
+        });
+      }, { threshold: 0.3 });
+      discs.forEach(d => observer.observe(d));
+    })();
+  </script>
+</body>
+</html>

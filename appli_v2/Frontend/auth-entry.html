@@ -233,7 +233,17 @@
     </div>
   </div>
 
+  <script src="js/auth-system.js"></script>
   <script>
+    if (typeof GoldAuth !== 'undefined' && GoldAuth.isLoggedIn()) {
+      const u = GoldAuth.getUser();
+      if (u && (u.role === 'ACHETEUR' || u.role === 'BOTH')) {
+        window.location.href = 'acheteur/index.html';
+      } else if (u && u.role === 'VENDEUR') {
+        window.location.href = 'seller/index.html';
+      }
+    }
+
     window.onload = () => {
       const assembly = document.getElementById('assembly');
       const vinylWrap = document.getElementById('vinylWrap');

@@ -246,14 +246,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── Qty change ── */
   window.changeQty = (id, delta) => {
-    const item = cartItems.find(i => i.id === id);
+    const item = cartItems.find(i => i.id === id || String(i.id) === String(id));
     if (!item) return;
     const newQty = item.qty + delta;
     if (newQty < 1) { removeItem(id); return; }
-    if (newQty > item.maxQty) { showToast(`⚠️ Maximum ${item.maxQty} exemplaires`, 'warn'); return; }
+    if (newQty > (item.maxQty || 99)) { showToast(`⚠️ Maximum ${item.maxQty || 99} exemplaires`, 'warn'); return; }
     item.qty = newQty;
     renderCart(); syncCartToStorage();
     showToast('Quantité mise à jour', 'success');
+
+    // Sync avec la BDD
+    if (typeof GoldAuth !== 'undefined' && GoldAuth.isLoggedIn()) {
+      const user = GoldAuth.getUser();
+      const bId = user?.id_user || user?.id;
+      if (bId) {
+        fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : 'http://127.0.0.1:8000/api'}/panier`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_acheteur: bId,
+            id_produit: id,
+            prix_unitaire: item.price,
+            quantite: newQty,
+            action: 'set'
+          })
+        }).catch(e => console.warn('Sync qty error:', e));
+      }
+    }
   };
 
   /* ── Remove ── */

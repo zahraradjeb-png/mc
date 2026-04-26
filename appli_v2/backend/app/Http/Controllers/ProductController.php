@@ -34,7 +34,9 @@ class ProductController extends Controller
                 'produit.*', 
                 'categorie.nom as categorie_nom', 
                 'produit_photo.chemin as photo_principale',
-                DB::raw('CASE WHEN annonce.statut = "VALIDEE" OR produit.statut = "VALIDEE" THEN "VALIDEE" WHEN annonce.statut = "REFUSEE" OR produit.statut = "REFUSEE" THEN "REFUSEE" ELSE "EN_ATTENTE" END as real_statut')
+                DB::raw('CASE WHEN annonce.statut = "VALIDEE" OR produit.statut = "VALIDEE" THEN "VALIDEE" WHEN annonce.statut = "REFUSEE" OR produit.statut = "REFUSEE" THEN "REFUSEE" ELSE "EN_ATTENTE" END as real_statut'),
+                DB::raw('(SELECT COALESCE(AVG(note), 0) FROM (SELECT note, id_produit FROM avis UNION ALL SELECT note, id_produit FROM avis_visiteur) as all_avis WHERE all_avis.id_produit = produit.id_produit) as avg_note'),
+                DB::raw('(SELECT COUNT(*) FROM (SELECT id_produit FROM avis UNION ALL SELECT id_produit FROM avis_visiteur) as all_avis_c WHERE all_avis_c.id_produit = produit.id_produit) as review_count')
             );
 
         if ($id_vendeur) {
@@ -71,7 +73,9 @@ class ProductController extends Controller
                 'produit.*',
                 'categorie.nom as categorie_nom',
                 'produit_photo.chemin as photo_principale',
-                DB::raw('COALESCE(annonce.statut, produit.statut, "VALIDEE") as real_statut')
+                DB::raw('COALESCE(annonce.statut, produit.statut, "VALIDEE") as real_statut'),
+                DB::raw('(SELECT COALESCE(AVG(note), 0) FROM (SELECT note, id_produit FROM avis UNION ALL SELECT note, id_produit FROM avis_visiteur) as all_avis WHERE all_avis.id_produit = produit.id_produit) as avg_note'),
+                DB::raw('(SELECT COUNT(*) FROM (SELECT id_produit FROM avis UNION ALL SELECT id_produit FROM avis_visiteur) as all_avis_c WHERE all_avis_c.id_produit = produit.id_produit) as review_count')
             )
             ->orderBy('produit.date_ajout', 'desc')
             ->limit(12)
