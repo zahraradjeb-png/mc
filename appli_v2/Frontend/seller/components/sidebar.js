@@ -5,10 +5,11 @@ const SellerSidebar = {
     if (!container) return;
 
     const mainNav = [
-      { id: 'dashboard', label: 'Tableau de bord', icon: 'fas fa-th-large',      url: 'dashboard.html' },
-      { id: 'products',  label: 'Mes Produits',    icon: 'fas fa-boxes',           url: 'products.html' },
-      { id: 'orders',    label: 'Commandes',        icon: 'fas fa-shopping-bag',    url: 'orders.html' },
-      { id: 'finance',   label: 'Finances',         icon: 'fas fa-wallet',          url: 'finance.html' },
+      { id: 'dashboard',      label: 'Tableau de bord', icon: 'fas fa-th-large',      url: 'dashboard.html' },
+      { id: 'products',       label: 'Mes Produits',    icon: 'fas fa-boxes',           url: 'products.html' },
+      { id: 'orders',         label: 'Commandes',        icon: 'fas fa-shopping-bag',    url: 'orders.html' },
+      { id: 'finance',        label: 'Finances',         icon: 'fas fa-wallet',          url: 'finance.html' },
+      { id: 'ia-predictions', label: 'IA Prédictions',   icon: 'fas fa-brain',           url: 'ia-predictions.html' },
     ];
     const shopNav = [
       { id: 'profile',   label: 'Aperçu Boutique',  icon: 'fas fa-store',           url: 'profile.html' },

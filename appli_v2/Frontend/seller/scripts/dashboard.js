@@ -23,6 +23,30 @@ const DashboardController = {
       this.loadKPIs(sellerId),
       this.loadRecentProducts(sellerId)
     ]);
+
+    // Load IA mini-widget (non-blocking)
+    this.loadIAMiniWidget(sellerId);
+  },
+
+  /* ── IA Mini Widget ── */
+  async loadIAMiniWidget(vendeurId) {
+    try {
+      const data = await PredictionService.getPredictions(vendeurId);
+      if (!data) return;
+
+      const el = document.getElementById('ia-mini-text');
+      if (!el) return;
+
+      const trendSign = data.trend_percent >= 0 ? '+' : '';
+      const trendColor = data.trend_percent >= 0 ? '#22C55E' : '#EF4444';
+      const trendIcon = data.trend_percent >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+
+      el.innerHTML = `
+        Tendance : <strong style="color:${trendColor}"><i class="fas ${trendIcon}"></i> ${trendSign}${data.trend_percent}%</strong>
+        · Revenu prédit : <strong style="color:var(--studio-honey)">${data.next_month_revenue} €</strong>
+        · Confiance : <strong style="color:#3B82F6">${data.confidence_score}% R²</strong>
+      `;
+    } catch (_) {}
   },
 
   /* ── KPI Cards ── */

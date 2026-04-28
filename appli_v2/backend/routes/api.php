@@ -29,6 +29,9 @@ Route::get('/vendeurs/{id}/stats', [\App\Http\Controllers\SellerController::clas
 Route::get('/vendeurs/{id}/finance', [\App\Http\Controllers\SellerController::class, 'getFinance']);
 Route::put('/vendeurs/{id}/password', [\App\Http\Controllers\SellerController::class, 'updatePassword']);
 
+// ── IA Prédictions Vendeur ──
+Route::get('/vendeurs/{id}/predictions', [\App\Http\Controllers\PredictionController::class, 'getPredictions']);
+
 // ── Acheteur ──
 Route::get('/acheteurs/{id}/favoris', [\App\Http\Controllers\BuyerController::class, 'getFavorites']);
 Route::post('/acheteurs/{id}/favoris', [\App\Http\Controllers\BuyerController::class, 'toggleFavorite']);

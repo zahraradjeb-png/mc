@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Prédictions — Retro Market Studio</title>
+  <meta name="description" content="Prédictions de ventes par intelligence artificielle pour votre boutique Retro Market.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles/seller-base.css">
+  <link rel="stylesheet" href="styles/seller-layout.css">
+  <link rel="stylesheet" href="styles/seller-ia.css">
+</head>
+<body class="seller-studio">
+
+<!-- Mobile sidebar toggle -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Menu">
+  <i class="fas fa-bars"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div id="studio-toast"></div>
+
+<div class="studio-layout">
+  <div id="sidebar-container"></div>
+
+  <main class="studio-main animate-slide">
+    <div id="header-container"></div>
+
+    <!-- ── IA Hero Section ── -->
+    <div class="ia-hero" id="ia-hero">
+      <div class="ia-hero-bg">
+        <div class="ia-particle"></div>
+        <div class="ia-particle"></div>
+        <div class="ia-particle"></div>
+        <div class="ia-particle"></div>
+        <div class="ia-particle"></div>
+      </div>
+      <div class="ia-hero-content">
+        <div class="ia-badge">
+          <i class="fas fa-brain"></i>
+          <span>Intelligence Artificielle</span>
+        </div>
+        <h2 class="ia-hero-title">Prédiction de Ventes</h2>
+        <p class="ia-hero-subtitle">Algorithme de régression linéaire analysant vos données de ventes pour prédire les tendances futures.</p>
+      </div>
+    </div>
+
+    <!-- ── IA KPI Row ── -->
+    <div class="ia-kpi-row" id="ia-kpi-row">
+      <div class="ia-kpi-card">
+        <div class="loading-pulse" style="height:100px;border-radius:16px;"></div>
+      </div>
+      <div class="ia-kpi-card">
+        <div class="loading-pulse" style="height:100px;border-radius:16px;"></div>
+      </div>
+      <div class="ia-kpi-card">
+        <div class="loading-pulse" style="height:100px;border-radius:16px;"></div>
+      </div>
+      <div class="ia-kpi-card">
+        <div class="loading-pulse" style="height:100px;border-radius:16px;"></div>
+      </div>
+    </div>
+
+    <!-- ── Chart Section ── -->
+    <div class="ia-chart-section">
+      <div class="studio-card ia-chart-card" id="ia-chart-card">
+        <div class="ia-chart-header">
+          <h3 class="section-title">
+            <i class="fas fa-chart-area"></i> Courbe de Prédiction
+          </h3>
+          <div class="ia-chart-legend">
+            <span class="legend-item"><span class="legend-dot real"></span> Ventes réelles</span>
+            <span class="legend-item"><span class="legend-dot predicted"></span> Prédiction IA</span>
+          </div>
+        </div>
+        <div class="ia-chart-container">
+          <canvas id="predictionChart"></canvas>
+        </div>
+        <div class="ia-chart-footer">
+          <div class="ia-algo-badge">
+            <i class="fas fa-cogs"></i>
+            <span>Régression Linéaire — Méthode des Moindres Carrés</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Main Content Grid ── -->
+    <div class="ia-content-grid">
+
+      <!-- Recommandations IA -->
+      <div class="studio-card ia-recommendations-card" id="ia-recommendations">
+        <h3 class="section-title" style="margin-bottom:16px;">
+          <i class="fas fa-lightbulb"></i> Recommandations IA
+        </h3>
+        <div class="ia-recommendations-list" id="ia-reco-list">
+          <div class="loading-pulse" style="height:70px;border-radius:12px;margin-bottom:10px;"></div>
+          <div class="loading-pulse" style="height:70px;border-radius:12px;margin-bottom:10px;"></div>
+          <div class="loading-pulse" style="height:70px;border-radius:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Top Produits -->
+      <div class="studio-card ia-top-products-card" id="ia-top-products">
+        <h3 class="section-title" style="margin-bottom:16px;">
+          <i class="fas fa-trophy"></i> Top Produits Vendus
+        </h3>
+        <div id="ia-top-products-list">
+          <div class="loading-pulse" style="height:55px;border-radius:12px;margin-bottom:8px;"></div>
+          <div class="loading-pulse" style="height:55px;border-radius:12px;margin-bottom:8px;"></div>
+          <div class="loading-pulse" style="height:55px;border-radius:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Catégories Analysis -->
+      <div class="studio-card ia-categories-card" id="ia-categories">
+        <h3 class="section-title" style="margin-bottom:16px;">
+          <i class="fas fa-chart-pie"></i> Performance par Catégorie
+        </h3>
+        <div class="ia-category-chart-container">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Produits Favoris (Hot) -->
+      <div class="studio-card ia-hot-products-card" id="ia-hot-products">
+        <h3 class="section-title" style="margin-bottom:16px;">
+          <i class="fas fa-fire"></i> Produits en Forte Demande
+          <span class="ia-badge-small">Favoris</span>
+        </h3>
+        <div id="ia-hot-products-list">
+          <div class="loading-pulse" style="height:55px;border-radius:12px;margin-bottom:8px;"></div>
+          <div class="loading-pulse" style="height:55px;border-radius:12px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Algo Explanation ── -->
+    <div class="studio-card ia-algo-card" id="ia-algo-explain">
+      <div class="ia-algo-content">
+        <div class="ia-algo-icon">
+          <i class="fas fa-brain"></i>
+        </div>
+        <div>
+          <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:#fff; margin-bottom:6px;">Comment fonctionne l'IA ?</h3>
+          <p style="color:var(--studio-muted); font-size:0.85rem; line-height:1.6;">
+            Notre algorithme utilise la <strong style="color:var(--studio-honey);">régression linéaire</strong> (méthode des moindres carrés)
+            pour analyser vos ventes historiques. Il calcule une droite de tendance <code style="color:var(--studio-honey);">y = mx + b</code>
+            et projette les revenus futurs. Le <strong style="color:var(--studio-honey);">score R²</strong> mesure la fiabilité du modèle
+            (plus il est proche de 100%, plus la prédiction est précise).
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<!-- Common Libraries -->
+<script src="../js/api-config.js"></script>
+<script src="../js/auth-system.js"></script>
+
+<!-- Modular Services -->
+<script src="services/seller-auth.js"></script>
+<script src="services/products.service.js"></script>
+<script src="services/prediction.service.js"></script>
+
+<!-- Shared Components -->
+<script src="components/sidebar.js"></script>
+<script src="components/header.js"></script>
+<script src="components/seller-layout.js"></script>
+
+<!-- Controller -->
+<script src="scripts/ia-predictions.js"></script>
+</body>
+</html>

@@ -104,6 +104,27 @@
 
     </div>
 
+    <!-- ── IA Prediction Mini-Widget ── -->
+    <div class="studio-card" id="ia-mini-widget" style="margin-top:20px; background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(59,130,246,0.05)); border: 1px solid rgba(168,85,247,0.15);">
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div style="width:48px; height:48px; background:linear-gradient(135deg, rgba(168,85,247,0.2), rgba(59,130,246,0.15)); border:1px solid rgba(168,85,247,0.25); border-radius:14px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-brain" style="color:#A855F7; font-size:1.2rem;"></i>
+        </div>
+        <div style="flex:1; min-width:200px;">
+          <div style="font-family:'Outfit',sans-serif; font-weight:700; font-size:0.95rem; color:#fff; margin-bottom:3px;">
+            <i class="fas fa-sparkles" style="color:var(--studio-honey); margin-right:4px;"></i>
+            Intelligence Artificielle
+          </div>
+          <p style="font-family:'Outfit',sans-serif; font-size:0.78rem; color:var(--studio-muted); margin:0; line-height:1.4;" id="ia-mini-text">
+            Analysez vos tendances de ventes et obtenez des prédictions basées sur vos données.
+          </p>
+        </div>
+        <a href="ia-predictions.html" class="btn-gold-studio" style="font-size:0.8rem; padding:10px 22px; white-space:nowrap;">
+          <i class="fas fa-chart-line"></i> Voir les prédictions
+        </a>
+      </div>
+    </div>
+
     </div>
 
   </main>
@@ -113,6 +134,7 @@
 <script src="../js/auth-system.js"></script>
 <script src="services/seller-auth.js"></script>
 <script src="services/products.service.js"></script>
+<script src="services/prediction.service.js"></script>
 <script src="components/sidebar.js"></script>
 <script src="components/header.js"></script>
 <script src="components/seller-layout.js"></script>
