@@ -4,7 +4,7 @@
 ══════════════════════════════════════ */
 
 // ── API Base (always points to Laravel backend) ──
-window.API_BASE = 'http://127.0.0.1:8000/api';
+window.API_BASE = window.API_BASE || 'http://127.0.0.1:8000/api';
 
 // ── Visitor ID (persistent UUID in localStorage) ──
 const VisitorSystem = {
