@@ -128,27 +128,58 @@ class AuthController extends Controller
             'email'  => 'required|email'
         ]);
 
-        DB::table('users')->where('id_user', $id)->update([
+        // Update users table (handle bio column gracefully)
+        $userData = [
             'nom'    => $request->nom,
             'prenom' => $request->prenom,
             'email'  => $request->email,
-            'bio'    => $request->bio ?? ''
-        ]);
+        ];
+        try {
+            $userData['bio'] = $request->bio ?? '';
+            DB::table('users')->where('id_user', $id)->update($userData);
+        } catch (\Exception $e) {
+            // bio column might not exist
+            unset($userData['bio']);
+            DB::table('users')->where('id_user', $id)->update($userData);
+        }
 
-        // On renvoie les nouvelles infos pour mettre à jour le localStorage
+        // Update acheteur table if buyer fields provided
+        $acheteur = DB::table('acheteur')->where('id_user', $id)->first();
+        if ($acheteur) {
+            DB::table('acheteur')->where('id_user', $id)->update([
+                'adresse'   => $request->adresse ?? $acheteur->adresse,
+                'telephone' => $request->telephone ?? $acheteur->telephone,
+            ]);
+        } elseif ($request->has('adresse') || $request->has('telephone')) {
+            // Create acheteur row if it doesn't exist
+            DB::table('acheteur')->insert([
+                'id_user'   => $id,
+                'adresse'   => $request->adresse ?? '',
+                'telephone' => $request->telephone ?? '',
+            ]);
+        }
+
+        // Return full user data
         $user = DB::table('users')->where('id_user', $id)->first();
+        $acheteurData = DB::table('acheteur')->where('id_user', $id)->first();
+
+        $response = [
+            'id'       => $user->id_user ?? $user->id ?? 0,
+            'id_user'  => $user->id_user ?? $user->id ?? 0,
+            'nom'      => $user->nom,
+            'prenom'   => $user->prenom,
+            'email'    => $user->email,
+            'role'     => $user->role,
+        ];
+
+        if ($acheteurData) {
+            $response['adresse']   = $acheteurData->adresse ?? '';
+            $response['telephone'] = $acheteurData->telephone ?? '';
+        }
 
         return response()->json([
             'message' => 'Profil mis à jour avec succès',
-            'user' => [
-                'id' => $user->id_user ?? $user->id ?? 0,
-                'id_user' => $user->id_user ?? $user->id ?? 0,
-                'nom' => $user->nom,
-                'prenom' => $user->prenom,
-                'email' => $user->email,
-                'role' => $user->role,
-                'bio' => $user->bio
-            ]
+            'user'    => $response
         ]);
     }
 

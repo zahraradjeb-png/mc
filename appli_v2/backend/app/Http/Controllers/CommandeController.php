@@ -117,6 +117,37 @@ class CommandeController extends Controller
                     }
                 }
 
+                // ── Notifier chaque vendeur concerné par cette commande ──
+                $acheteur = DB::table('users')->where('id_user', $idAcheteur)->first();
+                $acheteurNom = $acheteur ? ($acheteur->prenom . ' ' . $acheteur->nom) : 'Un acheteur';
+
+                // Récupérer les vendeurs distincts avec leurs produits commandés
+                $vendeursItems = DB::table('commande_produit')
+                    ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
+                    ->where('commande_produit.id_commande', $idCommande)
+                    ->select('produit.id_vendeur', 'produit.titre', 'commande_produit.quantite', 'commande_produit.prix_unitaire')
+                    ->get()
+                    ->groupBy('id_vendeur');
+
+                foreach ($vendeursItems as $vendeurId => $items) {
+                    $nbArticles = $items->count();
+                    $totalVendeur = $items->sum(fn($i) => $i->prix_unitaire * $i->quantite);
+                    $premierProduit = $items->first()->titre;
+                    $detail = $nbArticles > 1
+                        ? "\"{$premierProduit}\" et " . ($nbArticles - 1) . " autre(s) article(s)"
+                        : "\"{$premierProduit}\"";
+
+                    DB::table('notifications')->insert([
+                        'id_user'    => $vendeurId,
+                        'titre'      => 'Nouvelle commande reçue 🛒',
+                        'contenu'    => "{$acheteurNom} a commandé {$detail} pour " . number_format($totalVendeur, 2, ',', ' ') . " €. Commande #{$idCommande}.",
+                        'type'       => 'order',
+                        'est_lue'    => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
                 return ['id_commande' => $idCommande, 'montant_total' => $montantTotal];
             });
 

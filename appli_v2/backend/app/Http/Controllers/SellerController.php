@@ -400,6 +400,45 @@ class SellerController extends Controller
     }
 
     /**
+     * Get seller notifications.
+     */
+    public function getNotifications($id)
+    {
+        $notifications = DB::table('notifications')
+            ->where('id_user', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($notifications);
+    }
+
+    /**
+     * Mark a single notification as read.
+     */
+    public function markNotificationAsRead($id, $notifId)
+    {
+        DB::table('notifications')
+            ->where('id_user', $id)
+            ->where('id', $notifId)
+            ->update(['est_lue' => true]);
+
+        return response()->json(['message' => 'Notification marquée comme lue']);
+    }
+
+    /**
+     * Mark all notifications as read.
+     */
+    public function markAllNotificationsAsRead($id)
+    {
+        DB::table('notifications')
+            ->where('id_user', $id)
+            ->where('est_lue', false)
+            ->update(['est_lue' => true]);
+
+        return response()->json(['message' => 'Toutes les notifications marquées comme lues']);
+    }
+
+    /**
      * Update seller password.
      */
     public function updatePassword(Request $request, $id)

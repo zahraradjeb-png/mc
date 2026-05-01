@@ -23,7 +23,29 @@ const SellerLayout = {
     const nameEl = document.getElementById('layout-user-name');
     if (nameEl) nameEl.textContent = user.nom_boutique || user.prenom || '';
 
+    // 6. Load notification badge count
+    this._loadNotifBadge(user.id_user || user.id);
+
     return user;
+  },
+
+  async _loadNotifBadge(userId) {
+    try {
+      if (typeof NotificationService !== 'undefined') {
+        const count = await NotificationService.getUnreadCount(userId);
+        const badge = document.getElementById('notif-badge');
+        if (badge) {
+          if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      }
+    } catch (e) {
+      // Silently fail if service unavailable
+    }
   },
 
   _initMobileNav() {

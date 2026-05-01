@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Controllers\ProductController;
 
@@ -28,6 +29,9 @@ Route::put('/vendeurs/{vendeurId}/commandes/{orderId}/produit/{productId}/status
 Route::get('/vendeurs/{id}/stats', [\App\Http\Controllers\SellerController::class, 'getStats']);
 Route::get('/vendeurs/{id}/finance', [\App\Http\Controllers\SellerController::class, 'getFinance']);
 Route::put('/vendeurs/{id}/password', [\App\Http\Controllers\SellerController::class, 'updatePassword']);
+Route::get('/vendeurs/{id}/notifications', [\App\Http\Controllers\SellerController::class, 'getNotifications']);
+Route::put('/vendeurs/{id}/notifications/tout-lire', [\App\Http\Controllers\SellerController::class, 'markAllNotificationsAsRead']);
+Route::put('/vendeurs/{id}/notifications/{notifId}/lue', [\App\Http\Controllers\SellerController::class, 'markNotificationAsRead']);
 
 // ── IA Prédictions Vendeur ──
 Route::get('/vendeurs/{id}/predictions', [\App\Http\Controllers\PredictionController::class, 'getPredictions']);
@@ -79,7 +83,38 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/inscription', [AuthController::class, 'inscription']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/user/{id}/profile', function ($id) {
+    $user = DB::table('users')->where('id_user', $id)->first();
+    if (!$user) return response()->json(['message' => 'Utilisateur introuvable'], 404);
+
+    $acheteur = DB::table('acheteur')->where('id_user', $id)->first();
+
+    $data = [
+        'id'       => $user->id_user,
+        'id_user'  => $user->id_user,
+        'nom'      => $user->nom,
+        'prenom'   => $user->prenom,
+        'email'    => $user->email,
+        'role'     => $user->role,
+        'adresse'  => $acheteur->adresse ?? '',
+        'telephone'=> $acheteur->telephone ?? '',
+    ];
+    return response()->json($data);
+});
 Route::put('/user/{id}/profile', [AuthController::class, 'updateProfile']);
+Route::put('/user/{id}/password', function (Request $request, $id) {
+    $user = DB::table('users')->where('id_user', $id)->first();
+    if (!$user) return response()->json(['message' => 'Utilisateur introuvable'], 404);
+
+    if (!Hash::check($request->ancien_mdp, $user->mdp)) {
+        return response()->json(['message' => 'Mot de passe actuel incorrect'], 422);
+    }
+
+    DB::table('users')->where('id_user', $id)->update([
+        'mdp' => Hash::make($request->nouveau_mdp)
+    ]);
+    return response()->json(['message' => 'Mot de passe modifié avec succès']);
+});
 Route::post('/user/{id}/switch-role', [AuthController::class, 'switchRole']);
 Route::post('/become-seller', function(Request $request) {
     try {
@@ -209,6 +244,36 @@ Route::post('/orders', function(Request $request) {
                 'message' => "Votre commande #{$idCommande} est enregistrée.",
                 'status' => 'unread', 'created_at' => now(), 'updated_at' => now()
             ]);
+
+            // 7. Notifications vendeurs concernés
+            $acheteur = DB::table('users')->where('id_user', $idAcheteur)->first();
+            $acheteurNom = $acheteur ? ($acheteur->prenom . ' ' . $acheteur->nom) : 'Un acheteur';
+
+            $vendeursItems = DB::table('commande_produit')
+                ->join('produit', 'commande_produit.id_produit', '=', 'produit.id_produit')
+                ->where('commande_produit.id_commande', $idCommande)
+                ->select('produit.id_vendeur', 'produit.titre', 'commande_produit.quantite', 'commande_produit.prix_unitaire')
+                ->get()
+                ->groupBy('id_vendeur');
+
+            foreach ($vendeursItems as $vendeurId => $items) {
+                $nbArticles = $items->count();
+                $totalVendeur = $items->sum(fn($i) => $i->prix_unitaire * $i->quantite);
+                $premierProduit = $items->first()->titre;
+                $detail = $nbArticles > 1
+                    ? "\"{$premierProduit}\" et " . ($nbArticles - 1) . " autre(s) article(s)"
+                    : "\"{$premierProduit}\"";
+
+                DB::table('notifications')->insert([
+                    'id_user'    => $vendeurId,
+                    'titre'      => 'Nouvelle commande reçue 🛒',
+                    'contenu'    => "{$acheteurNom} a commandé {$detail} pour " . number_format($totalVendeur, 2, ',', ' ') . " €. Commande #{$idCommande}.",
+                    'type'       => 'order',
+                    'est_lue'    => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             return response()->json(['message' => 'Commande enregistrée dans la table commande.', 'id' => $idCommande], 201);
         });

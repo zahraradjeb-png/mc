@@ -325,7 +325,7 @@
       <a href="../visitor/index.html" class="nav-item">
         <i class="fas fa-external-link-alt"></i> <span>Voir le site</span>
       </a>
-      <button onclick="if(typeof GoldAuth!=='undefined') { GoldAuth.logout(); setTimeout(()=>window.location.href='../authentification/sign-in.html', 100); } else { window.location.href='../authentification/sign-in.html'; }" class="nav-item logout-btn">
+      <button onclick="(function(){ if(typeof GoldAuth!=='undefined') GoldAuth.logout(); localStorage.clear(); sessionStorage.clear(); window.location.href='../auth-entry.html'; })()" class="nav-item logout-btn">
         <i class="fas fa-power-off"></i> <span>Déconnexion</span>
       </button>
     </div>

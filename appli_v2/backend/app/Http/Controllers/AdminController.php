@@ -114,10 +114,9 @@ class AdminController extends Controller
                 'users.prenom',
                 'users.email',
                 'users.role',
-                'users.created_at',
                 'vendeur.nom_boutique'
             )
-            ->orderBy('users.created_at', 'desc')
+            ->orderBy('users.id_user', 'desc')
             ->get();
 
         return response()->json($users);
@@ -200,17 +199,106 @@ class AdminController extends Controller
                     'date_traitement' => now()
                 ]);
             }
+
+            // 3. Notifier le vendeur de la décision
+            $produit = DB::table('produit')->where('id_produit', $id)->first();
+            if ($produit) {
+                $vendeurId = $produit->id_vendeur;
+                $titre = $produit->titre ?? 'Produit #' . $id;
+
+                if ($status === 'VALIDEE') {
+                    DB::table('notifications')->insert([
+                        'id_user'    => $vendeurId,
+                        'titre'      => 'Produit validé ✅',
+                        'contenu'    => "Votre produit \"{$titre}\" a été approuvé par l'administration. Il est maintenant visible sur la marketplace !",
+                        'type'       => 'success',
+                        'est_lue'    => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                } else {
+                    DB::table('notifications')->insert([
+                        'id_user'    => $vendeurId,
+                        'titre'      => 'Produit refusé ❌',
+                        'contenu'    => "Votre produit \"{$titre}\" a été refusé par l'administration. Vérifiez qu'il respecte nos conditions de vente.",
+                        'type'       => 'alert',
+                        'est_lue'    => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
         });
 
         return response()->json(['message' => "Statut mis à jour : {$status}"]);
     }
 
     /**
-     * Supprimer un utilisateur.
+     * Supprimer un utilisateur et toutes ses données associées.
      */
     public function deleteUser($id)
     {
-        DB::table('users')->where('id_user', $id)->delete();
-        return response()->json(['message' => 'Utilisateur supprimé']);
+        try {
+            DB::transaction(function () use ($id) {
+                // 1. Supprimer les commandes où l'utilisateur est acheteur
+                $commandeIds = DB::table('commande')->where('id_acheteur', $id)->pluck('id_commande');
+                if ($commandeIds->isNotEmpty()) {
+                    DB::table('commande_produit')->whereIn('id_commande', $commandeIds)->delete();
+                    DB::table('paiement')->whereIn('id_commande', $commandeIds)->delete();
+                    DB::table('commande')->whereIn('id_commande', $commandeIds)->delete();
+                }
+
+                // 2. Supprimer le panier
+                $panierIds = DB::table('panier')->where('id_acheteur', $id)->pluck('id_panier');
+                if ($panierIds->isNotEmpty()) {
+                    DB::table('panier_produit')->whereIn('id_panier', $panierIds)->delete();
+                    DB::table('panier')->whereIn('id_panier', $panierIds)->delete();
+                }
+
+                // 3. Supprimer les produits du vendeur (et leurs dépendances)
+                $produitIds = DB::table('produit')->where('id_vendeur', $id)->pluck('id_produit');
+                if ($produitIds->isNotEmpty()) {
+                    // Commandes contenant ses produits (commande_produit)
+                    DB::table('commande_produit')->whereIn('id_produit', $produitIds)->delete();
+                    // Photos
+                    DB::table('produit_photo')->whereIn('id_produit', $produitIds)->delete();
+                    // Annonces
+                    $annonceIds = DB::table('annonce_produit')->whereIn('id_produit', $produitIds)->pluck('id_annonce');
+                    DB::table('annonce_produit')->whereIn('id_produit', $produitIds)->delete();
+                    if ($annonceIds->isNotEmpty()) {
+                        DB::table('annonce')->whereIn('id_annonce', $annonceIds)->delete();
+                    }
+                    // Avis
+                    try { DB::table('avis')->whereIn('id_produit', $produitIds)->delete(); } catch (\Exception $e) {}
+                    try { DB::table('reviews')->whereIn('product_id', $produitIds)->delete(); } catch (\Exception $e) {}
+                    // Favoris
+                    try { DB::table('favoris')->whereIn('id_produit', $produitIds)->delete(); } catch (\Exception $e) {}
+                    // Produits
+                    DB::table('produit')->whereIn('id_produit', $produitIds)->delete();
+                }
+
+                // 4. Supprimer les notifications
+                try { DB::table('notifications')->where('id_user', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('user_notifications')->where('user_id', $id)->delete(); } catch (\Exception $e) {}
+
+                // 5. Supprimer activités, favoris, avis de l'utilisateur
+                try { DB::table('activities')->where('user_id', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('favoris')->where('id_user', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('avis')->where('id_user', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('reviews')->where('user_id', $id)->delete(); } catch (\Exception $e) {}
+
+                // 6. Supprimer les tables de rôle
+                try { DB::table('vendeur')->where('id_user', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('sellers')->where('user_id', $id)->delete(); } catch (\Exception $e) {}
+                try { DB::table('acheteur')->where('id_user', $id)->delete(); } catch (\Exception $e) {}
+
+                // 7. Supprimer l'utilisateur
+                DB::table('users')->where('id_user', $id)->delete();
+            });
+
+            return response()->json(['message' => 'Utilisateur supprimé']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur: ' . $e->getMessage()], 500);
+        }
     }
 }

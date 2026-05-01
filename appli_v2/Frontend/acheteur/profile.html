@@ -9,129 +9,490 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/acheteur.css">
   <style>
-    .profile-card {
-      background: var(--ink2); border: 1px solid var(--biscuit);
-      border-radius: 12px; padding: 30px; margin-bottom: 20px;
+    /* ── Profile Page Styles ── */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      align-items: start;
     }
-    .profile-header {
-      display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--biscuit); padding-bottom: 20px; margin-bottom: 20px;
+
+    /* Left column — identity card */
+    .profile-identity {
+      background: var(--ink2);
+      border: 1px solid var(--biscuit);
+      border-radius: 16px;
+      padding: 36px 28px;
+      text-align: center;
+      position: sticky;
+      top: 100px;
     }
-    .profile-avatar {
-      width: 80px; height: 80px; border-radius: 50%; background: var(--honey); color: #111;
-      display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold;
+    .profile-avatar-lg {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--honey), #d4952e);
+      color: #111;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem; font-weight: 700;
+      margin: 0 auto 18px;
+      box-shadow: 0 8px 24px rgba(229,166,87,0.3);
+      font-family: 'Cormorant Garamond', serif;
     }
-    .profile-name { font-size: 1.5rem; font-weight: 600; color: var(--ink); }
-    .profile-email { color: var(--muted); font-size: 1rem; }
-    .profile-section-title { font-size: 1.2rem; color: var(--ink); margin-bottom: 15px; border-bottom: 1px dashed var(--biscuit); padding-bottom: 5px; }
+    .profile-fullname {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 600;
+      color: var(--ink); margin-bottom: 4px;
+    }
+    .profile-role-badge {
+      display: inline-block;
+      background: rgba(229,166,87,0.12);
+      color: var(--honey);
+      padding: 4px 14px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-top: 6px;
+    }
+    .profile-meta-list {
+      margin-top: 24px; text-align: left;
+      border-top: 1px solid var(--biscuit); padding-top: 20px;
+    }
+    .profile-meta-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; color: var(--muted); font-size: 0.88rem;
+    }
+    .profile-meta-item i {
+      width: 18px; text-align: center;
+      color: var(--honey); font-size: 0.85rem;
+    }
+    .profile-meta-item span { color: var(--ink); }
+    .profile-quick-links {
+      margin-top: 24px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .profile-quick-links a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      font-size: 0.85rem; color: var(--muted);
+      transition: all 0.3s; border: 1px solid transparent;
+    }
+    .profile-quick-links a:hover {
+      background: rgba(229,166,87,0.05);
+      border-color: rgba(229,166,87,0.15);
+      color: var(--honey);
+    }
+    .profile-quick-links a i { width: 18px; text-align: center; }
+
+    /* Right column — forms */
+    .profile-section {
+      background: var(--ink2);
+      border: 1px solid var(--biscuit);
+      border-radius: 16px;
+      padding: 32px; margin-bottom: 24px;
+    }
+    .profile-section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--biscuit);
+    }
+    .profile-section-header i {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(229,166,87,0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--honey); font-size: 1rem;
+    }
+    .profile-section-header h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; color: var(--ink); font-weight: 600;
+    }
+    .profile-section-header p {
+      font-size: 0.78rem; color: var(--muted); margin-top: 2px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    .profile-input-group { margin-bottom: 20px; }
+    .profile-input-group label {
+      display: block; font-size: 0.75rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .profile-input-group input {
+      width: 100%; background: rgba(0,0,0,0.25);
+      border: 1px solid var(--biscuit); border-radius: 10px;
+      padding: 13px 16px; color: var(--ink);
+      font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-input-group input:focus {
+      border-color: var(--honey); outline: none;
+      box-shadow: 0 0 0 3px rgba(229,166,87,0.1);
+    }
+    .profile-input-group input::placeholder { color: var(--faint); }
+
+    .btn-save {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--honey), #d4952e);
+      color: #111; font-weight: 700; font-size: 0.88rem;
+      border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.3s;
+      box-shadow: 0 4px 14px rgba(229,166,87,0.3);
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(229,166,87,0.4);
+    }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-logout-profile {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px;
+      background: transparent;
+      border: 1px solid rgba(181,51,36,0.4);
+      color: var(--paprika); font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .btn-logout-profile:hover {
+      background: rgba(181,51,36,0.1);
+      border-color: var(--paprika);
+    }
+
+    .save-feedback {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #22C55E; font-size: 0.85rem; font-weight: 500;
+      margin-left: 14px; opacity: 0; transition: opacity 0.3s;
+    }
+    .save-feedback.show { opacity: 1; }
+
+    /* Toast */
+    #profile-toast {
+      position: fixed; bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--ink2); border: 1px solid var(--honey);
+      color: var(--ink); padding: 14px 28px; border-radius: 12px;
+      font-size: 0.88rem; font-weight: 500;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      opacity: 0; transition: all 0.4s var(--ease-spring);
+      z-index: 10000; display: flex; align-items: center; gap: 10px;
+    }
+    #profile-toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+    #profile-toast i { color: var(--honey); }
+
+    @media (max-width: 900px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .profile-identity { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
   <div id="navbar-container"></div>
+
   <div class="v-page-header">
     <div class="wrap">
       <h1 class="v-page-title">Mon <em>Profil</em></h1>
-      <p class="v-page-subtitle">Gérez vos informations personnelles.</p>
+      <p class="v-page-subtitle">Gérez vos informations personnelles et vos préférences.</p>
     </div>
   </div>
+
   <main style="padding: 60px 0 80px;">
-    <div class="wrap" id="profile-container">
-      <div style="text-align:center; padding:40px; color:var(--muted);"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+    <div class="wrap">
+      <div class="profile-grid" id="profile-grid">
+
+        <!-- LEFT: Identity Card -->
+        <div class="profile-identity" id="identity-card">
+          <div class="profile-avatar-lg" id="p-avatar">U</div>
+          <div class="profile-fullname" id="p-fullname">Chargement...</div>
+          <div style="color:var(--muted); font-size:0.85rem;" id="p-email-display">—</div>
+          <div class="profile-role-badge" id="p-role">ACHETEUR</div>
+
+          <div class="profile-meta-list">
+            <div class="profile-meta-item">
+              <i class="fas fa-phone"></i>
+              <span id="p-phone-display">Non renseigné</span>
+            </div>
+            <div class="profile-meta-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span id="p-address-display">Non renseigné</span>
+            </div>
+          </div>
+
+          <div class="profile-quick-links">
+            <a href="commandes.html"><i class="fas fa-box"></i> Mes commandes</a>
+            <a href="favoris.html"><i class="fas fa-heart"></i> Mes favoris</a>
+            <a href="catalogue.html"><i class="fas fa-store"></i> Catalogue</a>
+          </div>
+        </div>
+
+        <!-- RIGHT: Settings Forms -->
+        <div>
+
+          <!-- Section 1: Infos Personnelles -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <i class="fas fa-user"></i>
+              <div>
+                <h3>Informations Personnelles</h3>
+                <p>Modifiez votre nom, email et coordonnées.</p>
+              </div>
+            </div>
+
+            <form id="form-infos">
+              <div class="form-row">
+                <div class="profile-input-group">
+                  <label for="inp-prenom">Prénom</label>
+                  <input type="text" id="inp-prenom" placeholder="Votre prénom" required>
+                </div>
+                <div class="profile-input-group">
+                  <label for="inp-nom">Nom</label>
+                  <input type="text" id="inp-nom" placeholder="Votre nom" required>
+                </div>
+              </div>
+
+              <div class="profile-input-group">
+                <label for="inp-email">Adresse email</label>
+                <input type="email" id="inp-email" placeholder="votre@email.com" required>
+              </div>
+
+              <div class="form-row">
+                <div class="profile-input-group">
+                  <label for="inp-telephone">Téléphone</label>
+                  <input type="tel" id="inp-telephone" placeholder="06 12 34 56 78">
+                </div>
+                <div class="profile-input-group">
+                  <label for="inp-adresse">Adresse de livraison</label>
+                  <input type="text" id="inp-adresse" placeholder="12 rue de la Musique, Paris">
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; margin-top:8px;">
+                <button type="submit" class="btn-save" id="btn-save-infos">
+                  <i class="fas fa-save"></i> Enregistrer
+                </button>
+                <span class="save-feedback" id="feedback-infos"><i class="fas fa-check-circle"></i> Sauvegardé !</span>
+              </div>
+            </form>
+          </div>
+
+          <!-- Section 2: Mot de Passe -->
+          <div class="profile-section">
+            <div class="profile-section-header">
+              <i class="fas fa-lock"></i>
+              <div>
+                <h3>Sécurité</h3>
+                <p>Modifiez votre mot de passe.</p>
+              </div>
+            </div>
+
+            <form id="form-password">
+              <div class="profile-input-group">
+                <label for="inp-old-mdp">Mot de passe actuel</label>
+                <input type="password" id="inp-old-mdp" placeholder="••••••••" required>
+              </div>
+              <div class="form-row">
+                <div class="profile-input-group">
+                  <label for="inp-new-mdp">Nouveau mot de passe</label>
+                  <input type="password" id="inp-new-mdp" placeholder="Min. 6 caractères" required minlength="6">
+                </div>
+                <div class="profile-input-group">
+                  <label for="inp-confirm-mdp">Confirmer</label>
+                  <input type="password" id="inp-confirm-mdp" placeholder="Retapez le mot de passe" required>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; margin-top:8px;">
+                <button type="submit" class="btn-save" id="btn-save-mdp" style="background:rgba(229,166,87,0.15); color:var(--honey); box-shadow:none; border:1px solid rgba(229,166,87,0.3);">
+                  <i class="fas fa-key"></i> Changer le mot de passe
+                </button>
+                <span class="save-feedback" id="feedback-mdp"><i class="fas fa-check-circle"></i> Modifié !</span>
+              </div>
+            </form>
+          </div>
+
+          <!-- Section 3: Déconnexion -->
+          <div class="profile-section" style="border-color: rgba(181,51,36,0.2); background: rgba(181,51,36,0.02);">
+            <div class="profile-section-header" style="border-bottom-color:rgba(181,51,36,0.15);">
+              <i class="fas fa-sign-out-alt" style="background:rgba(181,51,36,0.1); color:var(--paprika);"></i>
+              <div>
+                <h3 style="color:var(--paprika);">Déconnexion</h3>
+                <p>Vous serez redirigé vers la page d'accueil.</p>
+              </div>
+            </div>
+            <button class="btn-logout-profile" onclick="handleLogout()">
+              <i class="fas fa-power-off"></i> Se déconnecter
+            </button>
+          </div>
+
+        </div>
+      </div>
     </div>
   </main>
+
+  <div id="profile-toast"><i class="fas fa-check-circle"></i> <span id="toast-msg"></span></div>
   <div id="footer-container"></div>
+
+  <script src="../js/api-config.js"></script>
   <script src="js/acheteur.js"></script>
   <script src="../js/auth-system.js"></script>
   <script>
-    // Protection
+    // ── Auth Guard ──
     const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
     if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
-      window.location.href = '../authentification/sign-in.html';
+      window.location.href = '../auth-entry.html';
     }
+    const userId = u.id_user || u.id;
 
+    // ── Render layout ──
     document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('profile');
     document.getElementById('footer-container').innerHTML = renderacheteurFooter();
-    
-    if (u) {
-      document.getElementById('profile-container').innerHTML = `
-        <div class="profile-card">
-          <div class="profile-header">
-            <div class="profile-avatar">${u.prenom ? u.prenom.charAt(0).toUpperCase() : 'U'}</div>
-            <div>
-              <div class="profile-name">${u.prenom || ''} ${u.nom || 'Utilisateur'}</div>
-              <div class="profile-email">${u.email || 'Non spécifié'}</div>
-            </div>
-          </div>
-          
-          <div class="profile-section-title">Informations Personnelles</div>
-          <p style="color:var(--muted); margin-bottom: 10px;"><strong>Rôle :</strong> ${u.role || 'ACHETEUR'}</p>
-          
-          <div class="profile-section-title" style="margin-top:20px;">Accès Rapides</div>
-          <div style="display:flex; gap:15px; margin-bottom: 25px; flex-wrap:wrap;">
-            <a href="commandes.html" class="v-btn v-btn-secondary"><i class="fas fa-box"></i> Historique des commandes</a>
-            <a href="favoris.html" class="v-btn v-btn-secondary"><i class="fas fa-heart"></i> Mes favoris</a>
-          </div>
-          
-          <div style="border-top:1px solid var(--biscuit); padding-top:20px; margin-top:20px;">
-            <button onclick="handleLogout()" class="v-btn" style="background:var(--paprika); color:#fff; border:none;">
-              <i class="fas fa-sign-out-alt"></i> Se déconnecter
-            </button>
-          </div>
-        </div>
 
-        <div class="profile-card">
-          <h3 class="profile-section-title"><i class="fas fa-history" style="color:var(--honey); margin-right:10px;"></i> Historique d'activité</h3>
-          <div id="activity-list">
-            <div style="text-align:center; padding:20px; color:var(--muted);"><i class="fas fa-spinner fa-spin"></i> Chargement de l'activité...</div>
-          </div>
-        </div>
-      `;
-      loadActivities();
+    // ── Toast Utility ──
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('profile-toast');
+      const msgEl = document.getElementById('toast-msg');
+      msgEl.textContent = msg;
+      toast.style.borderColor = isError ? 'var(--paprika)' : 'var(--honey)';
+      toast.querySelector('i').style.color = isError ? 'var(--paprika)' : '#22C55E';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    async function loadActivities() {
+    // ── Load Profile ──
+    async function loadProfile() {
       try {
-        const userId = u.id_user || u.id;
-        const res = await fetch(`${window.API_BASE}/activities?user_id=${userId}`);
+        const res = await fetch(`${API_BASE}/user/${userId}/profile`);
+        if (!res.ok) throw new Error();
         const data = await res.json();
-        const list = document.getElementById('activity-list');
-        
-        if (!data || data.length === 0) {
-          list.innerHTML = '<p style="color:var(--muted); font-size:0.9rem;">Aucune activité récente.</p>';
-          return;
+
+        // Identity card
+        document.getElementById('p-avatar').textContent = (data.prenom || 'U').charAt(0).toUpperCase();
+        document.getElementById('p-fullname').textContent = `${data.prenom || ''} ${data.nom || ''}`;
+        document.getElementById('p-email-display').textContent = data.email || '—';
+        document.getElementById('p-role').textContent = data.role || 'ACHETEUR';
+        document.getElementById('p-phone-display').textContent = data.telephone || 'Non renseigné';
+        document.getElementById('p-address-display').textContent = data.adresse || 'Non renseigné';
+
+        // Form fields
+        document.getElementById('inp-prenom').value = data.prenom || '';
+        document.getElementById('inp-nom').value = data.nom || '';
+        document.getElementById('inp-email').value = data.email || '';
+        document.getElementById('inp-telephone').value = data.telephone || '';
+        document.getElementById('inp-adresse').value = data.adresse || '';
+      } catch (e) {
+        // Fallback to localStorage data
+        document.getElementById('p-avatar').textContent = (u.prenom || 'U').charAt(0).toUpperCase();
+        document.getElementById('p-fullname').textContent = `${u.prenom || ''} ${u.nom || ''}`;
+        document.getElementById('p-email-display').textContent = u.email || '—';
+        document.getElementById('inp-prenom').value = u.prenom || '';
+        document.getElementById('inp-nom').value = u.nom || '';
+        document.getElementById('inp-email').value = u.email || '';
+      }
+    }
+    loadProfile();
+
+    // ── Save Profile ──
+    document.getElementById('form-infos').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-infos');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sauvegarde...';
+
+      try {
+        const body = {
+          nom: document.getElementById('inp-nom').value,
+          prenom: document.getElementById('inp-prenom').value,
+          email: document.getElementById('inp-email').value,
+          telephone: document.getElementById('inp-telephone').value,
+          adresse: document.getElementById('inp-adresse').value,
+        };
+
+        const res = await fetch(`${API_BASE}/user/${userId}/profile`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Erreur');
         }
 
-        list.innerHTML = data.map(act => `
-          <div style="padding:12px; border-bottom:1px solid rgba(245,226,206,0.05); display:flex; gap:15px; align-items:center;">
-            <div style="width:36px; height:36px; border-radius:50%; background:rgba(229,166,87,0.1); display:flex; align-items:center; justify-content:center; color:var(--honey);">
-              <i class="fas ${getActivityIcon(act.type)}"></i>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:0.9rem; color:var(--ink);">${act.description}</div>
-              <div style="font-size:0.75rem; color:var(--muted);">${new Date(act.date).toLocaleString('fr-FR')}</div>
-            </div>
-          </div>
-        `).join('');
-      } catch (e) {
-        document.getElementById('activity-list').innerHTML = '<p style="color:var(--paprika); font-size:0.85rem;">Erreur de chargement de l\'activité.</p>';
+        const data = await res.json();
+
+        // Update localStorage
+        const stored = JSON.parse(localStorage.getItem('gold_user') || '{}');
+        Object.assign(stored, data.user);
+        localStorage.setItem('gold_user', JSON.stringify(stored));
+
+        // Update identity card
+        document.getElementById('p-fullname').textContent = `${body.prenom} ${body.nom}`;
+        document.getElementById('p-avatar').textContent = body.prenom.charAt(0).toUpperCase();
+        document.getElementById('p-email-display').textContent = body.email;
+        document.getElementById('p-phone-display').textContent = body.telephone || 'Non renseigné';
+        document.getElementById('p-address-display').textContent = body.adresse || 'Non renseigné';
+
+        // Feedback
+        showToast('Profil mis à jour avec succès !');
+        const fb = document.getElementById('feedback-infos');
+        fb.classList.add('show');
+        setTimeout(() => fb.classList.remove('show'), 3000);
+
+      } catch (err) {
+        showToast(err.message || 'Erreur lors de la sauvegarde', true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
       }
-    }
+    });
 
-    function getActivityIcon(type) {
-      if (type.includes('order')) return 'fa-shopping-bag';
-      if (type.includes('review')) return 'fa-star';
-      if (type.includes('cart')) return 'fa-shopping-cart';
-      if (type.includes('fav')) return 'fa-heart';
-      return 'fa-bolt';
-    }
+    // ── Change Password ──
+    document.getElementById('form-password').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newMdp = document.getElementById('inp-new-mdp').value;
+      const confirmMdp = document.getElementById('inp-confirm-mdp').value;
 
+      if (newMdp !== confirmMdp) {
+        showToast('Les mots de passe ne correspondent pas', true);
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-mdp');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/user/${userId}/password`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ancien_mdp: document.getElementById('inp-old-mdp').value,
+            nouveau_mdp: newMdp
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Erreur');
+
+        showToast('Mot de passe modifié !');
+        const fb = document.getElementById('feedback-mdp');
+        fb.classList.add('show');
+        setTimeout(() => fb.classList.remove('show'), 3000);
+        document.getElementById('form-password').reset();
+
+      } catch (err) {
+        showToast(err.message || 'Erreur lors du changement', true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ── Logout ──
     function handleLogout() {
-      if (typeof GoldAuth !== 'undefined') {
-        GoldAuth.logout();
-      } else {
-        localStorage.removeItem('gold_user');
-        localStorage.removeItem('gold_token');
-      }
-      window.location.href = '../visitor/index.html';
+      if (typeof GoldAuth !== 'undefined') GoldAuth.logout();
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '../auth-entry.html';
     }
   </script>
 </body>
