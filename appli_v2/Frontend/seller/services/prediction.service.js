@@ -1,6 +1,6 @@
 /* ══ PredictionService — API calls for AI predictions ══ */
 const PredictionService = {
-  baseUrl: 'http://localhost:8000/api',
+  baseUrl: window.API_BASE || 'http://localhost:8000/api',
 
   /**
    * Récupère les prédictions IA pour un vendeur.

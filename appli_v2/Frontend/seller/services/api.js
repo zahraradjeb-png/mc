@@ -1,5 +1,5 @@
 const SellerAPI = {
-  baseUrl: 'http://localhost:8000/api',
+  baseUrl: window.API_BASE || 'http://localhost:8000/api',
 
   async getStats(vendeurId) {
     try {

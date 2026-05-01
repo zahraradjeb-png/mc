@@ -1,6 +1,6 @@
 /* ══ ProductService — All seller product API operations ══ */
 const ProductService = {
-  baseUrl: 'http://localhost:8000/api',
+  baseUrl: window.API_BASE || 'http://localhost:8000/api',
 
   /* ── Fetch seller's products ── */
   async getProducts(vendeurId) {
@@ -159,7 +159,7 @@ const ProductService = {
     if (url.startsWith('http') || url.startsWith('data:')) return url;
     
     // Si c'est un chemin relatif (ex: uploads/products/xyz.jpg)
-    const base = this.baseUrl ? this.baseUrl.replace('/api', '') : 'http://localhost:8000';
+    const base = this.baseUrl ? this.baseUrl.replace('/api', '') : (window.API_BASE ? window.API_BASE.replace('/api', '') : 'http://localhost:8000');
     return `${base}/${url.replace(/^\//, '')}`;
   }
 };

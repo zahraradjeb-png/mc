@@ -1,5 +1,5 @@
 const FinanceService = {
-  baseUrl: 'http://localhost:8000/api',
+  baseUrl: window.API_BASE || 'http://localhost:8000/api',
 
   async getFinanceSummary(vendeurId) {
     try {

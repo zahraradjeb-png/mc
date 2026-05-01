@@ -21,7 +21,7 @@ const SettingsController = {
 
     const avatar = document.getElementById('settings-avatar-preview');
     if (this.user.photo_profil && this.user.photo_profil !== 'default.png') {
-        const base = 'http://localhost:8000';
+        const base = window.API_BASE ? window.API_BASE.replace('/api', '') : 'http://localhost:8000';
         avatar.style.backgroundImage = `url(${base}/${this.user.photo_profil.replace(/^\//, '')})`;
         avatar.textContent = '';
     } else {
@@ -54,7 +54,8 @@ const SettingsController = {
 
         try {
             const vId = this.user.id_vendeur || this.user.id;
-            const res = await fetch(`http://localhost:8000/api/vendeurs/${vId}/photo`, {
+            const apiBaseUrl = window.API_BASE || 'http://localhost:8000/api';
+            const res = await fetch(`${apiBaseUrl}/vendeurs/${vId}/photo`, {
                 method: 'POST',
                 body: formData
             });
@@ -104,7 +105,8 @@ const SettingsController = {
 
         try {
             const vId = this.user.id_vendeur || this.user.id;
-            const res = await fetch(`http://localhost:8000/api/vendeurs/${vId}`, {
+            const apiBaseUrl = window.API_BASE || 'http://localhost:8000/api';
+            const res = await fetch(`${apiBaseUrl}/vendeurs/${vId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(payload)
