@@ -42,12 +42,16 @@ RUN composer dump-autoload --optimize
 # Generate .env from example if available
 RUN cp -n .env.example .env 2>/dev/null || true
 
-# Set permissions for Laravel storage and cache
-RUN chown -R www-data:www-data storage bootstrap/cache
-RUN chmod -R 775 storage bootstrap/cache
-
-# Create required storage directories
+# Create required storage directories and upload directories
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views
+RUN mkdir -p public/uploads/products public/uploads/profiles
+
+# Set permissions for Laravel storage, cache, and uploads
+RUN chown -R www-data:www-data storage bootstrap/cache public/uploads
+RUN chmod -R 775 storage bootstrap/cache public/uploads
+
+# Increase PHP upload limits
+RUN echo "upload_max_filesize = 20M\npost_max_size = 25M\nmax_execution_time = 120" > /usr/local/etc/php/conf.d/uploads.ini
 
 # Point Apache to Laravel's public directory
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
