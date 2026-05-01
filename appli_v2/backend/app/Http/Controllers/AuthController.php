@@ -128,27 +128,58 @@ class AuthController extends Controller
             'email'  => 'required|email'
         ]);
 
-        DB::table('users')->where('id_user', $id)->update([
+        // Update users table (handle bio column gracefully)
+        $userData = [
             'nom'    => $request->nom,
             'prenom' => $request->prenom,
             'email'  => $request->email,
-            'bio'    => $request->bio ?? ''
-        ]);
+        ];
+        try {
+            $userData['bio'] = $request->bio ?? '';
+            DB::table('users')->where('id_user', $id)->update($userData);
+        } catch (\Exception $e) {
+            // bio column might not exist
+            unset($userData['bio']);
+            DB::table('users')->where('id_user', $id)->update($userData);
+        }
 
-        // On renvoie les nouvelles infos pour mettre à jour le localStorage
+        // Update acheteur table if buyer fields provided
+        $acheteur = DB::table('acheteur')->where('id_user', $id)->first();
+        if ($acheteur) {
+            DB::table('acheteur')->where('id_user', $id)->update([
+                'adresse'   => $request->adresse ?? $acheteur->adresse,
+                'telephone' => $request->telephone ?? $acheteur->telephone,
+            ]);
+        } elseif ($request->has('adresse') || $request->has('telephone')) {
+            // Create acheteur row if it doesn't exist
+            DB::table('acheteur')->insert([
+                'id_user'   => $id,
+                'adresse'   => $request->adresse ?? '',
+                'telephone' => $request->telephone ?? '',
+            ]);
+        }
+
+        // Return full user data
         $user = DB::table('users')->where('id_user', $id)->first();
+        $acheteurData = DB::table('acheteur')->where('id_user', $id)->first();
+
+        $response = [
+            'id'       => $user->id_user ?? $user->id ?? 0,
+            'id_user'  => $user->id_user ?? $user->id ?? 0,
+            'nom'      => $user->nom,
+            'prenom'   => $user->prenom,
+            'email'    => $user->email,
+            'role'     => $user->role,
+        ];
+
+        if ($acheteurData) {
+            $response['adresse']   = $acheteurData->adresse ?? '';
+            $response['telephone'] = $acheteurData->telephone ?? '';
+        }
 
         return response()->json([
             'message' => 'Profil mis à jour avec succès',
-            'user' => [
-                'id' => $user->id_user ?? $user->id ?? 0,
-                'id_user' => $user->id_user ?? $user->id ?? 0,
-                'nom' => $user->nom,
-                'prenom' => $user->prenom,
-                'email' => $user->email,
-                'role' => $user->role,
-                'bio' => $user->bio
-            ]
+            'user'    => $response
         ]);
     }
 
@@ -214,6 +245,55 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Rôle mis à jour',
             'user'    => $userData
+        ], 200);
+    }
+
+    public function becomeSeller(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required',
+            'shop_name' => 'required',
+            'description' => 'nullable',
+            'categories' => 'nullable',
+            'address' => 'nullable'
+        ]);
+
+        $id = $request->user_id;
+
+        // Ensure user exists
+        $user = DB::table('users')->where('id_user', $id)->orWhere('id', $id)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+        }
+
+        $userId = $user->id_user ?? $user->id;
+
+        // Update role to BOTH
+        // Since enum is ACHETEUR, VENDEUR, ADMIN, and we added 'BOTH' to users table role in our migration
+        // But if DB is using old schema, we might hit an error. We will try to update it, and if it fails, fallback to VENDEUR.
+        try {
+            DB::table('users')->where('id_user', $userId)->orWhere('id', $userId)->update(['role' => 'BOTH']);
+            $newRole = 'BOTH';
+        } catch (\Exception $e) {
+            // fallback if enum BOTH is not available
+            DB::table('users')->where('id_user', $userId)->orWhere('id', $userId)->update(['role' => 'VENDEUR']);
+            $newRole = 'VENDEUR';
+        }
+
+        $exists = DB::table('sellers')->where('user_id', $userId)->exists();
+        if (!$exists) {
+            DB::table('sellers')->insert([
+                'user_id'     => $userId,
+                'shop_name'   => $request->shop_name,
+                'description' => $request->description ?? '',
+                'categories'  => $request->categories ?? '',
+                'address'     => $request->address ?? ''
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Vous êtes maintenant vendeur !',
+            'role' => $newRole
         ], 200);
     }
 }

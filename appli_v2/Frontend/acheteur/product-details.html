@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détails Produit — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    .pd-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 40px 0 80px; align-items: start; }
+
+    /* Seller bar */
+    .pd-seller-bar {
+      display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 24px; cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    .pd-seller-bar:hover { border-color: rgba(229,166,87,0.3); }
+    .pd-seller-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--honey), #c07d30);
+      display: flex; align-items: center; justify-content: center;
+      color: #111; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .pd-seller-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .pd-seller-name { font-weight: 600; color: var(--ink); font-size: 0.95rem; }
+    .pd-seller-shop { font-size: 0.78rem; color: var(--muted); }
+    .pd-seller-bar i { margin-left: auto; color: var(--honey); font-size: 0.8rem; }
+
+    /* Carousel */
+    .pd-gallery { position: relative; border-radius: 16px; overflow: hidden; background: var(--ink2); border: 1px solid var(--biscuit); }
+    .pd-main-img {
+      width: 100%; height: 480px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--biscuit), var(--crumpet));
+      overflow: hidden;
+    }
+    .pd-main-img img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s; }
+    .pd-main-img img:hover { transform: scale(1.05); }
+    .pd-main-img .pd-emoji { font-size: 6rem; }
+    .pd-thumbs { display: flex; gap: 8px; padding: 12px; overflow-x: auto; }
+    .pd-thumb {
+      width: 70px; height: 70px; border-radius: 8px; overflow: hidden;
+      border: 2px solid transparent; cursor: pointer; flex-shrink: 0;
+      transition: border-color 0.3s; background: var(--biscuit);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pd-thumb.active, .pd-thumb:hover { border-color: var(--honey); }
+    .pd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .pd-nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(28,23,25,0.7); backdrop-filter: blur(6px);
+      border: 1px solid var(--biscuit); color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; z-index: 5;
+    }
+    .pd-nav-btn:hover { background: var(--honey); color: #111; }
+    .pd-nav-prev { left: 12px; }
+    .pd-nav-next { right: 12px; }
+
+    /* Details */
+    .pd-info { position: sticky; top: 100px; }
+    .pd-cat { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--honey); margin-bottom: 10px; }
+    .pd-title { font-size: 2.2rem; font-weight: 600; color: var(--ink); margin-bottom: 12px; line-height: 1.15; }
+    .pd-price { font-size: 1.8rem; font-weight: 700; color: var(--honey); margin-bottom: 20px; }
+    .pd-desc { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+
+    .pd-specs { margin-bottom: 28px; }
+    .pd-spec {
+      display: flex; justify-content: space-between; padding: 10px 0;
+      border-bottom: 1px solid var(--biscuit); font-size: 0.88rem;
+    }
+    .pd-spec-label { color: var(--muted); }
+    .pd-spec-val { color: var(--ink); font-weight: 500; }
+
+    .pd-actions { display: flex; gap: 12px; margin-bottom: 32px; }
+    .pd-actions .v-btn { flex: 1; justify-content: center; padding: 14px 24px; }
+
+    /* Reviews */
+    .pd-reviews { grid-column: 1/-1; }
+    .pd-review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .pd-review-avg { display: flex; align-items: center; gap: 12px; }
+    .pd-review-score { font-size: 2.5rem; font-weight: 700; color: var(--honey); }
+    .pd-review-stars { color: var(--honey); font-size: 1.1rem; letter-spacing: 3px; }
+    .pd-review-count { font-size: 0.85rem; color: var(--muted); }
+
+    .pd-review-card {
+      padding: 20px; background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 14px;
+    }
+    .pd-review-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .pd-review-author { font-weight: 600; color: var(--ink); font-size: 0.95rem; }
+    .pd-review-date { font-size: 0.78rem; color: var(--muted); }
+    .pd-review-text { font-size: 0.9rem; color: rgba(245,226,206,0.85); line-height: 1.6; font-style: italic; }
+
+    /* Review form */
+    .pd-review-form {
+      padding: 24px; background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 14px; margin-top: 24px;
+    }
+    .pd-review-form h4 { font-size: 1.2rem; color: var(--ink); margin-bottom: 16px; }
+    .pd-form-group { margin-bottom: 16px; }
+    .pd-form-group label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+    .pd-form-group input, .pd-form-group textarea {
+      width: 100%; padding: 12px 16px; border: 1px solid var(--biscuit);
+      border-radius: 8px; background: rgba(245,226,206,0.04);
+      color: var(--ink); font-family: 'Outfit', sans-serif; font-size: 0.9rem;
+      outline: none; transition: border-color 0.3s;
+    }
+    .pd-form-group input:focus, .pd-form-group textarea:focus { border-color: var(--honey); }
+    .pd-form-group textarea { resize: vertical; min-height: 100px; }
+
+    .pd-star-picker { display: flex; gap: 6px; }
+    .pd-star-picker span {
+      font-size: 1.5rem; cursor: pointer; color: var(--biscuit);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .pd-star-picker span:hover { transform: scale(1.2); }
+    .pd-star-picker span.active { color: var(--honey); }
+
+    @media (max-width: 900px) {
+      .pd-layout { grid-template-columns: 1fr; }
+      .pd-main-img { height: 320px; }
+      .pd-info { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main style="padding-top: 80px;">
+    <div class="wrap">
+      <!-- SELLER BAR -->
+      <div class="pd-seller-bar" id="sellerBar" style="display:none;"></div>
+
+      <div class="pd-layout">
+        <!-- LEFT: Gallery -->
+        <div>
+          <div class="pd-gallery" id="gallery">
+            <div class="pd-main-img" id="mainImage"></div>
+            <button class="pd-nav-btn pd-nav-prev" onclick="prevImage()"><i class="fas fa-chevron-left"></i></button>
+            <button class="pd-nav-btn pd-nav-next" onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+            <div class="pd-thumbs" id="thumbs"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Details -->
+        <div class="pd-info" id="productInfo">
+          <div style="text-align:center;padding:60px;color:var(--muted);">
+            <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--honey);"></i>
+            <p style="margin-top:12px;">Chargement...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="pd-reviews" id="reviewsSection"></div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    const productId = new URLSearchParams(window.location.search).get('id');
+    let photos = [];
+    let currentPhoto = 0;
+
+    if (!productId) {
+      document.getElementById('productInfo').innerHTML = '<div class="v-empty"><i class="fas fa-exclamation-triangle"></i><h3>Produit non trouvé</h3><p>Aucun ID de produit spécifié.</p></div>';
+    } else {
+      loadProduct();
+    }
+
+    async function loadProduct() {
+      try {
+        const res = await fetch(`${window.API_BASE}/produits/${productId}/details`);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        renderProduct(data);
+      } catch (e) {
+        // Fallback to basic endpoint
+        try {
+          const res = await fetch(`${window.API_BASE}/produits/${productId}`);
+          const data = await res.json();
+          renderProduct({ product: data.product, photos: data.photos, details: data.details, seller: null, reviews: { list: [], count: 0, average: 0 } });
+        } catch (e2) {
+          document.getElementById('productInfo').innerHTML = '<div class="v-empty"><i class="fas fa-exclamation-triangle"></i><h3>Erreur</h3><p>Impossible de charger le produit.</p></div>';
+        }
+      }
+    }
+
+    function renderProduct(data) {
+      const p = data.product;
+      const seller = data.seller;
+      const emojis = { 'VINYLE': '🎵', 'CASSETTE': '📼', 'INSTRUMENT': '🎸', 'POSTER': '🖼️', 'CD': '💿' };
+      const emoji = emojis[p.categorie_nom] || '🎵';
+      const price = parseFloat(p.prix).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €';
+      const baseUrl = window.API_BASE.replace('/api', '');
+
+      document.title = `${p.titre} — RetroMarket`;
+
+      // Seller bar
+      if (seller) {
+        const initials = (seller.prenom || 'V')[0] + (seller.nom || '')[0];
+        const sellerBar = document.getElementById('sellerBar');
+        sellerBar.style.display = 'flex';
+        sellerBar.innerHTML = `
+          <div class="pd-seller-avatar">
+            ${seller.photo_profil ? `<img src="${baseUrl}/${seller.photo_profil}" alt="${seller.nom_boutique}">` : initials}
+          </div>
+          <div>
+            <div class="pd-seller-name">${seller.nom_boutique || seller.prenom + ' ' + seller.nom}</div>
+            <div class="pd-seller-shop">${seller.localisation || 'Vendeur vérifié'}</div>
+          </div>
+          <i class="fas fa-chevron-right"></i>`;
+        sellerBar.onclick = () => { window.location.href = `boutique-vendeur.html?id=${seller.id_user}`; };
+      }
+
+      // Photos gallery
+      photos = (data.photos || []).map(ph => `${baseUrl}/${ph.chemin}`);
+      if (photos.length === 0) photos = [];
+      renderGallery(emoji);
+
+      // Product info
+      const isFav = acheteurSystem.isFav(p.id_produit);
+      const inCart = acheteurSystem.isInCart(p.id_produit);
+
+      document.getElementById('productInfo').innerHTML = `
+        <div class="pd-cat">${p.categorie_nom || 'Produit'} · ${p.etat || 'Occasion'}</div>
+        <h1 class="pd-title">${p.titre}</h1>
+        <div class="pd-price">${price}</div>
+        <p class="pd-desc">${p.description || 'Produit vintage authentique.'}</p>
+        <div class="pd-specs">
+          <div class="pd-spec"><span class="pd-spec-label">État</span><span class="pd-spec-val">${p.etat || '-'}</span></div>
+          <div class="pd-spec"><span class="pd-spec-label">Rareté</span><span class="pd-spec-val">${(p.rarete||'').replace('_',' ')}</span></div>
+          <div class="pd-spec"><span class="pd-spec-label">Stock</span><span class="pd-spec-val">${p.quantite || 1} disponible(s)</span></div>
+          ${p.artiste ? `<div class="pd-spec"><span class="pd-spec-label">Artiste</span><span class="pd-spec-val">${p.artiste}</span></div>` : ''}
+          ${p.decennie ? `<div class="pd-spec"><span class="pd-spec-label">Décennie</span><span class="pd-spec-val">${p.decennie}</span></div>` : ''}
+        </div>
+        <div class="pd-actions">
+          <button class="v-btn v-btn-primary ${inCart?'v-btn-secondary':''}" id="addCartBtn" onclick="addProductToCart()" ${inCart?'disabled':''}>
+            <i class="fas ${inCart?'fa-check':'fa-shopping-bag'}"></i> ${inCart?'Déjà au panier':'Ajouter au panier'}
+          </button>
+          <button class="v-btn ${isFav?'v-btn-danger':'v-btn-secondary'}" id="favBtn" onclick="toggleProductFav()">
+            <i class="fas fa-heart"></i> ${isFav?'Retirer':'Favoris'}
+          </button>
+        </div>`;
+
+      // Reviews section
+      renderReviews(data.reviews || { list: [], count: 0, average: 0 });
+    }
+
+    function renderGallery(emoji) {
+      const mainImg = document.getElementById('mainImage');
+      const thumbsEl = document.getElementById('thumbs');
+
+      if (photos.length > 0) {
+        mainImg.innerHTML = `<img src="${photos[0]}" alt="Product" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pd-emoji" style="display:none">${emoji}</div>`;
+        thumbsEl.innerHTML = photos.map((ph, i) =>
+          `<div class="pd-thumb ${i===0?'active':''}" onclick="goToImage(${i})"><img src="${ph}" alt="Photo ${i+1}"></div>`
+        ).join('');
+      } else {
+        mainImg.innerHTML = `<div class="pd-emoji">${emoji}</div>`;
+        thumbsEl.innerHTML = '';
+      }
+    }
+
+    function goToImage(idx) {
+      currentPhoto = idx;
+      const mainImg = document.getElementById('mainImage');
+      if (photos[idx]) {
+        mainImg.querySelector('img').src = photos[idx];
+        document.querySelectorAll('.pd-thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
+      }
+    }
+    function prevImage() { goToImage((currentPhoto - 1 + photos.length) % photos.length); }
+    function nextImage() { goToImage((currentPhoto + 1) % photos.length); }
+
+    function addProductToCart() {
+      const btn = document.getElementById('addCartBtn');
+      const p = { id: productId, name: document.querySelector('.pd-title').textContent, price: parseFloat(document.querySelector('.pd-price').textContent), image: photos[0] || '' };
+      if (acheteurSystem.addToCart(p)) {
+        btn.innerHTML = '<i class="fas fa-check"></i> Déjà au panier';
+        btn.disabled = true; btn.classList.add('v-btn-secondary'); btn.classList.remove('v-btn-primary');
+      }
+    }
+
+    function toggleProductFav() {
+      const btn = document.getElementById('favBtn');
+      const p = { id: productId, name: document.querySelector('.pd-title').textContent, price: parseFloat(document.querySelector('.pd-price').textContent), image: photos[0] || '' };
+      const added = acheteurSystem.toggleFav(p);
+      btn.innerHTML = `<i class="fas fa-heart"></i> ${added ? 'Retirer' : 'Favoris'}`;
+      btn.classList.toggle('v-btn-danger', added);
+      btn.classList.toggle('v-btn-secondary', !added);
+    }
+
+    let selectedRating = 5;
+
+    function renderReviews(reviews) {
+      const section = document.getElementById('reviewsSection');
+      const stars = n => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
+
+      section.innerHTML = `
+        <div class="pd-review-header">
+          <div class="pd-review-avg">
+            <span class="pd-review-score">${reviews.average || '-'}</span>
+            <div>
+              <div class="pd-review-stars">${stars(reviews.average || 0)}</div>
+              <div class="pd-review-count">${reviews.count} avis</div>
+            </div>
+          </div>
+        </div>
+
+        ${(reviews.list || []).map(r => `
+          <div class="pd-review-card">
+            <div class="pd-review-top">
+              <div>
+                <span class="pd-review-author">${r.pseudo || 'Anonyme'}</span>
+                <span style="color:var(--honey); margin-left:8px; font-size:0.8rem;">${stars(r.note)}</span>
+              </div>
+              <span class="pd-review-date">${new Date(r.date_avis).toLocaleDateString('fr-FR')}</span>
+            </div>
+            ${r.commentaire ? `<p class="pd-review-text">"${r.commentaire}"</p>` : ''}
+          </div>`).join('')}
+
+        <div class="pd-review-form">
+          <h4><i class="fas fa-pen" style="color:var(--honey);margin-right:8px;"></i>Laisser un avis</h4>
+          <div class="pd-form-group">
+            <label>Votre pseudo</label>
+            <input type="text" id="reviewPseudo" placeholder="Acheteur" maxlength="100">
+          </div>
+          <div class="pd-form-group">
+            <label>Note</label>
+            <div class="pd-star-picker" id="starPicker">
+              ${[1,2,3,4,5].map(n => `<span data-n="${n}" class="${n<=5?'active':''}" onclick="setRating(${n})">★</span>`).join('')}
+            </div>
+          </div>
+          <div class="pd-form-group">
+            <label>Commentaire</label>
+            <textarea id="reviewComment" placeholder="Partagez votre expérience..." maxlength="1000"></textarea>
+          </div>
+          <button class="v-btn v-btn-primary" onclick="submitReview()" id="submitReviewBtn">
+            <i class="fas fa-paper-plane"></i> Publier l'avis
+          </button>
+        </div>`;
+
+      // Prefill pseudo if connected
+      setTimeout(() => {
+        const u = JSON.parse(localStorage.getItem('gold_user'));
+        if(u && u.prenom) {
+          const pseudoInput = document.getElementById('reviewPseudo');
+          if (pseudoInput) pseudoInput.value = u.prenom;
+        }
+      }, 50);
+    }
+
+    function setRating(n) {
+      selectedRating = n;
+      document.querySelectorAll('#starPicker span').forEach((s, i) => s.classList.toggle('active', i < n));
+    }
+
+    async function submitReview() {
+      const user = JSON.parse(localStorage.getItem('gold_user'));
+      if (!user) {
+        showLoginRequired('laisser un avis');
+        return;
+      }
+      
+      const pseudo = document.getElementById('reviewPseudo').value.trim() || user.prenom || 'Acheteur';
+      const comment = document.getElementById('reviewComment').value.trim();
+      const btn = document.getElementById('submitReviewBtn');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${window.API_BASE}/reviews`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_produit: parseInt(productId),
+            id_user: user.id,
+            pseudo: pseudo,
+            note: selectedRating,
+            commentaire: comment
+          })
+        });
+        if (res.ok) {
+          acheteurToast.show('Avis publié avec succès !');
+          acheteurSystem.logActivity('review_added', `Avis publié (${selectedRating}★)${comment ? ' : "' + comment + '"' : ''}`, parseInt(productId));
+          document.getElementById('reviewPseudo').value = '';
+          document.getElementById('reviewComment').value = '';
+          // Reload reviews
+          const data = await fetch(`${window.API_BASE}/visitor/avis/${productId}`).then(r => r.json());
+          renderReviews({ list: data.reviews, count: data.count, average: data.average });
+        } else {
+          acheteurToast.show('Erreur lors de la publication', 'error');
+        }
+      } catch (e) {
+        console.error('Erreur submitReview:', e);
+        acheteurToast.show('Erreur réseau : ' + e.message, 'error');
+      }
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publier l\'avis';
+      btn.disabled = false;
+    }
+  </script>
+</body>
+</html>

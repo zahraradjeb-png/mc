@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Activité — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    .v-act-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 18px; background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 14px; transition: border-color 0.3s;
+    }
+    .v-act-item:hover { border-color: rgba(229,166,87,0.2); }
+    .v-act-icon {
+      width: 42px; height: 42px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .v-act-body { flex: 1; }
+    .v-act-label { font-size: 0.95rem; color: var(--ink); margin-bottom: 4px; }
+    .v-act-date { font-size: 0.78rem; color: var(--muted); }
+
+    .v-act-filters {
+      display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .v-act-filter {
+      padding: 8px 18px; border-radius: 50px;
+      border: 1px solid var(--biscuit); background: transparent;
+      color: var(--muted); cursor: pointer; font-size: 0.8rem;
+      transition: all 0.3s;
+    }
+    .v-act-filter:hover, .v-act-filter.active {
+      border-color: var(--honey); color: var(--honey);
+      background: rgba(229,166,87,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Mon <em>Activité</em></h1>
+      <p class="v-page-subtitle">Historique de vos actions sur RetroMarket.</p>
+    </div>
+  </div>
+  <main style="padding: 40px 0 80px;">
+    <div class="wrap">
+      <div class="v-act-filters">
+        <button class="v-act-filter active" data-type="all">Tout</button>
+        <button class="v-act-filter" data-type="cart_add"><i class="fas fa-shopping-bag"></i> Panier</button>
+        <button class="v-act-filter" data-type="fav_add"><i class="fas fa-heart"></i> Favoris</button>
+        <button class="v-act-filter" data-type="review"><i class="fas fa-star"></i> Avis</button>
+      </div>
+      <div id="activityList"></div>
+    </div>
+  </main>
+  <div id="footer-container"></div>
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('activite');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    let activeFilter = 'all';
+
+    function renderActivities() {
+      let activities = acheteurSystem.getActivities();
+      const container = document.getElementById('activityList');
+
+      if (activeFilter !== 'all') {
+        activities = activities.filter(a => a.type === activeFilter || (activeFilter === 'fav_add' && a.type === 'fav_remove'));
+      }
+
+      if (activities.length === 0) {
+        container.innerHTML = `<div class="v-empty"><i class="fas fa-clock"></i><h3>Aucune activité</h3><p>Explorez le catalogue, ajoutez des produits au panier ou aux favoris pour voir votre historique ici.</p><a href="catalogue.html" class="v-btn v-btn-primary v-btn-sm">Explorer</a></div>`;
+        return;
+      }
+
+      container.innerHTML = activities.map(a => {
+        const icon = acheteurSystem.getActivityIcon(a.type);
+        const color = acheteurSystem.getActivityColor(a.type);
+        const date = new Date(a.date);
+        const dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        return `
+        <div class="v-act-item">
+          <div class="v-act-icon" style="background:${color}22; color:${color};">
+            <i class="fas ${icon}"></i>
+          </div>
+          <div class="v-act-body">
+            <div class="v-act-label">${a.label || a.type}</div>
+            <div class="v-act-date">${dateStr}</div>
+          </div>
+          ${a.id_produit ? `<a href="product-details.html?id=${a.id_produit}" style="color:var(--honey);font-size:0.78rem;white-space:nowrap;">Voir →</a>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    document.querySelectorAll('.v-act-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.v-act-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.type;
+        renderActivities();
+      });
+    });
+
+    renderActivities();
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Favoris — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/visitor.css">
+  <style>
+    .v-fav-item {
+      display: flex; gap: 20px; padding: 20px;
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 16px; transition: all 0.3s;
+      align-items: center;
+    }
+    .v-fav-item:hover { border-color: rgba(229,166,87,0.2); }
+    .v-fav-img {
+      width: 80px; height: 80px; border-radius: 10px;
+      background: var(--biscuit); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; overflow: hidden;
+    }
+    .v-fav-img img { width: 100%; height: 100%; object-fit: cover; }
+    .v-fav-details { flex: 1; }
+    .v-fav-name { font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .v-fav-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+    .v-fav-price { font-size: 1rem; font-weight: 700; color: var(--honey); }
+    .v-fav-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .v-fav-btn {
+      width: 38px; height: 38px; border-radius: 8px;
+      border: 1px solid var(--biscuit); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; font-size: 0.9rem;
+    }
+    .v-fav-btn.cart-btn { color: var(--honey); }
+    .v-fav-btn.cart-btn:hover { background: var(--honey); color: #111; border-color: var(--honey); }
+    .v-fav-btn.remove-btn { color: var(--muted); }
+    .v-fav-btn.remove-btn:hover { color: var(--paprika); border-color: var(--paprika); background: rgba(181,51,36,0.1); }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Mes <em>Favoris</em></h1>
+      <p class="v-page-subtitle">Retrouvez tous les produits que vous avez aimés.</p>
+    </div>
+  </div>
+  <main style="padding: 40px 0 80px;">
+    <div class="wrap" id="favsContainer"></div>
+  </main>
+  <div id="footer-container"></div>
+  <script>
+    // Redirect if logged in
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (u) {
+      if (u.role === 'ACHETEUR' || u.role === 'BOTH') {
+        window.location.href = '../acheteur/favoris.html';
+      } else if (u.role === 'VENDEUR') {
+        window.location.href = '../seller/index.html';
+      }
+    }
+  </script>
+  <script src="js/visitor.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderVisitorNavbar('favoris');
+    document.getElementById('footer-container').innerHTML = renderVisitorFooter();
+
+    function renderFavs() {
+      const favs = VisitorSystem.getFavs();
+      const container = document.getElementById('favsContainer');
+
+      if (favs.length === 0) {
+        container.innerHTML = `<div class="v-empty"><i class="fas fa-heart"></i><h3>Aucun favori</h3><p>Explorez le catalogue et ajoutez des produits à vos favoris.</p><a href="catalogue.html" class="v-btn v-btn-primary v-btn-sm">Explorer</a></div>`;
+        return;
+      }
+
+      container.innerHTML = `<p style="color:var(--muted);margin-bottom:20px;font-size:0.9rem;">${favs.length} produit${favs.length>1?'s':''} dans vos favoris</p>` +
+        favs.map(f => `
+        <div class="v-fav-item" data-id="${f.id}">
+          <div class="v-fav-img">
+            ${f.image ? `<img src="${f.image}" alt="${f.name}" onerror="this.style.display='none';this.parentElement.textContent='♥'">` : '♥'}
+          </div>
+          <div class="v-fav-details">
+            <a href="product-details.html?id=${f.id}" class="v-fav-name" style="display:block;color:var(--ink);text-decoration:none;">${f.name}</a>
+            <div class="v-fav-meta">${f.meta || 'Article vintage'}</div>
+            <div class="v-fav-price">${parseFloat(f.price).toLocaleString('fr-FR',{minimumFractionDigits:2})} €</div>
+          </div>
+          <div class="v-fav-actions">
+            <button class="v-fav-btn cart-btn" onclick="addFavToCart('${f.id}','${f.name.replace(/'/g,"\\'")}',${f.price},'${f.image||''}')" title="Ajouter au panier">
+              <i class="fas fa-shopping-bag"></i>
+            </button>
+            <button class="v-fav-btn remove-btn" onclick="removeFavItem('${f.id}')" title="Retirer des favoris">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>`).join('');
+    }
+
+    function addFavToCart(id, name, price, image) {
+      VisitorSystem.addToCart({ id, name, price, image });
+    }
+
+    function removeFavItem(id) {
+      VisitorSystem.removeFav(id);
+      renderFavs();
+    }
+
+    renderFavs();
+  </script>
+</body>
+</html>

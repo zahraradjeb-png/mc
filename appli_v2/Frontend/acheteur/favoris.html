@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Favoris — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    .v-fav-item {
+      display: flex; gap: 20px; padding: 20px;
+      background: var(--ink2); border: 1px solid var(--biscuit);
+      border-radius: 12px; margin-bottom: 16px; transition: all 0.3s;
+      align-items: center;
+    }
+    .v-fav-item:hover { border-color: rgba(229,166,87,0.2); }
+    .v-fav-img {
+      width: 80px; height: 80px; border-radius: 10px;
+      background: var(--biscuit); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; overflow: hidden;
+    }
+    .v-fav-img img { width: 100%; height: 100%; object-fit: cover; }
+    .v-fav-details { flex: 1; }
+    .v-fav-name { font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .v-fav-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+    .v-fav-price { font-size: 1rem; font-weight: 700; color: var(--honey); }
+    .v-fav-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .v-fav-btn {
+      width: 38px; height: 38px; border-radius: 8px;
+      border: 1px solid var(--biscuit); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s; font-size: 0.9rem;
+    }
+    .v-fav-btn.cart-btn { color: var(--honey); }
+    .v-fav-btn.cart-btn:hover { background: var(--honey); color: #111; border-color: var(--honey); }
+    .v-fav-btn.remove-btn { color: var(--muted); }
+    .v-fav-btn.remove-btn:hover { color: var(--paprika); border-color: var(--paprika); background: rgba(181,51,36,0.1); }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="v-page-header">
+    <div class="wrap">
+      <h1 class="v-page-title">Mes <em>Favoris</em></h1>
+      <p class="v-page-subtitle">Retrouvez tous les produits que vous avez aimés.</p>
+    </div>
+  </div>
+  <main style="padding: 40px 0 80px;">
+    <div class="wrap" id="favsContainer"></div>
+  </main>
+  <div id="footer-container"></div>
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('favoris');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    async function renderFavs() {
+      const container = document.getElementById('favsContainer');
+      container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--muted);"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+
+      try {
+        const userId = u.id_user || u.id;
+        const res = await fetch(`${window.API_BASE}/acheteurs/${userId}/favoris`);
+        const favs = await res.json();
+
+        // Sync local storage IDs
+        const favIds = favs.map(f => String(f.id_produit || f.id));
+        localStorage.setItem('gold_favs', JSON.stringify(favIds));
+        if (typeof acheteurSystem !== 'undefined' && acheteurSystem.updateFavBadge) {
+          acheteurSystem.updateFavBadge();
+        }
+
+        if (favs.length === 0) {
+          container.innerHTML = `<div class="v-empty"><i class="fas fa-heart"></i><h3>Aucun favori</h3><p>Explorez le catalogue et ajoutez des produits à vos favoris.</p><a href="catalogue.html" class="v-btn v-btn-primary v-btn-sm">Explorer</a></div>`;
+          return;
+        }
+
+        container.innerHTML = `<p style="color:var(--muted);margin-bottom:20px;font-size:0.9rem;">${favs.length} produit${favs.length>1?'s':''} dans vos favoris</p>` +
+          favs.map(f => {
+            const id = f.id_produit || f.id;
+            const name = f.titre || f.name;
+            const price = f.prix || f.price || 0;
+            const image = f.photo || f.image || '';
+            const meta = f.artiste || f.meta || 'Article vintage';
+
+            return `
+            <div class="v-fav-item" data-id="${id}">
+              <div class="v-fav-img">
+                ${image ? `<img src="${image.startsWith('http') ? image : '../' + image}" alt="${name}" onerror="this.style.display='none';this.parentElement.textContent='♥'">` : '♥'}
+              </div>
+              <div class="v-fav-details">
+                <a href="product-details.html?id=${id}" class="v-fav-name" style="display:block;color:var(--ink);text-decoration:none;">${name}</a>
+                <div class="v-fav-meta">${meta}</div>
+                <div class="v-fav-price">${parseFloat(price).toLocaleString('fr-FR',{minimumFractionDigits:2})} €</div>
+              </div>
+              <div class="v-fav-actions">
+                <button class="v-fav-btn cart-btn" onclick="addFavToCart('${id}','${name.replace(/'/g,"\\'")}',${price},'${image}')" title="Ajouter au panier">
+                  <i class="fas fa-shopping-bag"></i>
+                </button>
+                <button class="v-fav-btn remove-btn" onclick="removeFavItem('${id}')" title="Retirer des favoris">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>`;
+          }).join('');
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--paprika);">Erreur lors du chargement des favoris.</div>';
+      }
+    }
+
+    function addFavToCart(id, name, price, image) {
+      acheteurSystem.addToCart({ id, name, price, image });
+    }
+
+    async function removeFavItem(id) {
+      await acheteurSystem.toggleFav({ id });
+      renderFavs();
+    }
+
+    renderFavs();
+  </script>
+</body>
+</html>

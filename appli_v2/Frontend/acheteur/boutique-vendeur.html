@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boutique Vendeur — RetroMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/acheteur.css">
+  <style>
+    .bv-header {
+      padding: 160px 0 80px;
+      background: linear-gradient(to bottom, rgba(28,23,25,0.7), rgba(28,23,25,1)),
+                  url('../assets/images/hero/second.jpg') center/cover no-repeat;
+      border-bottom: 1px solid var(--biscuit); text-align: center;
+      position: relative;
+    }
+    .bv-avatar {
+      width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--honey), #c07d30);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem; font-weight: 700; color: #111;
+      border: 4px solid var(--crumpet); box-shadow: 0 0 0 2px var(--honey);
+      overflow: hidden; transition: transform 0.4s var(--ease-spring);
+    }
+    .bv-avatar:hover { transform: scale(1.05); }
+    .bv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .bv-shop-name { font-size: 3rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; font-family: 'Cormorant Garamond', serif; }
+    .bv-seller-name { font-size: 1.1rem; color: var(--muted); margin-bottom: 24px; letter-spacing: 0.05em; }
+    .bv-stats { display: flex; gap: 40px; justify-content: center; margin-top: 20px; }
+    .bv-stat-item {
+      background: rgba(39,33,36,0.6); backdrop-filter: blur(8px);
+      padding: 16px 28px; border-radius: 16px; border: 1px solid rgba(245,226,206,0.05);
+      min-width: 120px;
+    }
+    .bv-stat-val { font-size: 1.8rem; font-weight: 700; color: var(--honey); margin-bottom: 4px; }
+    .bv-stat-val i { font-size: 1.4rem; }
+    .bv-stat-lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 500; }
+    .bv-desc { max-width: 600px; margin: 32px auto 0; font-size: 1.05rem; color: var(--muted); line-height: 1.8; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div class="bv-header" id="shopHeader">
+    <div class="wrap">
+      <div style="text-align:center;padding:40px;color:var(--muted);">
+        <i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--honey);"></i>
+        <p style="margin-top:16px;">Chargement de la boutique...</p>
+      </div>
+    </div>
+  </div>
+  <main style="padding: 60px 0 100px;">
+    <div class="wrap">
+      <div style="margin-bottom:32px; display:flex; align-items:center; gap:16px;">
+        <h2 style="font-size:2rem; color:var(--ink); font-family:'Cormorant Garamond', serif;">
+          Collection de la <em style="color:var(--honey);font-style:italic;">Boutique</em>
+        </h2>
+        <div style="flex:1; height:1px; background:linear-gradient(to right, var(--biscuit), transparent);"></div>
+      </div>
+      <div class="v-products-grid" id="shopProducts">
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">Chargement des produits...</div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-container"></div>
+
+  <script src="js/acheteur.js"></script>
+  <script>
+    // Protection: Redirect if not logged in as buyer
+    const u = JSON.parse(localStorage.getItem('gold_user') || 'null');
+    if (!u || (u.role !== 'ACHETEUR' && u.role !== 'BOTH')) {
+      window.location.href = '../authentification/sign-in.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderacheteurNavbar('');
+    document.getElementById('footer-container').innerHTML = renderacheteurFooter();
+
+    const sellerId = new URLSearchParams(window.location.search).get('id');
+
+    async function loadShop() {
+      if (!sellerId) {
+        document.getElementById('shopHeader').querySelector('.wrap').innerHTML = '<div class="v-empty"><h3>Boutique non trouvée</h3><p>Le vendeur que vous cherchez n\'existe pas.</p></div>';
+        return;
+      }
+      try {
+        const res = await fetch(`${window.API_BASE}/vendeurs/${sellerId}/boutique`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const s = data.seller;
+        const baseUrl = window.API_BASE.replace('/api', '');
+        const initials = (s.prenom || 'V')[0] + (s.nom || '')[0];
+
+        document.title = `${s.nom_boutique || s.prenom} — RetroMarket`;
+        document.getElementById('shopHeader').querySelector('.wrap').innerHTML = `
+          <div class="bv-avatar">
+            ${s.photo_profil ? `<img src="${baseUrl}/${s.photo_profil}" alt="${s.nom_boutique}">` : initials}
+          </div>
+          <h1 class="bv-shop-name">${s.nom_boutique || s.prenom + ' ' + s.nom}</h1>
+          <p class="bv-seller-name">${s.prenom} ${s.nom}</p>
+          <div class="bv-stats">
+            <div class="bv-stat-item"><div class="bv-stat-val">${data.products.length}</div><div class="bv-stat-lbl">Produits</div></div>
+            <div class="bv-stat-item"><div class="bv-stat-val">${data.review_count}</div><div class="bv-stat-lbl">Avis</div></div>
+            ${s.localisation ? `<div class="bv-stat-item"><div class="bv-stat-val"><i class="fas fa-map-marker-alt"></i></div><div class="bv-stat-lbl">${s.localisation}</div></div>` : ''}
+          </div>
+          ${s.description ? `<p class="bv-desc">"${s.description}"</p>` : ''}`;
+
+        const grid = document.getElementById('shopProducts');
+        if (data.products.length > 0) {
+          grid.innerHTML = data.products.map(p => buildacheteurProductCard(p)).join('');
+        } else {
+          grid.innerHTML = '<div style="grid-column:1/-1;" class="v-empty"><i class="fas fa-store" style="font-size:3rem;color:var(--biscuit);"></i><h3 style="margin-top:16px;color:var(--ink);">Boutique vide</h3><p style="color:var(--muted);">Ce vendeur n\'a pas encore de produits en vente pour le moment.</p></div>';
+        }
+      } catch (e) {
+        document.getElementById('shopProducts').innerHTML = '<div class="v-empty"><h3>Erreur de chargement</h3><p>Impossible de charger la boutique.</p></div>';
+      }
+    }
+    loadShop();
+  </script>
+</body>
+</html>

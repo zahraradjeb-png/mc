@@ -5,10 +5,12 @@ const SellerSidebar = {
     if (!container) return;
 
     const mainNav = [
-      { id: 'dashboard', label: 'Tableau de bord', icon: 'fas fa-th-large',      url: 'dashboard.html' },
-      { id: 'products',  label: 'Mes Produits',    icon: 'fas fa-boxes',           url: 'products.html' },
-      { id: 'orders',    label: 'Commandes',        icon: 'fas fa-shopping-bag',    url: 'orders.html' },
-      { id: 'finance',   label: 'Finances',         icon: 'fas fa-wallet',          url: 'finance.html' },
+      { id: 'dashboard',      label: 'Tableau de bord', icon: 'fas fa-th-large',      url: 'dashboard.html' },
+      { id: 'products',       label: 'Mes Produits',    icon: 'fas fa-boxes',           url: 'products.html' },
+      { id: 'orders',         label: 'Commandes',        icon: 'fas fa-shopping-bag',    url: 'orders.html' },
+      { id: 'finance',        label: 'Finances',         icon: 'fas fa-wallet',          url: 'finance.html' },
+      { id: 'ia-predictions', label: 'IA Prédictions',   icon: 'fas fa-brain',           url: 'ia-predictions.html' },
+      { id: 'notifications',  label: 'Notifications',    icon: 'fas fa-bell',            url: 'notifications.html', hasBadge: true },
     ];
     const shopNav = [
       { id: 'profile',   label: 'Aperçu Boutique',  icon: 'fas fa-store',           url: 'profile.html' },
@@ -17,9 +19,10 @@ const SellerSidebar = {
     ];
 
     const navItem = (item) => `
-      <a href="${item.url}" class="nav-item ${activePage === item.id ? 'active' : ''}" id="nav-${item.id}">
+      <a href="${item.url}" class="nav-item ${activePage === item.id ? 'active' : ''}" id="nav-${item.id}" style="position:relative;">
         <i class="${item.icon}"></i>
         <span>${item.label}</span>
+        ${item.hasBadge ? '<span id="notif-badge" class="notif-badge" style="display:none;"></span>' : ''}
       </a>`;
 
     container.innerHTML = `
@@ -44,7 +47,7 @@ const SellerSidebar = {
         </nav>
 
         <div class="sidebar-footer">
-          <a href="../index.html" class="nav-item back-site" style="margin-bottom: 5px;">
+          <a href="../visitor/index.html" class="nav-item back-site" style="margin-bottom: 5px;">
             <i class="fas fa-arrow-left"></i>
             <span>Retour au site</span>
           </a>

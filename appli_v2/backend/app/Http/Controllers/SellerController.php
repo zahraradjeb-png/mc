@@ -150,10 +150,27 @@ class SellerController extends Controller
             return response()->json(['message' => 'Produit non trouvé pour ce vendeur.'], 403);
         }
 
-        DB::table('commande_produit')
-            ->where('id_commande', $orderId)
-            ->where('id_produit', $productId)
-            ->update(['statut' => $request->statut]);
+        DB::transaction(function () use ($orderId, $productId, $request) {
+            // 1. Mettre à jour l'article
+            DB::table('commande_produit')
+                ->where('id_commande', $orderId)
+                ->where('id_produit', $productId)
+                ->update(['statut' => $request->statut]);
+
+            // 2. Vérifier si TOUTE la commande est maintenant livrée
+            // On compte les articles qui ne sont pas encore LIVRE ou ANNULE
+            $remaining = DB::table('commande_produit')
+                ->where('id_commande', $orderId)
+                ->whereNotIn('statut', ['LIVRE', 'ANNULE'])
+                ->count();
+
+            if ($remaining === 0) {
+                // Tout est livré (ou annulé), on passe la commande globale à LIVREE
+                DB::table('commande')
+                    ->where('id_commande', $orderId)
+                    ->update(['statut' => 'LIVREE']);
+            }
+        });
 
         return response()->json(['message' => 'Statut de l\'article mis à jour !']);
     }
@@ -380,6 +397,45 @@ class SellerController extends Controller
         }
 
         return response()->json($result);
+    }
+
+    /**
+     * Get seller notifications.
+     */
+    public function getNotifications($id)
+    {
+        $notifications = DB::table('notifications')
+            ->where('id_user', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($notifications);
+    }
+
+    /**
+     * Mark a single notification as read.
+     */
+    public function markNotificationAsRead($id, $notifId)
+    {
+        DB::table('notifications')
+            ->where('id_user', $id)
+            ->where('id', $notifId)
+            ->update(['est_lue' => true]);
+
+        return response()->json(['message' => 'Notification marquée comme lue']);
+    }
+
+    /**
+     * Mark all notifications as read.
+     */
+    public function markAllNotificationsAsRead($id)
+    {
+        DB::table('notifications')
+            ->where('id_user', $id)
+            ->where('est_lue', false)
+            ->update(['est_lue' => true]);
+
+        return response()->json(['message' => 'Toutes les notifications marquées comme lues']);
     }
 
     /**
